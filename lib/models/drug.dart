@@ -1,10 +1,17 @@
 import 'package:flutter/foundation.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:my_drugs/models/model.dart';
 
+part 'drug.g.dart';
+
 /// The main model. Represents a med.
+@JsonSerializable()
 class Drug extends Model {
+  @JsonKey(required: true, disallowNullValue: true)
   final String name;
+  @JsonKey(required: true, disallowNullValue: true)
   final DateTime expiresOn;
+  @JsonKey(required: true, disallowNullValue: true)
   final DateTime createdAt;
 
   Drug({
@@ -18,12 +25,7 @@ class Drug extends Model {
         assert(createdAt != null),
         super(id);
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'expiresOn': expiresOn,
-      'createdAt': createdAt,
-    };
-  }
+  factory Drug.fromJson(Map json) => _$DrugFromJson(json);
+
+  Map<String, dynamic> toJson() => _$DrugToJson(this);
 }
