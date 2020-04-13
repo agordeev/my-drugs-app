@@ -1,3 +1,5 @@
 abstract class Model {
-  String id;
+  final String id;
+
+  Model(this.id);
 }
