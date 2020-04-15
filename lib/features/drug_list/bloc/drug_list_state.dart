@@ -4,7 +4,20 @@ abstract class DrugListState extends Equatable {
   const DrugListState();
 }
 
-class DrugListInitial extends DrugListState {
+class DrugListEmpty extends DrugListState {
   @override
   List<Object> get props => [];
+}
+
+class DrugListLoaded extends DrugListState {
+  final List<DrugListItem> items;
+
+  DrugListLoaded(
+    this.items,
+  );
+
+  @override
+  List<Object> get props => [
+        this.items,
+      ];
 }
