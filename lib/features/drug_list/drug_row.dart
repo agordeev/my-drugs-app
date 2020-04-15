@@ -10,21 +10,56 @@ class DrugRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Container(
-        height: 68,
+        constraints: BoxConstraints(minHeight: 68),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
           color: Colors.white,
           boxShadow: [
             BoxShadow(
               blurRadius: 4,
-              color: Colors.grey,
+              color: Color(0xFFD7D7D7),
             ),
           ],
         ),
-        child: Center(
-          child: Text(item.name),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  item.name,
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'EXPIRES ON',
+                    style: TextStyle(
+                      color: Color(0xFFBABABA),
+                      fontSize: 10,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    item.expiresOn,
+                    style: TextStyle(
+                      color: Color(0xFF8C8C8C),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

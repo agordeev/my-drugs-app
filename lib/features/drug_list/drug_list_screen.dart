@@ -57,6 +57,10 @@ class DrugListScreen extends StatelessWidget {
     DrugListLoaded state,
   ) {
     return ListView.builder(
+      padding: EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 12,
+      ),
       itemCount: state.items.length,
       itemBuilder: (context, index) {
         final item = state.items[index];
@@ -78,8 +82,14 @@ class DrugListScreen extends StatelessWidget {
 
   Widget _buildHeading(BuildContext context, String text) {
     return Padding(
-      padding: EdgeInsets.all(16),
-      child: Text(text),
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: Color(0xFFBABABA),
+          fontWeight: FontWeight.w500,
+        ),
+      ),
     );
   }
 }

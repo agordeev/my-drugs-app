@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
 import 'package:my_drugs/data_access/data_access.dart';
 import 'package:my_drugs/features/drug_list/drug_list_item.dart';
 import 'package:my_drugs/models/drug.dart';
@@ -12,6 +13,8 @@ part 'drug_list_state.dart';
 class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   final AbstractDrugRepository _repository;
   List<Drug> _drugs;
+
+  final DateFormat _dateFormat = DateFormat('MMM yyyy');
 
   DrugListBloc(
     this._repository,
@@ -49,7 +52,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
           (e) => DrugItem(
             e.id,
             e.name,
-            'Sep 2010',
+            _dateFormat.format(e.expiresOn),
           ),
         ),
       );
@@ -63,7 +66,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
           (e) => DrugItem(
             e.id,
             e.name,
-            'Dec 2020',
+            _dateFormat.format(e.expiresOn),
           ),
         ),
       );

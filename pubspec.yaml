@@ -19,6 +19,7 @@ dependencies:
   provider:
   flutter_bloc:
   equatable:
+  intl:
 
   cupertino_icons: ^0.1.3
 

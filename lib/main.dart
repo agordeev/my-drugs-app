@@ -69,19 +69,29 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        colorScheme: ThemeData.light().colorScheme.copyWith(
-              surface: Colors.grey[100],
-            ),
-      ),
+      theme: _buildTheme(context),
       home: BlocProvider<DrugListBloc>(
         create: (context) => DrugListBloc(
           repository,
           drugs,
         ),
         child: DrugListScreen(),
+      ),
+    );
+  }
+
+  ThemeData _buildTheme(BuildContext context) {
+    final baseTheme = ThemeData.light();
+    return ThemeData(
+      primarySwatch: Colors.teal,
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+      colorScheme: baseTheme.colorScheme.copyWith(
+        surface: Color(0xFFFBFBFB),
+      ),
+      appBarTheme: AppBarTheme(
+        brightness: Brightness.light,
+        color: Colors.white,
+        textTheme: Theme.of(context).textTheme,
       ),
     );
   }
