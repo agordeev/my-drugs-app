@@ -98,7 +98,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         _screenMode = ScreenMode.edit;
       }
       _screenModeStreamController.add(_screenMode);
-      // yield _buildState();
+      yield _buildState();
     }
   }
 }

@@ -42,7 +42,6 @@ class DrugHeading extends StatelessWidget {
           CurvedAnimation(
             parent: animationController,
             curve: Curves.ease,
-            // reverseCurve:
           ),
         ),
         super(key: key);

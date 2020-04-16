@@ -15,12 +15,13 @@ class DrugListScreen extends StatefulWidget {
 class _DrugListScreenState extends State<DrugListScreen>
     with SingleTickerProviderStateMixin {
   AnimationController _animationController;
+  final _animationDuration = Duration(milliseconds: 500);
 
   @override
   void initState() {
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 500),
+      duration: _animationDuration,
     );
 
     BlocProvider.of<DrugListBloc>(context).screenMode.listen((screenMode) {
@@ -51,18 +52,17 @@ class _DrugListScreenState extends State<DrugListScreen>
           context,
           state,
         );
-        final onPressed = () =>
-            BlocProvider.of<DrugListBloc>(context).add(SwitchScreenMode());
         actions = [
-          state.screenMode == ScreenMode.edit
-              ? FlatButton(
-                  child: Text('Cancel'),
-                  onPressed: onPressed,
-                )
-              : IconButton(
-                  icon: Icon(Icons.more_horiz),
-                  onPressed: onPressed,
-                ),
+          FlatButton(
+            child: AnimatedSwitcher(
+              duration: _animationDuration,
+              child: state.screenMode == ScreenMode.edit
+                  ? Text('Cancel')
+                  : Icon(Icons.more_horiz),
+            ),
+            onPressed: () =>
+                BlocProvider.of<DrugListBloc>(context).add(SwitchScreenMode()),
+          ),
         ];
       } else {
         body = Container();
