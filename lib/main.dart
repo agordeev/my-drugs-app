@@ -35,7 +35,8 @@ void main() async {
       ),
       Drug(
         id: '4',
-        name: 'Yet another medication',
+        name:
+            'Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
         expiresOn: DateTime(2020, 11),
         createdAt: DateTime.now(),
       ),
@@ -92,6 +93,9 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.light,
         color: Colors.white,
         textTheme: Theme.of(context).textTheme,
+        iconTheme: IconThemeData(
+          color: Colors.teal,
+        ),
       ),
     );
   }

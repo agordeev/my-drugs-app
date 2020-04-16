@@ -10,11 +10,17 @@ import 'package:my_drugs/models/drug.dart';
 part 'drug_list_event.dart';
 part 'drug_list_state.dart';
 
+enum ScreenMode { normal, edit }
+
 class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   final AbstractDrugRepository _repository;
   List<Drug> _drugs;
 
   final DateFormat _dateFormat = DateFormat('MMM yyyy');
+  ScreenMode _screenMode = ScreenMode.normal;
+  StreamController<ScreenMode> _screenModeStreamController =
+      StreamController<ScreenMode>.broadcast();
+  Stream<ScreenMode> get screenMode => _screenModeStreamController.stream;
 
   DrugListBloc(
     this._repository,
@@ -22,11 +28,18 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   );
 
   @override
+  Future<void> close() {
+    _screenModeStreamController.close();
+    return super.close();
+  }
+
+  @override
   DrugListState get initialState => _buildState();
 
   DrugListState _buildState() => _drugs.isEmpty
       ? DrugListEmpty()
       : DrugListLoaded(
+          _screenMode,
           _listItems,
         );
 
@@ -78,6 +91,14 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> mapEventToState(
     DrugListEvent event,
   ) async* {
-    // TODO: implement mapEventToState
+    if (event is SwitchScreenMode) {
+      if (_screenMode == ScreenMode.edit) {
+        _screenMode = ScreenMode.normal;
+      } else {
+        _screenMode = ScreenMode.edit;
+      }
+      _screenModeStreamController.add(_screenMode);
+      // yield _buildState();
+    }
   }
 }
