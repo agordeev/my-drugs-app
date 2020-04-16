@@ -4,6 +4,7 @@ class DrugListBottomBar extends StatelessWidget {
   final AnimationController animationController;
   final String numberOfItemsTotal;
   final String numberOfItemsSelected;
+  final bool isDeleteButtonActive;
   final Animation<Offset> numberOfItemsTotalOffset;
   final Animation<double> numberOfItemsTotalOpacity;
   final Animation<Offset> numberOfItemsSelectedOffset;
@@ -11,12 +12,13 @@ class DrugListBottomBar extends StatelessWidget {
 
   final double height = 44;
 
-  DrugListBottomBar(
-      {Key key,
-      @required this.animationController,
-      @required this.numberOfItemsTotal,
-      @required this.numberOfItemsSelected})
-      : numberOfItemsTotalOffset = Tween<Offset>(
+  DrugListBottomBar({
+    Key key,
+    @required this.animationController,
+    @required this.numberOfItemsTotal,
+    @required this.numberOfItemsSelected,
+    @required this.isDeleteButtonActive,
+  })  : numberOfItemsTotalOffset = Tween<Offset>(
           begin: Offset.zero,
           end: Offset(0.0, 0.3),
         ).animate(
@@ -69,7 +71,9 @@ class DrugListBottomBar extends StatelessWidget {
           height: 34,
           child: ClipRect(
             child: AnimatedBuilder(
-                animation: animationController, builder: _buildContent),
+              animation: animationController,
+              builder: _buildContent,
+            ),
           ),
         ),
       ),
@@ -87,11 +91,13 @@ class DrugListBottomBar extends StatelessWidget {
           numberOfItemsSelected,
           Icon(
             Icons.delete,
-            color: Theme.of(context).colorScheme.error,
           ),
-          () {
-            print('Delete');
-          },
+          Theme.of(context).colorScheme.error,
+          isDeleteButtonActive
+              ? () {
+                  print('Delete');
+                }
+              : null,
         ),
         _buildRow(
           context,
@@ -100,6 +106,7 @@ class DrugListBottomBar extends StatelessWidget {
           numberOfItemsTotalOffset,
           numberOfItemsTotal,
           Icon(Icons.add),
+          null,
           () {
             print('Add');
           },
@@ -109,13 +116,15 @@ class DrugListBottomBar extends StatelessWidget {
   }
 
   Widget _buildRow(
-      BuildContext context,
-      bool ignoreTaps,
-      Animation<double> opacity,
-      Animation<Offset> position,
-      String text,
-      Icon icon,
-      VoidCallback onPressed) {
+    BuildContext context,
+    bool ignoreTaps,
+    Animation<double> opacity,
+    Animation<Offset> position,
+    String text,
+    Icon icon,
+    Color color,
+    VoidCallback onPressed,
+  ) {
     return IgnorePointer(
       // Add and Delete buttons overlaps because we're offsetting them by 0.3, not 1.0 (see [numberOfItemsTotalOffset])
       // That causes the top button of the stack (Add button) to intercept touches even if it's not visible.
@@ -144,9 +153,10 @@ class DrugListBottomBar extends StatelessWidget {
                       padding: const EdgeInsets.all(0.0),
                       width: height,
                       height: height,
-                      child: FlatButton(
+                      child: IconButton(
                         padding: const EdgeInsets.all(0.0),
-                        child: icon,
+                        color: color,
+                        icon: icon,
                         onPressed: onPressed,
                       ),
                     ),

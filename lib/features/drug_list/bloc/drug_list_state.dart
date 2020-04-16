@@ -14,12 +14,14 @@ class DrugListLoaded extends DrugListState {
   final List<DrugListItem> items;
   final String numberOfItemsTotal;
   final String numberOfItemsSelected;
+  final bool isDeleteButtonActive;
 
   DrugListLoaded(
     this.screenMode,
     this.items,
     this.numberOfItemsTotal,
     this.numberOfItemsSelected,
+    this.isDeleteButtonActive,
   );
 
   @override
@@ -28,5 +30,6 @@ class DrugListLoaded extends DrugListState {
         this.items,
         this.numberOfItemsTotal,
         this.numberOfItemsSelected,
+        this.isDeleteButtonActive,
       ];
 }

@@ -43,6 +43,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
           _buildListItems(),
           '${_drugs.length} items',
           '0 selected',
+          false,
         );
 
   List<DrugListItem> _buildListItems() {

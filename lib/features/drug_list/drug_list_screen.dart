@@ -49,6 +49,7 @@ class _DrugListScreenState extends State<DrugListScreen>
         Widget body;
         String numberOfItemsTotal = '';
         String numberOfItemsSelected = '';
+        bool isDeleteButtonActive = false;
         if (state is DrugListEmpty) {
           body = _buildEmptyStateContent(context);
           numberOfItemsTotal = 'No items';
@@ -71,6 +72,7 @@ class _DrugListScreenState extends State<DrugListScreen>
           ];
           numberOfItemsTotal = state.numberOfItemsTotal;
           numberOfItemsSelected = state.numberOfItemsSelected;
+          isDeleteButtonActive = state.isDeleteButtonActive;
         } else {
           body = Container();
         }
@@ -84,6 +86,7 @@ class _DrugListScreenState extends State<DrugListScreen>
             animationController: _animationController,
             numberOfItemsTotal: numberOfItemsTotal,
             numberOfItemsSelected: numberOfItemsSelected,
+            isDeleteButtonActive: isDeleteButtonActive,
           ),
         );
       },
