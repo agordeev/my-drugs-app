@@ -47,8 +47,11 @@ class _DrugListScreenState extends State<DrugListScreen>
       builder: (context, state) {
         List<Widget> actions;
         Widget body;
+        String numberOfItemsTotal = '';
+        String numberOfItemsSelected = '';
         if (state is DrugListEmpty) {
           body = _buildEmptyStateContent(context);
+          numberOfItemsTotal = 'No items';
         } else if (state is DrugListLoaded) {
           body = _buildLoadedStateContent(
             context,
@@ -66,6 +69,8 @@ class _DrugListScreenState extends State<DrugListScreen>
                   .add(SwitchScreenMode()),
             ),
           ];
+          numberOfItemsTotal = state.numberOfItemsTotal;
+          numberOfItemsSelected = state.numberOfItemsSelected;
         } else {
           body = Container();
         }
@@ -77,8 +82,8 @@ class _DrugListScreenState extends State<DrugListScreen>
           body: body,
           bottomNavigationBar: DrugListBottomBar(
             animationController: _animationController,
-            numberOfItemsTotal: '5 items',
-            numberOfItemsSelected: '0 selected',
+            numberOfItemsTotal: numberOfItemsTotal,
+            numberOfItemsSelected: numberOfItemsSelected,
           ),
         );
       },

@@ -9,6 +9,8 @@ class DrugListBottomBar extends StatelessWidget {
   final Animation<Offset> numberOfItemsSelectedOffset;
   final Animation<double> numberOfItemsSelectedOpacity;
 
+  final double height = 44;
+
   DrugListBottomBar(
       {Key key,
       @required this.animationController,
@@ -79,14 +81,7 @@ class DrugListBottomBar extends StatelessWidget {
       children: <Widget>[
         _buildRow(
           context,
-          numberOfItemsTotalOpacity,
-          numberOfItemsTotalOffset,
-          numberOfItemsTotal,
-          Icon(Icons.add),
-          () {},
-        ),
-        _buildRow(
-          context,
+          animationController.status == AnimationStatus.dismissed,
           numberOfItemsSelectedOpacity,
           numberOfItemsSelectedOffset,
           numberOfItemsSelected,
@@ -94,7 +89,20 @@ class DrugListBottomBar extends StatelessWidget {
             Icons.delete,
             color: Theme.of(context).colorScheme.error,
           ),
-          () {},
+          () {
+            print('Delete');
+          },
+        ),
+        _buildRow(
+          context,
+          animationController.status == AnimationStatus.completed,
+          numberOfItemsTotalOpacity,
+          numberOfItemsTotalOffset,
+          numberOfItemsTotal,
+          Icon(Icons.add),
+          () {
+            print('Add');
+          },
         ),
       ],
     );
@@ -102,39 +110,50 @@ class DrugListBottomBar extends StatelessWidget {
 
   Widget _buildRow(
       BuildContext context,
+      bool ignoreTaps,
       Animation<double> opacity,
       Animation<Offset> position,
       String text,
       Icon icon,
       VoidCallback onPressed) {
-    return Center(
-      child: Opacity(
-        opacity: opacity.value,
-        child: SlideTransition(
-          position: position,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Spacer(),
-              Text(
-                text,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
+    return IgnorePointer(
+      // Add and Delete buttons overlaps because we're offsetting them by 0.3, not 1.0 (see [numberOfItemsTotalOffset])
+      // That causes the top button of the stack (Add button) to intercept touches even if it's not visible.
+      // That's why we manually set whether a button should handle taps or not.
+      ignoring: ignoreTaps,
+      child: Center(
+        child: Opacity(
+          opacity: opacity.value,
+          child: SlideTransition(
+            position: position,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Spacer(),
+                Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
                 ),
-              ),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Material(
-                    child: IconButton(
-                      icon: icon,
-                      onPressed: onPressed,
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      padding: const EdgeInsets.all(0.0),
+                      width: height,
+                      height: height,
+                      child: FlatButton(
+                        padding: const EdgeInsets.all(0.0),
+                        child: icon,
+                        onPressed: onPressed,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

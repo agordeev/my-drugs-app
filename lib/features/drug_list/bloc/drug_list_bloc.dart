@@ -40,10 +40,12 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       ? DrugListEmpty()
       : DrugListLoaded(
           _screenMode,
-          _listItems,
+          _buildListItems(),
+          '${_drugs.length} items',
+          '0 selected',
         );
 
-  List<DrugListItem> get _listItems {
+  List<DrugListItem> _buildListItems() {
     List<DrugListItem> result = [];
     List<Drug> expired = [];
     List<Drug> notExpired = [];

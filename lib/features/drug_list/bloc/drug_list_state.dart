@@ -12,15 +12,21 @@ class DrugListEmpty extends DrugListState {
 class DrugListLoaded extends DrugListState {
   final ScreenMode screenMode;
   final List<DrugListItem> items;
+  final String numberOfItemsTotal;
+  final String numberOfItemsSelected;
 
   DrugListLoaded(
     this.screenMode,
     this.items,
+    this.numberOfItemsTotal,
+    this.numberOfItemsSelected,
   );
 
   @override
   List<Object> get props => [
         this.screenMode,
         this.items,
+        this.numberOfItemsTotal,
+        this.numberOfItemsSelected,
       ];
 }
