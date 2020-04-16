@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_drugs/features/drug_list/drug_heading.dart';
 import 'package:my_drugs/features/drug_list/drug_list_item.dart';
-import 'package:my_drugs/features/drug_list/drug_row.dart';
+import 'package:my_drugs/features/drug_list/widgets/drug_heading.dart';
+import 'package:my_drugs/features/drug_list/widgets/drug_list_bottom_bar.dart';
+import 'package:my_drugs/features/drug_list/widgets/drug_row.dart';
 
 import 'bloc/drug_list_bloc.dart';
 
@@ -42,56 +43,45 @@ class _DrugListScreenState extends State<DrugListScreen>
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DrugListBloc, DrugListState>(builder: (context, state) {
-      List<Widget> actions;
-      Widget body;
-      if (state is DrugListEmpty) {
-        body = _buildEmptyStateContent(context);
-      } else if (state is DrugListLoaded) {
-        body = _buildLoadedStateContent(
-          context,
-          state,
-        );
-        actions = [
-          FlatButton(
-            child: AnimatedSwitcher(
-              duration: _animationDuration,
-              child: state.screenMode == ScreenMode.edit
-                  ? Text('Cancel')
-                  : Icon(Icons.more_horiz),
+    return BlocBuilder<DrugListBloc, DrugListState>(
+      builder: (context, state) {
+        List<Widget> actions;
+        Widget body;
+        if (state is DrugListEmpty) {
+          body = _buildEmptyStateContent(context);
+        } else if (state is DrugListLoaded) {
+          body = _buildLoadedStateContent(
+            context,
+            state,
+          );
+          actions = [
+            FlatButton(
+              child: AnimatedSwitcher(
+                duration: Duration(milliseconds: 250),
+                child: state.screenMode == ScreenMode.edit
+                    ? Text('Cancel')
+                    : Icon(Icons.more_horiz),
+              ),
+              onPressed: () => BlocProvider.of<DrugListBloc>(context)
+                  .add(SwitchScreenMode()),
             ),
-            onPressed: () =>
-                BlocProvider.of<DrugListBloc>(context).add(SwitchScreenMode()),
+          ];
+        } else {
+          body = Container();
+        }
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('My Drugs'),
+            actions: actions,
           ),
-        ];
-      } else {
-        body = Container();
-      }
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('My Drugs'),
-          actions: actions,
-        ),
-        body: body,
-        bottomNavigationBar: _buildBottomNavigationBar(context),
-      );
-    });
-  }
-
-  Widget _buildBottomNavigationBar(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          border: Border(
-            top: BorderSide(
-              color: Colors.grey[350],
-            ),
-          )),
-      child: SafeArea(
-        child: Container(
-          height: 24,
-        ),
-      ),
+          body: body,
+          bottomNavigationBar: DrugListBottomBar(
+            animationController: _animationController,
+            numberOfItemsTotal: '5 items',
+            numberOfItemsSelected: '0 selected',
+          ),
+        );
+      },
     );
   }
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../../shared/circle_painter.dart';
-import 'drug_list_item.dart';
+import 'package:my_drugs/features/drug_list/drug_list_item.dart';
+import 'package:my_drugs/shared/circle_painter.dart';
 
 class DrugRow extends StatelessWidget {
   final DrugItem item;
@@ -46,7 +45,6 @@ class DrugRow extends StatelessWidget {
           CurvedAnimation(
             parent: animationController,
             curve: Curves.ease,
-            // reverseCurve:
           ),
         ),
         super(key: key);
