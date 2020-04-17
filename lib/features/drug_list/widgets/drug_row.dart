@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:my_drugs/features/drug_list/drug_list_item.dart';
-import 'package:my_drugs/shared/circle_painter.dart';
+import 'package:my_drugs/features/drug_list/widgets/checkmark.dart';
 
-class DrugRow extends StatelessWidget {
+class DrugRow extends StatefulWidget {
+  final bool isInEditMode;
   final DrugItem item;
   final AnimationController animationController;
   final double width;
-  final double _expiresOnWidth = 90;
   final Animation<double> _checkmarkOpacity;
   final Animation<EdgeInsets> _textPadding;
   final Animation<EdgeInsets> _checkmarkPadding;
 
   DrugRow({
     Key key,
+    @required this.isInEditMode,
     @required this.item,
     @required this.animationController,
     @required this.width,
@@ -50,10 +51,28 @@ class DrugRow extends StatelessWidget {
         super(key: key);
 
   @override
+  _DrugRowState createState() => _DrugRowState();
+}
+
+class _DrugRowState extends State<DrugRow> with SingleTickerProviderStateMixin {
+  final double _expiresOnWidth = 90;
+  bool isSelected = false;
+  AnimationController _checkmarkAnimationController;
+
+  @override
+  void initState() {
+    _checkmarkAnimationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final animatedChild = AnimatedBuilder(
       builder: _buildAnimation,
-      animation: animationController,
+      animation: widget.animationController,
       child: _buildExpiresOn(context),
     );
     return _buildScaffold(
@@ -96,7 +115,7 @@ class DrugRow extends StatelessWidget {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  item.expiresOn,
+                  widget.item.expiresOn,
                   style: TextStyle(
                     color: Color(0xFF8C8C8C),
                     fontSize: 14,
@@ -117,45 +136,60 @@ class DrugRow extends StatelessWidget {
   Widget _buildScaffold(BuildContext context, Widget animatedChild) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Container(
-        height: 68,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 4,
-              color: Color(0xFFD7D7D7),
-            ),
-          ],
+      child: InkWell(
+        onTap: widget.isInEditMode
+            ? () {
+                isSelected = !isSelected;
+                if (isSelected) {
+                  _checkmarkAnimationController.forward();
+                } else {
+                  _checkmarkAnimationController.reverse();
+                }
+              }
+            : null,
+        child: Container(
+          height: 68,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 4,
+                color: Color(0xFFD7D7D7),
+              ),
+            ],
+          ),
+          child: animatedChild,
         ),
-        child: animatedChild,
       ),
     );
   }
 
   Widget _buildAnimation(BuildContext context, Widget child) {
-    final textWidth = width - (_expiresOnWidth + 16 + 16 + 8);
+    final textWidth = widget.width - (_expiresOnWidth + 16 + 16 + 8);
     return Stack(
       children: <Widget>[
         Padding(
-          padding: _checkmarkPadding.value,
+          padding: widget._checkmarkPadding.value,
           child: Align(
             alignment: Alignment.centerLeft,
             child: Opacity(
-              opacity: _checkmarkOpacity.value,
-              child: _buildCheckmark(context),
+              opacity: widget._checkmarkOpacity.value,
+              child: Checkmark(
+                animationController: _checkmarkAnimationController,
+              ),
+              // child: _buildCheckmark(context),
             ),
           ),
         ),
         Padding(
-          padding: _textPadding.value,
+          padding: widget._textPadding.value,
           child: Align(
             alignment: Alignment.centerLeft,
             child: Container(
               width: textWidth,
               child: Text(
-                item.name,
+                widget.item.name,
                 maxLines: 2,
                 style: TextStyle(
                   fontSize: 16,
@@ -166,16 +200,6 @@ class DrugRow extends StatelessWidget {
         ),
         child,
       ],
-    );
-  }
-
-  Widget _buildCheckmark(BuildContext context) {
-    return SizedBox(
-      width: 20,
-      height: 20,
-      child: CustomPaint(
-        painter: CirclePainter(),
-      ),
     );
   }
 }

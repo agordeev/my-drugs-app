@@ -119,6 +119,7 @@ class _DrugListScreenState extends State<DrugListScreen>
           );
         } else if (item is DrugItem) {
           return DrugRow(
+            isInEditMode: state.screenMode == ScreenMode.edit,
             item: item,
             animationController: _animationController,
             width: drugRowWidth,
