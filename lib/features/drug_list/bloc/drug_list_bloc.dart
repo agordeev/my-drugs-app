@@ -15,6 +15,7 @@ enum ScreenMode { normal, edit }
 class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   final AbstractDrugRepository _repository;
   List<Drug> _drugs;
+  List<String> _selectedDrugsIds = [];
 
   final DateFormat _dateFormat = DateFormat('MMM yyyy');
   ScreenMode _screenMode = ScreenMode.normal;
@@ -42,8 +43,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
           _screenMode,
           _buildListItems(),
           '${_drugs.length} items',
-          '0 selected',
-          false,
+          '${_selectedDrugsIds.length} selected',
+          _selectedDrugsIds.isNotEmpty,
         );
 
   List<DrugListItem> _buildListItems() {
@@ -100,7 +101,15 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       } else {
         _screenMode = ScreenMode.edit;
       }
+      _selectedDrugsIds = [];
       _screenModeStreamController.add(_screenMode);
+      yield _buildState();
+    } else if (event is SelectDeselectDrug) {
+      if (event.isSelected) {
+        _selectedDrugsIds.add(event.id);
+      } else {
+        _selectedDrugsIds.remove(event.id);
+      }
       yield _buildState();
     }
   }

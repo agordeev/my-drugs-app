@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_drugs/features/drug_list/bloc/drug_list_bloc.dart';
 import 'package:my_drugs/features/drug_list/drug_list_item.dart';
 import 'package:my_drugs/features/drug_list/widgets/checkmark.dart';
 
@@ -145,6 +147,8 @@ class _DrugRowState extends State<DrugRow> with SingleTickerProviderStateMixin {
                 } else {
                   _checkmarkAnimationController.reverse();
                 }
+                BlocProvider.of<DrugListBloc>(context)
+                    .add(SelectDeselectDrug(widget.item.id, isSelected));
               }
             : null,
         child: Container(
