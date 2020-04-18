@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_drugs/features/drug_list/drug_list_item.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_heading.dart';
+import 'package:my_drugs/features/drug_list/widgets/drug_heading_row.dart';
+import 'package:my_drugs/features/drug_list/widgets/drug_item_row.dart';
 import 'package:my_drugs/features/drug_list/widgets/drug_list_bottom_bar.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_row.dart';
 
 import 'bloc/drug_list_bloc.dart';
 
@@ -113,15 +113,16 @@ class _DrugListScreenState extends State<DrugListScreen>
       itemBuilder: (context, index) {
         final item = state.items[index];
         if (item is DrugHeadingItem) {
-          return DrugHeading(
+          return DrugHeadingRow(
             item: item,
-            animationController: _animationController,
+            isInEditMode: state.screenMode == ScreenMode.edit,
+            editModeAnimationController: _animationController,
           );
         } else if (item is DrugItem) {
-          return DrugRow(
-            isInEditMode: state.screenMode == ScreenMode.edit,
+          return DrugItemRow(
             item: item,
-            animationController: _animationController,
+            isInEditMode: state.screenMode == ScreenMode.edit,
+            editModeAnimationController: _animationController,
             width: drugRowWidth,
           );
         } else {
