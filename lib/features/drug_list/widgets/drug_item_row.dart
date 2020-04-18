@@ -51,16 +51,8 @@ class DrugItemRowState extends DrugListRowState<DrugItemRow> {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: InkWell(
         onTap: widget.isInEditMode
-            ? () {
-                isSelected = !isSelected;
-                if (isSelected) {
-                  checkmarkAnimationController.forward();
-                } else {
-                  checkmarkAnimationController.reverse();
-                }
-                BlocProvider.of<DrugListBloc>(context)
-                    .add(SelectDeselectDrug(widget.item.id, isSelected));
-              }
+            ? () => BlocProvider.of<DrugListBloc>(context)
+                .add(SelectDeselectDrug(widget.item))
             : null,
         child: Container(
           height: 68,

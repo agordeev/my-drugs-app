@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:my_drugs/features/drug_list/widgets/drug_heading_row.dart';
 import 'package:my_drugs/features/drug_list/widgets/drug_item_row.dart';
 
-abstract class DrugListItem {}
+abstract class DrugListItem {
+  final bool isExpired;
+
+  DrugListItem(this.isExpired);
+}
 
 class DrugHeadingItem extends DrugListItem {
   final GlobalKey<DrugHeadingRowState> key;
-  final String name;
 
   DrugHeadingItem(
     this.key,
-    this.name,
-  );
+    bool isExpired,
+  ) : super(isExpired);
 }
 
 class DrugItem extends DrugListItem {
@@ -25,5 +28,6 @@ class DrugItem extends DrugListItem {
     this.id,
     this.name,
     this.expiresOn,
-  );
+    bool isExpired,
+  ) : super(isExpired);
 }

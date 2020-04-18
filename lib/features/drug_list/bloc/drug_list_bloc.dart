@@ -15,8 +15,9 @@ enum ScreenMode { normal, edit }
 
 class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   final AbstractDrugRepository _repository;
-  final List<Drug> _drugs;
-  List<String> _selectedDrugsIds = [];
+  final List<Drug> _expiredDrugs;
+  final List<Drug> _notExpiredDrugs;
+  Set<String> _selectedDrugsIds = Set();
 
   /// Items that are currently displaying on DrugListScreen.
   List<DrugListItem> _listItems;
@@ -27,10 +28,18 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       StreamController<ScreenMode>.broadcast();
   Stream<ScreenMode> get screenMode => _screenModeStreamController.stream;
 
+  static final _firstDayOfCurrentMonth =
+      DateTime(DateTime.now().year, DateTime.now().month, 1);
+
   DrugListBloc(
     this._repository,
-    this._drugs,
-  );
+    List<Drug> drugs,
+  )   : _expiredDrugs = drugs
+            .where((e) => e.expiresOn.compareTo(_firstDayOfCurrentMonth) <= 0)
+            .toList(),
+        _notExpiredDrugs = drugs
+            .where((e) => e.expiresOn.compareTo(_firstDayOfCurrentMonth) > 0)
+            .toList();
 
   @override
   Future<void> close() {
@@ -42,40 +51,30 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   DrugListState get initialState => _buildState();
 
   DrugListState _buildState() {
-    if (_drugs.isEmpty) {
+    if (_expiredDrugs.isEmpty && _notExpiredDrugs.isEmpty) {
       return DrugListEmpty();
     } else {
       if (_listItems == null) {
-        _listItems = _buildListItems(_drugs);
+        _listItems = _buildListItems(_expiredDrugs, _notExpiredDrugs);
       }
       return DrugListLoaded(
         _screenMode,
         _listItems,
-        '${_drugs.length} items',
+        '${(_expiredDrugs.length + _notExpiredDrugs.length)} items',
         '${_selectedDrugsIds.length} selected',
         _selectedDrugsIds.isNotEmpty,
       );
     }
   }
 
-  List<DrugListItem> _buildListItems(List<Drug> drugs) {
+  List<DrugListItem> _buildListItems(
+      List<Drug> expired, List<Drug> notExpired) {
     List<DrugListItem> result = [];
-    List<Drug> expired = [];
-    List<Drug> notExpired = [];
-    final now = DateTime.now();
-    final firstDayOfCurrentMonth = DateTime(now.year, now.month, 1);
-    drugs.forEach((e) {
-      if (e.expiresOn.compareTo(firstDayOfCurrentMonth) > 0) {
-        notExpired.add(e);
-      } else {
-        expired.add(e);
-      }
-    });
     if (expired.isNotEmpty) {
       result.add(
         DrugHeadingItem(
           GlobalKey(),
-          'EXPIRED',
+          true,
         ),
       );
       result.addAll(
@@ -85,6 +84,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
             e.id,
             e.name,
             _dateFormat.format(e.expiresOn),
+            true,
           ),
         ),
       );
@@ -93,7 +93,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       result.add(
         DrugHeadingItem(
           GlobalKey(),
-          'NOT EXPIRED',
+          false,
         ),
       );
       result.addAll(
@@ -103,6 +103,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
             e.id,
             e.name,
             _dateFormat.format(e.expiresOn),
+            false,
           ),
         ),
       );
@@ -120,16 +121,69 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       } else {
         _screenMode = ScreenMode.edit;
       }
-      _selectedDrugsIds = [];
+      _selectedDrugsIds = Set();
       _screenModeStreamController.add(_screenMode);
       yield _buildState();
     } else if (event is SelectDeselectDrug) {
-      if (event.isSelected) {
-        _selectedDrugsIds.add(event.id);
-      } else {
-        _selectedDrugsIds.remove(event.id);
-      }
-      yield _buildState();
+      yield* _mapSelectDeselectDrugEventToState(event);
+    } else if (event is SelectDeselectGroup) {
+      yield* _mapSelectDeselectGroupEventToState(event);
     }
+  }
+
+  Stream<DrugListState> _mapSelectDeselectDrugEventToState(
+    SelectDeselectDrug event,
+  ) async* {
+    final list = event.item.isExpired ? _expiredDrugs : _notExpiredDrugs;
+    // If not selected.
+    if (!_selectedDrugsIds.contains(event.item.id)) {
+      // Add to selected.
+      _selectedDrugsIds.add(event.item.id);
+      // Animate checkmark to "ON".
+      event.item.key.currentState.checkmarkAnimationController.forward();
+    } else {
+      _selectedDrugsIds.remove(event.item.id);
+      event.item.key.currentState.checkmarkAnimationController.reverse();
+    }
+    // If all drugs from the current group are selected, then update group checkmark too.
+    // final nonSelectedItem = list.firstWhere((element) => !_selectedDrugsIds.contains(element.id),
+    //     orElse: () => null);
+    //     if (nonSelectedItem == null) {
+
+    //     }
+    yield _buildState();
+  }
+
+  Stream<DrugListState> _mapSelectDeselectGroupEventToState(
+    SelectDeselectGroup event,
+  ) async* {
+    final list = event.item.isExpired ? _expiredDrugs : _notExpiredDrugs;
+    // Should select if at least one drug from the group is not selected
+    final shouldSelect = list.firstWhere(
+            (element) => !_selectedDrugsIds.contains(element.id),
+            orElse: () => null) !=
+        null;
+    if (shouldSelect) {
+      event.item.key.currentState.checkmarkAnimationController.forward();
+    } else {
+      event.item.key.currentState.checkmarkAnimationController.reverse();
+    }
+    list.forEach((e) {
+      if (shouldSelect) {
+        _selectedDrugsIds.add(e.id);
+      } else {
+        _selectedDrugsIds.remove(e.id);
+      }
+      _listItems.forEach((element) {
+        if (element is DrugItem && element.id == e.id) {
+          if (shouldSelect) {
+            element.key.currentState.checkmarkAnimationController.forward();
+          } else {
+            element.key.currentState.checkmarkAnimationController.reverse();
+          }
+        }
+      });
+    });
+    yield _buildState();
   }
 }

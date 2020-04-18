@@ -10,11 +10,27 @@ class SwitchScreenMode extends DrugListEvent {
 }
 
 class SelectDeselectDrug extends DrugListEvent {
-  final String id;
-  final bool isSelected;
+  final DrugItem item;
 
-  SelectDeselectDrug(this.id, this.isSelected);
+  SelectDeselectDrug(
+    this.item,
+  );
 
   @override
-  List<Object> get props => [id, isSelected];
+  List<Object> get props => [
+        item,
+      ];
+}
+
+class SelectDeselectGroup extends DrugListEvent {
+  final DrugHeadingItem item;
+
+  SelectDeselectGroup(
+    this.item,
+  );
+
+  @override
+  List<Object> get props => [
+        item,
+      ];
 }
