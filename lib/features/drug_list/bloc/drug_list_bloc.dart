@@ -167,19 +167,28 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     DrugListEvent event,
   ) async* {
     if (event is SwitchScreenMode) {
-      if (_screenMode == ScreenMode.edit) {
-        _screenMode = ScreenMode.normal;
-      } else {
-        _screenMode = ScreenMode.edit;
-      }
-      _selectedDrugsIds = Set();
-      _screenModeStreamController.add(_screenMode);
-      yield _buildState();
+      yield* _mapSwitchScreenModeEventToState();
     } else if (event is SelectDeselectDrug) {
       yield* _mapSelectDeselectDrugEventToState(event);
     } else if (event is SelectDeselectGroup) {
       yield* _mapSelectDeselectGroupEventToState(event);
     }
+  }
+
+  Stream<DrugListState> _mapSwitchScreenModeEventToState() async* {
+    if (_screenMode == ScreenMode.edit) {
+      _screenMode = ScreenMode.normal;
+    } else {
+      _screenMode = ScreenMode.edit;
+    }
+    _selectedDrugsIds = Set();
+    _groups.forEach((group) {
+      group.key.currentState.checkmarkAnimationController.reverse();
+      group.items.forEach((item) =>
+          item.key.currentState.checkmarkAnimationController.reverse());
+    });
+    _screenModeStreamController.add(_screenMode);
+    yield _buildState();
   }
 
   Stream<DrugListState> _mapSelectDeselectDrugEventToState(

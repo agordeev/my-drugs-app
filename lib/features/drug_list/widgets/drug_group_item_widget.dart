@@ -32,15 +32,31 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
     final widgetWidth =
         MediaQuery.of(context).size.width - widget.horizontalPadding * 2;
     final textWidth = widgetWidth - (_expiresOnWidth + 16 + 16 + 8);
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        width: textWidth,
-        child: Text(
-          widget.item.name,
-          maxLines: 2,
-          style: TextStyle(
-            fontSize: 16,
+    return Container(
+      height: 68,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(4),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 4,
+            color: Color(0xFFD7D7D7),
+          ),
+        ],
+      ),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: SizedBox(
+          width: textWidth,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16.0),
+            child: Text(
+              widget.item.name,
+              maxLines: 2,
+              style: TextStyle(
+                fontSize: 16,
+              ),
+            ),
           ),
         ),
       ),
@@ -51,27 +67,14 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
   Widget buildScaffold(BuildContext context, Widget animatedChild) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: InkWell(
+      child: GestureDetector(
         onTap: widget.isInEditMode
             ? () =>
                 BlocProvider.of<DrugListBloc>(context).add(SelectDeselectDrug(
                   widget.item,
                 ))
             : null,
-        child: Container(
-          height: 68,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4),
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 4,
-                color: Color(0xFFD7D7D7),
-              ),
-            ],
-          ),
-          child: animatedChild,
-        ),
+        child: animatedChild,
       ),
     );
   }
@@ -83,6 +86,7 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
       alignment: Alignment.centerRight,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           SizedBox(
             width: 16,

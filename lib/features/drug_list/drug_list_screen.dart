@@ -98,12 +98,8 @@ class _DrugListScreenState extends State<DrugListScreen>
     BuildContext context,
     DrugListLoaded state,
   ) {
-    final horizontalPadding = 16.0;
     return ListView.builder(
-      padding: EdgeInsets.symmetric(
-        horizontal: horizontalPadding,
-        vertical: 12,
-      ),
+      padding: EdgeInsets.fromLTRB(8, 12, 16, 12),
       itemCount: state.items.length,
       itemBuilder: (context, index) {
         final item = state.items[index];
