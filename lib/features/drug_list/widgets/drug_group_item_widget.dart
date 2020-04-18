@@ -4,15 +4,15 @@ import 'package:my_drugs/features/drug_list/bloc/drug_list_bloc.dart';
 import 'package:my_drugs/features/drug_list/drug_list_item.dart';
 import 'package:my_drugs/features/drug_list/widgets/drug_list_row.dart';
 
-class DrugItemRow extends DrugListRow {
-  final DrugItem item;
-  final double width;
+class DrugGroupItemWidget extends DrugListRow {
+  final DrugGroupItem item;
+  // A padding of parent widget. 16 by default.
+  final double horizontalPadding = 16;
 
-  DrugItemRow({
-    @required bool isInEditMode,
+  DrugGroupItemWidget({
     @required this.item,
+    @required bool isInEditMode,
     @required AnimationController editModeAnimationController,
-    @required this.width,
   }) : super(
           key: item.key,
           isInEditMode: isInEditMode,
@@ -23,13 +23,15 @@ class DrugItemRow extends DrugListRow {
   DrugListRowState createState() => DrugItemRowState();
 }
 
-class DrugItemRowState extends DrugListRowState<DrugItemRow> {
+class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
   final double _expiresOnWidth = 90;
 
   /// Drug name block.
   @override
   Widget buildDynamicContent(BuildContext context) {
-    final textWidth = widget.width - (_expiresOnWidth + 16 + 16 + 8);
+    final widgetWidth =
+        MediaQuery.of(context).size.width - widget.horizontalPadding * 2;
+    final textWidth = widgetWidth - (_expiresOnWidth + 16 + 16 + 8);
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
@@ -51,8 +53,10 @@ class DrugItemRowState extends DrugListRowState<DrugItemRow> {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: InkWell(
         onTap: widget.isInEditMode
-            ? () => BlocProvider.of<DrugListBloc>(context)
-                .add(SelectDeselectDrug(widget.item))
+            ? () =>
+                BlocProvider.of<DrugListBloc>(context).add(SelectDeselectDrug(
+                  widget.item,
+                ))
             : null,
         child: Container(
           height: 68,

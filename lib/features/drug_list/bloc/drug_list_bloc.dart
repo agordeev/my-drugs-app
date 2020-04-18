@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_drugs/data_access/data_access.dart';
 import 'package:my_drugs/features/drug_list/drug_list_item.dart';
+import 'package:my_drugs/features/drug_list/widgets/drug_group_widget.dart';
 import 'package:my_drugs/models/drug.dart';
 
 part 'drug_list_event.dart';
@@ -19,8 +20,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   final List<Drug> _notExpiredDrugs;
   Set<String> _selectedDrugsIds = Set();
 
-  /// Items that are currently displaying on DrugListScreen.
-  List<DrugListItem> _listItems;
+  List<DrugGroup> _groups;
 
   final DateFormat _dateFormat = DateFormat('MMM yyyy');
   ScreenMode _screenMode = ScreenMode.normal;
@@ -54,12 +54,18 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     if (_expiredDrugs.isEmpty && _notExpiredDrugs.isEmpty) {
       return DrugListEmpty();
     } else {
-      if (_listItems == null) {
-        _listItems = _buildListItems(_expiredDrugs, _notExpiredDrugs);
+      if (_groups == null) {
+        _groups = _buildGroups(_expiredDrugs, _notExpiredDrugs);
       }
+      List<DrugListItem> listItems = _groups.fold(
+        List(),
+        (previousValue, element) => previousValue
+          ..add(element)
+          ..addAll(element.items),
+      );
       return DrugListLoaded(
         _screenMode,
-        _listItems,
+        listItems,
         '${(_expiredDrugs.length + _notExpiredDrugs.length)} items',
         '${_selectedDrugsIds.length} selected',
         _selectedDrugsIds.isNotEmpty,
@@ -67,44 +73,89 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     }
   }
 
-  List<DrugListItem> _buildListItems(
-      List<Drug> expired, List<Drug> notExpired) {
-    List<DrugListItem> result = [];
+  // List<DrugListItem> _buildListItems(
+  //     List<Drug> expired, List<Drug> notExpired) {
+  //   List<DrugListItem> result = [];
+  //   if (expired.isNotEmpty) {
+  //     result.add(
+  //       DrugHeadingItem(
+  //         GlobalKey(),
+  //         true,
+  //       ),
+  //     );
+  //     result.addAll(
+  //       expired.map(
+  //         (e) => DrugItem(
+  //           GlobalKey(),
+  //           e.id,
+  //           e.name,
+  //           _dateFormat.format(e.expiresOn),
+  //           true,
+  //         ),
+  //       ),
+  //     );
+  //   }
+  //   if (notExpired.isNotEmpty) {
+  //     result.add(
+  //       DrugHeadingItem(
+  //         GlobalKey(),
+  //         false,
+  //       ),
+  //     );
+  //     result.addAll(
+  //       notExpired.map(
+  //         (e) => DrugItem(
+  //           GlobalKey(),
+  //           e.id,
+  //           e.name,
+  //           _dateFormat.format(e.expiresOn),
+  //           false,
+  //         ),
+  //       ),
+  //     );
+  //   }
+  //   return result;
+  // }
+
+  List<DrugGroup> _buildGroups(List<Drug> expired, List<Drug> notExpired) {
+    List<DrugGroup> result = [];
     if (expired.isNotEmpty) {
+      final groupKey = GlobalKey<DrugHeadingRowState>();
       result.add(
-        DrugHeadingItem(
-          GlobalKey(),
-          true,
-        ),
-      );
-      result.addAll(
-        expired.map(
-          (e) => DrugItem(
-            GlobalKey(),
-            e.id,
-            e.name,
-            _dateFormat.format(e.expiresOn),
-            true,
-          ),
+        DrugGroup(
+          groupKey,
+          'EXPIRED',
+          expired
+              .map(
+                (e) => DrugGroupItem(
+                  GlobalKey(),
+                  groupKey,
+                  e.id,
+                  e.name,
+                  _dateFormat.format(e.expiresOn),
+                ),
+              )
+              .toList(),
         ),
       );
     }
     if (notExpired.isNotEmpty) {
+      final groupKey = GlobalKey<DrugHeadingRowState>();
       result.add(
-        DrugHeadingItem(
-          GlobalKey(),
-          false,
-        ),
-      );
-      result.addAll(
-        notExpired.map(
-          (e) => DrugItem(
-            GlobalKey(),
-            e.id,
-            e.name,
-            _dateFormat.format(e.expiresOn),
-            false,
-          ),
+        DrugGroup(
+          groupKey,
+          'NOT EXPIRED',
+          expired
+              .map(
+                (e) => DrugGroupItem(
+                  GlobalKey(),
+                  groupKey,
+                  e.id,
+                  e.name,
+                  _dateFormat.format(e.expiresOn),
+                ),
+              )
+              .toList(),
         ),
       );
     }
@@ -134,7 +185,14 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> _mapSelectDeselectDrugEventToState(
     SelectDeselectDrug event,
   ) async* {
-    final list = event.item.isExpired ? _expiredDrugs : _notExpiredDrugs;
+    final groupState = event.item.groupKey.currentState;
+    final group = _groups.firstWhere(
+      (element) => element.key == event.item.groupKey,
+      orElse: () => null,
+    );
+    if (group == null) {
+      return;
+    }
     // If not selected.
     if (!_selectedDrugsIds.contains(event.item.id)) {
       // Add to selected.
@@ -146,44 +204,42 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       event.item.key.currentState.checkmarkAnimationController.reverse();
     }
     // If all drugs from the current group are selected, then update group checkmark too.
-    // final nonSelectedItem = list.firstWhere((element) => !_selectedDrugsIds.contains(element.id),
-    //     orElse: () => null);
-    //     if (nonSelectedItem == null) {
-
-    //     }
+    final areAllSelected = _areAllSelected(group);
+    if (areAllSelected) {
+      groupState.checkmarkAnimationController.forward();
+    } else {
+      groupState.checkmarkAnimationController.reverse();
+    }
     yield _buildState();
   }
 
   Stream<DrugListState> _mapSelectDeselectGroupEventToState(
     SelectDeselectGroup event,
   ) async* {
-    final list = event.item.isExpired ? _expiredDrugs : _notExpiredDrugs;
     // Should select if at least one drug from the group is not selected
-    final shouldSelect = list.firstWhere(
-            (element) => !_selectedDrugsIds.contains(element.id),
-            orElse: () => null) !=
-        null;
+    final shouldSelect = !_areAllSelected(event.group);
     if (shouldSelect) {
-      event.item.key.currentState.checkmarkAnimationController.forward();
+      event.group.key.currentState.checkmarkAnimationController.forward();
     } else {
-      event.item.key.currentState.checkmarkAnimationController.reverse();
+      event.group.key.currentState.checkmarkAnimationController.reverse();
     }
-    list.forEach((e) {
+    event.group.items.forEach((e) {
       if (shouldSelect) {
         _selectedDrugsIds.add(e.id);
+        e.key.currentState.checkmarkAnimationController.forward();
       } else {
         _selectedDrugsIds.remove(e.id);
+        e.key.currentState.checkmarkAnimationController.reverse();
       }
-      _listItems.forEach((element) {
-        if (element is DrugItem && element.id == e.id) {
-          if (shouldSelect) {
-            element.key.currentState.checkmarkAnimationController.forward();
-          } else {
-            element.key.currentState.checkmarkAnimationController.reverse();
-          }
-        }
-      });
     });
     yield _buildState();
+  }
+
+  /// Returns [true] if all group items are selected. [false] otherwise.
+  bool _areAllSelected(DrugGroup group) {
+    final nonSelectedItem = group.items.firstWhere(
+        (element) => !_selectedDrugsIds.contains(element.id),
+        orElse: () => null);
+    return nonSelectedItem == null;
   }
 }

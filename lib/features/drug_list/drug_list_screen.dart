@@ -1,9 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_drugs/features/drug_list/drug_list_item.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_heading_row.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_item_row.dart';
 import 'package:my_drugs/features/drug_list/widgets/drug_list_bottom_bar.dart';
 
 import 'bloc/drug_list_bloc.dart';
@@ -102,8 +99,6 @@ class _DrugListScreenState extends State<DrugListScreen>
     DrugListLoaded state,
   ) {
     final horizontalPadding = 16.0;
-    final drugRowWidth =
-        MediaQuery.of(context).size.width - horizontalPadding * 2;
     return ListView.builder(
       padding: EdgeInsets.symmetric(
         horizontal: horizontalPadding,
@@ -112,22 +107,8 @@ class _DrugListScreenState extends State<DrugListScreen>
       itemCount: state.items.length,
       itemBuilder: (context, index) {
         final item = state.items[index];
-        if (item is DrugHeadingItem) {
-          return DrugHeadingRow(
-            item: item,
-            isInEditMode: state.screenMode == ScreenMode.edit,
-            editModeAnimationController: _animationController,
-          );
-        } else if (item is DrugItem) {
-          return DrugItemRow(
-            item: item,
-            isInEditMode: state.screenMode == ScreenMode.edit,
-            editModeAnimationController: _animationController,
-            width: drugRowWidth,
-          );
-        } else {
-          return Container();
-        }
+        return item.build(
+            context, state.screenMode == ScreenMode.edit, _animationController);
       },
     );
   }

@@ -10,7 +10,7 @@ class SwitchScreenMode extends DrugListEvent {
 }
 
 class SelectDeselectDrug extends DrugListEvent {
-  final DrugItem item;
+  final DrugGroupItem item;
 
   SelectDeselectDrug(
     this.item,
@@ -23,14 +23,14 @@ class SelectDeselectDrug extends DrugListEvent {
 }
 
 class SelectDeselectGroup extends DrugListEvent {
-  final DrugHeadingItem item;
+  final DrugGroup group;
 
   SelectDeselectGroup(
-    this.item,
+    this.group,
   );
 
   @override
   List<Object> get props => [
-        item,
+        group,
       ];
 }

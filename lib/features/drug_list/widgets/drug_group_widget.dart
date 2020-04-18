@@ -5,10 +5,10 @@ import 'package:my_drugs/features/drug_list/drug_list_item.dart';
 
 import 'drug_list_row.dart';
 
-class DrugHeadingRow extends DrugListRow {
-  final DrugHeadingItem item;
+class DrugGroupWidget extends DrugListRow {
+  final DrugGroup item;
 
-  DrugHeadingRow({
+  DrugGroupWidget({
     @required bool isInEditMode,
     @required this.item,
     @required AnimationController editModeAnimationController,
@@ -22,7 +22,7 @@ class DrugHeadingRow extends DrugListRow {
   State<StatefulWidget> createState() => DrugHeadingRowState();
 }
 
-class DrugHeadingRowState extends DrugListRowState<DrugHeadingRow> {
+class DrugHeadingRowState extends DrugListRowState<DrugGroupWidget> {
   @override
   Widget buildScaffold(BuildContext context, Widget animatedChild) {
     return Padding(
@@ -46,7 +46,7 @@ class DrugHeadingRowState extends DrugListRowState<DrugHeadingRow> {
     return Align(
       alignment: Alignment.centerLeft,
       child: Text(
-        widget.item.isExpired ? 'EXPIRED' : 'NOT EXPIRED',
+        widget.item.name,
         style: TextStyle(
           fontSize: 16,
           color: Color(0xFFBABABA),
