@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:my_drugs/data_access/data_access.dart';
 import 'package:my_drugs/features/drug_list/drug_list_item.dart';
 import 'package:my_drugs/features/drug_list/widgets/drug_group_widget.dart';
+import 'package:my_drugs/features/drug_list/widgets/drug_list_bottom_bar.dart';
 import 'package:my_drugs/models/drug.dart';
 
 part 'drug_list_event.dart';
@@ -27,6 +28,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   StreamController<ScreenMode> _screenModeStreamController =
       StreamController<ScreenMode>.broadcast();
   Stream<ScreenMode> get screenMode => _screenModeStreamController.stream;
+
+  final GlobalKey<DrugListBottomBarState> _bottomBarKey = GlobalKey();
 
   static final _firstDayOfCurrentMonth =
       DateTime(DateTime.now().year, DateTime.now().month, 1);
@@ -65,6 +68,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       );
       return DrugListLoaded(
         _screenMode,
+        _bottomBarKey,
         listItems,
         '${(_expiredDrugs.length + _notExpiredDrugs.length)} items',
         '${_selectedDrugsIds.length} selected',
@@ -72,50 +76,6 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       );
     }
   }
-
-  // List<DrugListItem> _buildListItems(
-  //     List<Drug> expired, List<Drug> notExpired) {
-  //   List<DrugListItem> result = [];
-  //   if (expired.isNotEmpty) {
-  //     result.add(
-  //       DrugHeadingItem(
-  //         GlobalKey(),
-  //         true,
-  //       ),
-  //     );
-  //     result.addAll(
-  //       expired.map(
-  //         (e) => DrugItem(
-  //           GlobalKey(),
-  //           e.id,
-  //           e.name,
-  //           _dateFormat.format(e.expiresOn),
-  //           true,
-  //         ),
-  //       ),
-  //     );
-  //   }
-  //   if (notExpired.isNotEmpty) {
-  //     result.add(
-  //       DrugHeadingItem(
-  //         GlobalKey(),
-  //         false,
-  //       ),
-  //     );
-  //     result.addAll(
-  //       notExpired.map(
-  //         (e) => DrugItem(
-  //           GlobalKey(),
-  //           e.id,
-  //           e.name,
-  //           _dateFormat.format(e.expiresOn),
-  //           false,
-  //         ),
-  //       ),
-  //     );
-  //   }
-  //   return result;
-  // }
 
   List<DrugGroup> _buildGroups(List<Drug> expired, List<Drug> notExpired) {
     List<DrugGroup> result = [];
@@ -219,6 +179,11 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     } else {
       groupState.checkmarkAnimationController.reverse();
     }
+    if (_selectedDrugsIds.isNotEmpty) {
+      _bottomBarKey.currentState.deleteButtonColorAnimationController.forward();
+    } else {
+      _bottomBarKey.currentState.deleteButtonColorAnimationController.reverse();
+    }
     yield _buildState();
   }
 
@@ -241,6 +206,11 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         e.key.currentState.checkmarkAnimationController.reverse();
       }
     });
+    if (_selectedDrugsIds.isNotEmpty) {
+      _bottomBarKey.currentState.deleteButtonColorAnimationController.forward();
+    } else {
+      _bottomBarKey.currentState.deleteButtonColorAnimationController.reverse();
+    }
     yield _buildState();
   }
 

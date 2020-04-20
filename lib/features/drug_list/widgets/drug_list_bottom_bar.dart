@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class DrugListBottomBar extends StatelessWidget {
-  final AnimationController animationController;
+class DrugListBottomBar extends StatefulWidget {
+  final AnimationController screenModeAnimationController;
   final String numberOfItemsTotal;
   final String numberOfItemsSelected;
   final bool isDeleteButtonActive;
@@ -10,11 +10,9 @@ class DrugListBottomBar extends StatelessWidget {
   final Animation<Offset> numberOfItemsSelectedOffset;
   final Animation<double> numberOfItemsSelectedOpacity;
 
-  final double height = 44;
-
   DrugListBottomBar({
     Key key,
-    @required this.animationController,
+    @required this.screenModeAnimationController,
     @required this.numberOfItemsTotal,
     @required this.numberOfItemsSelected,
     @required this.isDeleteButtonActive,
@@ -23,7 +21,7 @@ class DrugListBottomBar extends StatelessWidget {
           end: Offset(0.0, 0.3),
         ).animate(
           CurvedAnimation(
-            parent: animationController,
+            parent: screenModeAnimationController,
             curve: Interval(0.0, 0.8, curve: Curves.ease),
           ),
         ),
@@ -32,7 +30,7 @@ class DrugListBottomBar extends StatelessWidget {
           end: 0.0,
         ).animate(
           CurvedAnimation(
-            parent: animationController,
+            parent: screenModeAnimationController,
             curve: Interval(0.0, 0.8, curve: Curves.ease),
           ),
         ),
@@ -41,7 +39,7 @@ class DrugListBottomBar extends StatelessWidget {
           end: Offset.zero,
         ).animate(
           CurvedAnimation(
-            parent: animationController,
+            parent: screenModeAnimationController,
             curve: Interval(0.2, 1.0, curve: Curves.ease),
           ),
         ),
@@ -50,28 +48,60 @@ class DrugListBottomBar extends StatelessWidget {
           end: 1.0,
         ).animate(
           CurvedAnimation(
-            parent: animationController,
+            parent: screenModeAnimationController,
             curve: Interval(0.2, 1.0, curve: Curves.ease),
           ),
         ),
         super(key: key);
 
   @override
+  DrugListBottomBarState createState() => DrugListBottomBarState();
+}
+
+class DrugListBottomBarState extends State<DrugListBottomBar>
+    with SingleTickerProviderStateMixin {
+  AnimationController deleteButtonColorAnimationController;
+  Animation<Color> _colorAnimation;
+  final double _height = 44;
+
+  @override
+  void initState() {
+    deleteButtonColorAnimationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 250),
+    );
+    _colorAnimation = ColorTween(
+      begin: Colors.grey,
+      end: Colors.red[500],
+    ).animate(
+      deleteButtonColorAnimationController,
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    deleteButtonColorAnimationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          border: Border(
-            top: BorderSide(
-              color: Colors.grey[350],
-            ),
-          )),
+        color: Theme.of(context).colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey[350],
+          ),
+        ),
+      ),
       child: SafeArea(
         child: Container(
           height: 34,
           child: ClipRect(
             child: AnimatedBuilder(
-              animation: animationController,
+              animation: widget.screenModeAnimationController,
               builder: _buildContent,
             ),
           ),
@@ -83,28 +113,33 @@ class DrugListBottomBar extends StatelessWidget {
   Widget _buildContent(BuildContext context, Widget child) {
     return Stack(
       children: <Widget>[
-        _buildRow(
-          context,
-          animationController.status == AnimationStatus.dismissed,
-          numberOfItemsSelectedOpacity,
-          numberOfItemsSelectedOffset,
-          numberOfItemsSelected,
-          Icon(
-            Icons.delete,
+        AnimatedBuilder(
+          animation: _colorAnimation,
+          builder: (BuildContext context, Widget child) => _buildRow(
+            context,
+            widget.screenModeAnimationController.status ==
+                AnimationStatus.dismissed,
+            widget.numberOfItemsSelectedOpacity,
+            widget.numberOfItemsSelectedOffset,
+            widget.numberOfItemsSelected,
+            Icon(
+              Icons.delete,
+            ),
+            _colorAnimation.value,
+            widget.isDeleteButtonActive
+                ? () {
+                    print('Delete');
+                  }
+                : null,
           ),
-          Theme.of(context).colorScheme.error,
-          isDeleteButtonActive
-              ? () {
-                  print('Delete');
-                }
-              : null,
         ),
         _buildRow(
           context,
-          animationController.status == AnimationStatus.completed,
-          numberOfItemsTotalOpacity,
-          numberOfItemsTotalOffset,
-          numberOfItemsTotal,
+          widget.screenModeAnimationController.status ==
+              AnimationStatus.completed,
+          widget.numberOfItemsTotalOpacity,
+          widget.numberOfItemsTotalOffset,
+          widget.numberOfItemsTotal,
           Icon(Icons.add),
           null,
           () {
@@ -121,7 +156,7 @@ class DrugListBottomBar extends StatelessWidget {
     Animation<double> opacity,
     Animation<Offset> position,
     String text,
-    Icon icon,
+    Widget icon,
     Color color,
     VoidCallback onPressed,
   ) {
@@ -151,11 +186,12 @@ class DrugListBottomBar extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: Container(
                       padding: const EdgeInsets.all(0.0),
-                      width: height,
-                      height: height,
+                      width: _height,
+                      height: _height,
                       child: IconButton(
                         padding: const EdgeInsets.all(0.0),
                         color: color,
+                        disabledColor: color,
                         icon: icon,
                         onPressed: onPressed,
                       ),

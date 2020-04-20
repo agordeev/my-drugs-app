@@ -12,21 +12,21 @@ class DrugListScreen extends StatefulWidget {
 
 class _DrugListScreenState extends State<DrugListScreen>
     with SingleTickerProviderStateMixin {
-  AnimationController _animationController;
+  AnimationController _screenModeAnimationController;
   final _animationDuration = Duration(milliseconds: 500);
 
   @override
   void initState() {
-    _animationController = AnimationController(
+    _screenModeAnimationController = AnimationController(
       vsync: this,
       duration: _animationDuration,
     );
 
     BlocProvider.of<DrugListBloc>(context).screenMode.listen((screenMode) {
       if (screenMode == ScreenMode.edit) {
-        _animationController.forward();
+        _screenModeAnimationController.forward();
       } else {
-        _animationController.reverse();
+        _screenModeAnimationController.reverse();
       }
     });
     super.initState();
@@ -34,7 +34,7 @@ class _DrugListScreenState extends State<DrugListScreen>
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _screenModeAnimationController.dispose();
     super.dispose();
   }
 
@@ -42,6 +42,7 @@ class _DrugListScreenState extends State<DrugListScreen>
   Widget build(BuildContext context) {
     return BlocBuilder<DrugListBloc, DrugListState>(
       builder: (context, state) {
+        GlobalKey<DrugListBottomBarState> bottomBarKey = GlobalKey();
         List<Widget> actions;
         Widget body;
         String numberOfItemsTotal = '';
@@ -70,6 +71,7 @@ class _DrugListScreenState extends State<DrugListScreen>
           numberOfItemsTotal = state.numberOfItemsTotal;
           numberOfItemsSelected = state.numberOfItemsSelected;
           isDeleteButtonActive = state.isDeleteButtonActive;
+          bottomBarKey = state.bottomBarKey;
         } else {
           body = Container();
         }
@@ -80,7 +82,8 @@ class _DrugListScreenState extends State<DrugListScreen>
           ),
           body: body,
           bottomNavigationBar: DrugListBottomBar(
-            animationController: _animationController,
+            key: bottomBarKey,
+            screenModeAnimationController: _screenModeAnimationController,
             numberOfItemsTotal: numberOfItemsTotal,
             numberOfItemsSelected: numberOfItemsSelected,
             isDeleteButtonActive: isDeleteButtonActive,
@@ -104,7 +107,10 @@ class _DrugListScreenState extends State<DrugListScreen>
       itemBuilder: (context, index) {
         final item = state.items[index];
         return item.build(
-            context, state.screenMode == ScreenMode.edit, _animationController);
+          context,
+          state.screenMode == ScreenMode.edit,
+          _screenModeAnimationController,
+        );
       },
     );
   }
