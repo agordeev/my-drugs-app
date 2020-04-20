@@ -105,7 +105,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         DrugGroup(
           groupKey,
           'NOT EXPIRED',
-          expired
+          notExpired
               .map(
                 (e) => DrugGroupItem(
                   GlobalKey(),

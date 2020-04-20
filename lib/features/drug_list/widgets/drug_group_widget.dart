@@ -25,16 +25,16 @@ class DrugGroupWidget extends DrugListRow {
 class DrugHeadingRowState extends DrugListRowState<DrugGroupWidget> {
   @override
   Widget buildScaffold(BuildContext context, Widget animatedChild) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
-      child: InkWell(
-        onTap: widget.isInEditMode
-            ? () => BlocProvider.of<DrugListBloc>(context).add(
-                  SelectDeselectGroup(
-                    widget.item,
-                  ),
-                )
-            : null,
+    return GestureDetector(
+      onTap: widget.isInEditMode
+          ? () => BlocProvider.of<DrugListBloc>(context).add(
+                SelectDeselectGroup(
+                  widget.item,
+                ),
+              )
+          : null,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
         child: animatedChild,
       ),
     );
