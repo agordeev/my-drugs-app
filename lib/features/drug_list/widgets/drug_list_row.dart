@@ -28,7 +28,7 @@ abstract class DrugListRow extends StatefulWidget {
         ),
         _checkmarkPadding = Tween<EdgeInsets>(
           begin: EdgeInsets.zero,
-          end: EdgeInsets.only(left: 0.0),
+          end: EdgeInsets.only(left: 4.0),
         ).animate(
           CurvedAnimation(
             parent: editModeAnimationController,
@@ -37,7 +37,7 @@ abstract class DrugListRow extends StatefulWidget {
         ),
         _contentPadding = Tween<EdgeInsets>(
           begin: EdgeInsets.only(left: 8.0),
-          end: EdgeInsets.only(left: 28.0),
+          end: EdgeInsets.only(left: 36.0),
         ).animate(
           CurvedAnimation(
             parent: editModeAnimationController,

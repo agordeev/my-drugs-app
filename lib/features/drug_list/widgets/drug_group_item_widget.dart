@@ -25,15 +25,16 @@ class DrugGroupItemWidget extends DrugListRow {
 
 class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
   final double _expiresOnWidth = 90;
+  final double _height = 68;
 
   /// Drug name block.
   @override
   Widget buildDynamicContent(BuildContext context) {
     final widgetWidth =
         MediaQuery.of(context).size.width - widget.horizontalPadding * 2;
-    final textWidth = widgetWidth - (_expiresOnWidth + 16 + 16 + 8);
+    final textWidth = widgetWidth - (_expiresOnWidth + 16 + 8);
     return Container(
-      height: 68,
+      height: _height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4),
         color: Colors.white,
@@ -82,55 +83,55 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
   /// EXPIRES ON block.
   @override
   Widget buildStaticContent(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          SizedBox(
-            width: 16,
-            child: Container(
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        SizedBox(
+          width: 16,
+          height: _height,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
                 colors: [Colors.white.withOpacity(0), Colors.white],
                 stops: [0.0, 1.0],
-              )),
+              ),
             ),
           ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            width: _expiresOnWidth,
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  'EXPIRES ON',
-                  style: TextStyle(
-                    color: Color(0xFFBABABA),
-                    fontSize: 10,
-                    letterSpacing: 1.2,
-                  ),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          width: _expiresOnWidth,
+          height: _height,
+          color: Colors.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'EXPIRES ON',
+                style: TextStyle(
+                  color: Color(0xFFBABABA),
+                  fontSize: 10,
+                  letterSpacing: 1.2,
                 ),
-                SizedBox(height: 4),
-                Text(
-                  widget.item.expiresOn,
-                  style: TextStyle(
-                    color: Color(0xFF8C8C8C),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                widget.item.expiresOn,
+                style: TextStyle(
+                  color: Color(0xFF8C8C8C),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          SizedBox(
-            width: 8,
-          ),
-        ],
-      ),
+        ),
+        SizedBox(
+          width: 8,
+        ),
+      ],
     );
   }
 }
