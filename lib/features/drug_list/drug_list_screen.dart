@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:my_drugs/features/drug_list/widgets/drug_list_bottom_bar.dart';
 
 import 'bloc/drug_list_bloc.dart';
@@ -57,12 +58,11 @@ class _DrugListScreenState extends State<DrugListScreen>
             state,
           );
           actions = [
-            FlatButton(
-              child: AnimatedSwitcher(
-                duration: Duration(milliseconds: 250),
-                child: state.screenMode == ScreenMode.edit
-                    ? Text('Cancel')
-                    : Icon(Icons.more_horiz),
+            PlatformButton(
+              androidFlat: (context) => MaterialFlatButtonData(),
+              child: AnimatedIcon(
+                icon: AnimatedIcons.arrow_menu,
+                progress: _screenModeAnimationController,
               ),
               onPressed: () => BlocProvider.of<DrugListBloc>(context)
                   .add(SwitchScreenMode()),

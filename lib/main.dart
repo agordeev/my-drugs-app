@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_drugs/data_access/data_access.dart';
@@ -83,6 +84,7 @@ class MyApp extends StatelessWidget {
 
   ThemeData _buildTheme(BuildContext context) {
     final baseTheme = ThemeData.light();
+    final primarySwatch = Colors.teal;
     return ThemeData(
       primarySwatch: Colors.teal,
       visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -96,6 +98,9 @@ class MyApp extends StatelessWidget {
         iconTheme: IconThemeData(
           color: Colors.teal,
         ),
+      ),
+      cupertinoOverrideTheme: CupertinoThemeData(
+        primaryColor: primarySwatch,
       ),
     );
   }

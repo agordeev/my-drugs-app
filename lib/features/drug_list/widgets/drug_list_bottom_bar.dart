@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class DrugListBottomBar extends StatefulWidget {
   final AnimationController screenModeAnimationController;
@@ -124,6 +125,7 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
             widget.numberOfItemsSelected,
             Icon(
               Icons.delete,
+              color: _colorAnimation.value,
             ),
             _colorAnimation.value,
             widget.isDeleteButtonActive
@@ -188,11 +190,12 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
                       padding: const EdgeInsets.all(0.0),
                       width: _height,
                       height: _height,
-                      child: IconButton(
+                      child: PlatformButton(
+                        androidFlat: (context) => MaterialFlatButtonData(),
                         padding: const EdgeInsets.all(0.0),
-                        color: color,
-                        disabledColor: color,
-                        icon: icon,
+                        // color: color,
+                        // disabledColor: color,
+                        child: icon,
                         onPressed: onPressed,
                       ),
                     ),
