@@ -93,6 +93,8 @@ class _DrugListScreenState extends State<DrugListScreen>
             numberOfItemsTotal: numberOfItemsTotal,
             numberOfItemsSelected: numberOfItemsSelected,
             isDeleteButtonActive: isDeleteButtonActive,
+            onAddButtonPressed: () {},
+            onDeleteButtonPressed: () => _deleteSelectedItems(context, state),
           ),
         );
       },
@@ -237,4 +239,26 @@ class _DrugListScreenState extends State<DrugListScreen>
           ),
         ),
       );
+
+  void _deleteSelectedItems(BuildContext context, DrugListState state) {
+    if (state is DrugListLoaded) {
+      final isInEditMode = state.screenMode == ScreenMode.edit;
+      BlocProvider.of<DrugListBloc>(context).add(DeleteSelectedItems(
+        (context, group, animation) => DrugGroupWidget(
+          group: group,
+          isInEditMode: isInEditMode,
+          editModeAnimation: _screenModeAnimationController,
+          listAnimation: animation,
+          onPresentContextMenuTap: null,
+        ),
+        (context, item, animation) => DrugGroupItemWidget(
+          item: item,
+          isInEditMode: isInEditMode,
+          editModeAnimation: _screenModeAnimationController,
+          animation: animation,
+          onPresentContextMenuTap: null,
+        ),
+      ));
+    }
+  }
 }

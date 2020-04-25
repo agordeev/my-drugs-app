@@ -7,12 +7,14 @@ class DrugGroup {
   final GlobalKey<AnimatedListState> listKey;
   final String name;
   final List<DrugGroupItem> items;
+  bool isSelected;
 
   DrugGroup(
     this.key,
     this.listKey,
     this.name,
     this.items,
+    this.isSelected,
   );
 }
 
@@ -22,6 +24,7 @@ class DrugGroupItem {
   final String id;
   final String name;
   final String expiresOn;
+  bool isSelected;
 
   DrugGroupItem(
     this.key,
@@ -29,5 +32,6 @@ class DrugGroupItem {
     this.id,
     this.name,
     this.expiresOn,
+    this.isSelected,
   );
 }

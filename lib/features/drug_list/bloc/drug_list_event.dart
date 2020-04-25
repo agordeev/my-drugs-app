@@ -53,3 +53,21 @@ class DeleteDrugGroupItem extends DrugListEvent {
         itemBuilder,
       ];
 }
+
+class DeleteSelectedItems extends DrugListEvent {
+  final Widget Function(BuildContext, DrugGroup, Animation<double>)
+      groupBuilder;
+  final Widget Function(BuildContext, DrugGroupItem, Animation<double>)
+      itemBuilder;
+
+  DeleteSelectedItems(
+    this.groupBuilder,
+    this.itemBuilder,
+  );
+
+  @override
+  List<Object> get props => [
+        groupBuilder,
+        itemBuilder,
+      ];
+}

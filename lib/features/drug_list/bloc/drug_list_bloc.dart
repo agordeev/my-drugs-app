@@ -19,9 +19,18 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   final AbstractDrugRepository _repository;
   final List<Drug> _expiredDrugs;
   final List<Drug> _notExpiredDrugs;
-  Set<String> _selectedDrugsIds = Set();
 
   List<DrugGroup> _groups;
+  int get _selectedItemsCount => _groups.fold(
+        0,
+        (previousValue, group) =>
+            previousValue +
+            group.items.fold(
+              0,
+              (previousValue, item) =>
+                  previousValue + (item.isSelected ? 1 : 0),
+            ),
+      );
 
   final DateFormat _dateFormat = DateFormat('MMM yyyy');
   ScreenMode _screenMode = ScreenMode.normal;
@@ -31,7 +40,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
 
   final GlobalKey<DrugListBottomBarState> _bottomBarKey = GlobalKey();
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
-  final Duration _animationDuration = Duration(milliseconds: 300);
+  final Duration _animationDuration = Duration(milliseconds: 5000);
 
   static final _firstDayOfCurrentMonth =
       DateTime(DateTime.now().year, DateTime.now().month, 1);
@@ -62,14 +71,15 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       if (_groups == null) {
         _groups = _buildGroups(_expiredDrugs, _notExpiredDrugs);
       }
+      final selectedItemsCount = _selectedItemsCount;
       return DrugListLoaded(
         _screenMode,
         _bottomBarKey,
         _listKey,
         _groups,
         '${(_expiredDrugs.length + _notExpiredDrugs.length)} items',
-        '${_selectedDrugsIds.length} selected',
-        _selectedDrugsIds.isNotEmpty,
+        '$selectedItemsCount selected',
+        selectedItemsCount > 0,
       );
     }
   }
@@ -91,9 +101,11 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
                   e.id,
                   e.name,
                   _dateFormat.format(e.expiresOn),
+                  false,
                 ),
               )
               .toList(),
+          false,
         ),
       );
     }
@@ -112,9 +124,11 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
                   e.id,
                   e.name,
                   _dateFormat.format(e.expiresOn),
+                  false,
                 ),
               )
               .toList(),
+          false,
         ),
       );
     }
@@ -133,6 +147,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       yield* _mapSelectDeselectGroupEventToState(event);
     } else if (event is DeleteDrugGroupItem) {
       yield* _mapDeleteDrugGroupItemEventToState(event);
+    } else if (event is DeleteSelectedItems) {
+      yield* _mapDeleteSelectedItemsEventToState(event);
     }
   }
 
@@ -142,7 +158,10 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     } else {
       _screenMode = ScreenMode.edit;
     }
-    _selectedDrugsIds = Set();
+    _groups.forEach((group) {
+      group.isSelected = false;
+      group.items.forEach((item) => item.isSelected = false);
+    });
     _groups.forEach((group) {
       group.key.currentState.checkmarkAnimationController.reverse();
       group.items.forEach((item) =>
@@ -164,23 +183,25 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       return;
     }
     // If not selected.
-    if (!_selectedDrugsIds.contains(event.item.id)) {
-      // Add to selected.
-      _selectedDrugsIds.add(event.item.id);
+    if (!event.item.isSelected) {
+      event.item.isSelected = true;
       // Animate checkmark to "ON".
       event.item.key.currentState.checkmarkAnimationController.forward();
     } else {
-      _selectedDrugsIds.remove(event.item.id);
+      event.item.isSelected = false;
       event.item.key.currentState.checkmarkAnimationController.reverse();
     }
     // If all drugs from the current group are selected, then update group checkmark too.
-    final areAllSelected = _areAllSelected(group);
+    final areAllSelected = group.items.length ==
+        group.items.where((item) => item.isSelected).length;
     if (areAllSelected) {
+      group.isSelected = true;
       groupState.checkmarkAnimationController.forward();
     } else {
+      group.isSelected = false;
       groupState.checkmarkAnimationController.reverse();
     }
-    if (_selectedDrugsIds.isNotEmpty) {
+    if (_selectedItemsCount > 0) {
       _bottomBarKey.currentState.deleteButtonColorAnimationController.forward();
     } else {
       _bottomBarKey.currentState.deleteButtonColorAnimationController.reverse();
@@ -191,23 +212,22 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> _mapSelectDeselectGroupEventToState(
     SelectDeselectGroup event,
   ) async* {
-    // Should select if at least one drug from the group is not selected
-    final shouldSelect = !_areAllSelected(event.group);
-    if (shouldSelect) {
+    event.group.isSelected = !event.group.isSelected;
+    if (event.group.isSelected) {
       event.group.key.currentState.checkmarkAnimationController.forward();
     } else {
       event.group.key.currentState.checkmarkAnimationController.reverse();
     }
-    event.group.items.forEach((e) {
-      if (shouldSelect) {
-        _selectedDrugsIds.add(e.id);
-        e.key.currentState.checkmarkAnimationController.forward();
+    event.group.items.forEach((item) {
+      if (event.group.isSelected) {
+        item.isSelected = true;
+        item.key.currentState.checkmarkAnimationController.forward();
       } else {
-        _selectedDrugsIds.remove(e.id);
-        e.key.currentState.checkmarkAnimationController.reverse();
+        item.isSelected = false;
+        item.key.currentState.checkmarkAnimationController.reverse();
       }
     });
-    if (_selectedDrugsIds.isNotEmpty) {
+    if (_selectedItemsCount > 0) {
       _bottomBarKey.currentState.deleteButtonColorAnimationController.forward();
     } else {
       _bottomBarKey.currentState.deleteButtonColorAnimationController.reverse();
@@ -235,7 +255,6 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       }
     }
     if (groupIndex == -1 || itemIndex == -1) {
-      print('Item not found');
       return;
     }
     _expiredDrugs.removeWhere((element) => element.id == event.item.id);
@@ -264,11 +283,39 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     }
   }
 
-  /// Returns [true] if all group items are selected. [false] otherwise.
-  bool _areAllSelected(DrugGroup group) {
-    final nonSelectedItem = group.items.firstWhere(
-        (element) => !_selectedDrugsIds.contains(element.id),
-        orElse: () => null);
-    return nonSelectedItem == null;
+  Stream<DrugListState> _mapDeleteSelectedItemsEventToState(
+    DeleteSelectedItems event,
+  ) async* {
+    int selectedGroupsCount = _groups.where((group) => group.isSelected).length;
+    while (selectedGroupsCount > 0) {
+      final index = _groups.indexWhere((group) => group.isSelected);
+      final group = _groups.removeAt(index);
+      _listKey.currentState.removeItem(
+        index,
+        (context, animation) => event.groupBuilder(context, group, animation),
+        duration: _animationDuration,
+      );
+      selectedGroupsCount -= 1;
+    }
+
+    if (_groups.isEmpty) {
+      await Future.delayed(_animationDuration);
+      yield DrugListEmpty();
+    } else {
+      for (var group in _groups) {
+        int selectedItemsCount =
+            group.items.where((item) => item.isSelected).length;
+        while (selectedItemsCount > 0) {
+          final index = group.items.indexWhere((item) => item.isSelected);
+          final item = group.items.removeAt(index);
+          group.listKey.currentState.removeItem(
+            index,
+            (context, animation) => event.itemBuilder(context, item, animation),
+            duration: _animationDuration,
+          );
+          selectedItemsCount -= 1;
+        }
+      }
+    }
   }
 }

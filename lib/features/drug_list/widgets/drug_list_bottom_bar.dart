@@ -6,6 +6,8 @@ class DrugListBottomBar extends StatefulWidget {
   final String numberOfItemsTotal;
   final String numberOfItemsSelected;
   final bool isDeleteButtonActive;
+  final VoidCallback onAddButtonPressed;
+  final VoidCallback onDeleteButtonPressed;
   final Animation<Offset> numberOfItemsTotalOffset;
   final Animation<double> numberOfItemsTotalOpacity;
   final Animation<Offset> numberOfItemsSelectedOffset;
@@ -17,6 +19,8 @@ class DrugListBottomBar extends StatefulWidget {
     @required this.numberOfItemsTotal,
     @required this.numberOfItemsSelected,
     @required this.isDeleteButtonActive,
+    @required this.onAddButtonPressed,
+    @required this.onDeleteButtonPressed,
   })  : numberOfItemsTotalOffset = Tween<Offset>(
           begin: Offset.zero,
           end: Offset(0.0, 0.3),
@@ -128,11 +132,7 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
               color: _colorAnimation.value,
             ),
             _colorAnimation.value,
-            widget.isDeleteButtonActive
-                ? () {
-                    print('Delete');
-                  }
-                : null,
+            widget.isDeleteButtonActive ? widget.onDeleteButtonPressed : null,
           ),
         ),
         _buildRow(
@@ -144,9 +144,7 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
           widget.numberOfItemsTotal,
           Icon(Icons.add),
           null,
-          () {
-            print('Add');
-          },
+          widget.onAddButtonPressed,
         ),
       ],
     );
