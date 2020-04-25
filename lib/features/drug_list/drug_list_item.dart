@@ -1,46 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:my_drugs/features/drug_list/widgets/drug_group_item_widget.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_group_widget.dart';
+import 'package:my_drugs/features/drug_list/widgets/drug_heading_row_widget.dart';
 
-abstract class DrugListItem {
-  Widget build(BuildContext context, bool isInEditMode,
-      AnimationController editModeAnimationController);
-}
-
-class DrugGroup implements DrugListItem {
+class DrugGroup {
   final GlobalKey<DrugHeadingRowState> key;
+  final GlobalKey<AnimatedListState> listKey;
   final String name;
   final List<DrugGroupItem> items;
 
-  DrugGroup(this.key, this.name, this.items);
-
-  @override
-  Widget build(BuildContext context, bool isInEditMode,
-      AnimationController editModeAnimationController) {
-    return DrugGroupWidget(
-      item: this,
-      isInEditMode: isInEditMode,
-      editModeAnimationController: editModeAnimationController,
-    );
-  }
+  DrugGroup(
+    this.key,
+    this.listKey,
+    this.name,
+    this.items,
+  );
 }
 
-class DrugGroupItem implements DrugListItem {
+class DrugGroupItem {
   final GlobalKey<DrugItemRowState> key;
   final GlobalKey<DrugHeadingRowState> groupKey;
   final String id;
   final String name;
   final String expiresOn;
 
-  DrugGroupItem(this.key, this.groupKey, this.id, this.name, this.expiresOn);
-
-  @override
-  Widget build(BuildContext context, bool isInEditMode,
-      AnimationController editModeAnimationController) {
-    return DrugGroupItemWidget(
-      item: this,
-      isInEditMode: isInEditMode,
-      editModeAnimationController: editModeAnimationController,
-    );
-  }
+  DrugGroupItem(
+    this.key,
+    this.groupKey,
+    this.id,
+    this.name,
+    this.expiresOn,
+  );
 }

@@ -34,3 +34,22 @@ class SelectDeselectGroup extends DrugListEvent {
         group,
       ];
 }
+
+class DeleteDrugGroupItem extends DrugListEvent {
+  final DrugGroupItem item;
+  final AnimatedListRemovedItemBuilder groupBuilder;
+  final AnimatedListRemovedItemBuilder itemBuilder;
+
+  DeleteDrugGroupItem(
+    this.item,
+    this.groupBuilder,
+    this.itemBuilder,
+  );
+
+  @override
+  List<Object> get props => [
+        item,
+        groupBuilder,
+        itemBuilder,
+      ];
+}

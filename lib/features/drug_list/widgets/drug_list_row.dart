@@ -3,22 +3,21 @@ import 'package:flutter/material.dart';
 import 'checkmark.dart';
 
 abstract class DrugListRow extends StatefulWidget {
-  final bool isInEditMode;
-  final AnimationController editModeAnimationController;
+  /// Animation used to show/hide checkmark
+  final Animation<double> editModeAnimation;
   final Animation<double> _checkmarkOpacity;
   final Animation<EdgeInsets> _checkmarkPadding;
   final Animation<EdgeInsets> _contentPadding;
 
   DrugListRow({
     Key key,
-    @required this.isInEditMode,
-    @required this.editModeAnimationController,
+    @required this.editModeAnimation,
   })  : _checkmarkOpacity = Tween<double>(
           begin: 0.0,
           end: 1.0,
         ).animate(
           CurvedAnimation(
-            parent: editModeAnimationController,
+            parent: editModeAnimation,
             curve: Interval(
               0.2,
               1.0,
@@ -31,7 +30,7 @@ abstract class DrugListRow extends StatefulWidget {
           end: EdgeInsets.only(left: 4.0),
         ).animate(
           CurvedAnimation(
-            parent: editModeAnimationController,
+            parent: editModeAnimation,
             curve: Curves.ease,
           ),
         ),
@@ -40,7 +39,7 @@ abstract class DrugListRow extends StatefulWidget {
           end: EdgeInsets.only(left: 36.0),
         ).animate(
           CurvedAnimation(
-            parent: editModeAnimationController,
+            parent: editModeAnimation,
             curve: Curves.ease,
           ),
         ),
@@ -71,7 +70,7 @@ abstract class DrugListRowState<T extends DrugListRow> extends State<T>
   Widget build(BuildContext context) {
     final animatedChild = AnimatedBuilder(
       builder: buildAnimationStack,
-      animation: widget.editModeAnimationController,
+      animation: widget.editModeAnimation,
       child: buildStaticContent(context),
     );
     return buildScaffold(

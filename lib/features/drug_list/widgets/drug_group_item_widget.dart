@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_drugs/features/drug_list/bloc/drug_list_bloc.dart';
@@ -6,17 +7,24 @@ import 'package:my_drugs/features/drug_list/widgets/drug_list_row.dart';
 
 class DrugGroupItemWidget extends DrugListRow {
   final DrugGroupItem item;
-  // A padding of parent widget. 16 by default.
+
+  /// Animation comes from [AnimatedList].
+  /// Used on removal.
+  final Animation<double> animation;
+
+  /// A padding of parent widget. 16 by default.
   final double horizontalPadding = 16;
+
+  final VoidCallback onPresentContextMenuTap;
 
   DrugGroupItemWidget({
     @required this.item,
-    @required bool isInEditMode,
-    @required AnimationController editModeAnimationController,
+    @required this.onPresentContextMenuTap,
+    @required this.animation,
+    @required Animation<double> editModeAnimation,
   }) : super(
           key: item.key,
-          isInEditMode: isInEditMode,
-          editModeAnimationController: editModeAnimationController,
+          editModeAnimation: editModeAnimation,
         );
 
   @override
@@ -66,16 +74,22 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
 
   @override
   Widget buildScaffold(BuildContext context, Widget animatedChild) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: GestureDetector(
-        onTap: widget.isInEditMode
-            ? () =>
-                BlocProvider.of<DrugListBloc>(context).add(SelectDeselectDrug(
-                  widget.item,
-                ))
-            : null,
-        child: animatedChild,
+    return SizeTransition(
+      sizeFactor: widget.animation,
+      child: FadeTransition(
+        opacity: widget.animation,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: GestureDetector(
+            onTap: widget.editModeAnimation.isCompleted
+                ? () => BlocProvider.of<DrugListBloc>(context)
+                        .add(SelectDeselectDrug(
+                      widget.item,
+                    ))
+                : widget.onPresentContextMenuTap,
+            child: animatedChild,
+          ),
+        ),
       ),
     );
   }

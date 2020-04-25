@@ -12,7 +12,8 @@ class DrugListEmpty extends DrugListState {
 class DrugListLoaded extends DrugListState {
   final ScreenMode screenMode;
   final GlobalKey<DrugListBottomBarState> bottomBarKey;
-  final List<DrugListItem> items;
+  final GlobalKey<AnimatedListState> listKey;
+  final List<DrugGroup> groups;
   final String numberOfItemsTotal;
   final String numberOfItemsSelected;
   final bool isDeleteButtonActive;
@@ -20,7 +21,8 @@ class DrugListLoaded extends DrugListState {
   DrugListLoaded(
     this.screenMode,
     this.bottomBarKey,
-    this.items,
+    this.listKey,
+    this.groups,
     this.numberOfItemsTotal,
     this.numberOfItemsSelected,
     this.isDeleteButtonActive,
@@ -30,7 +32,8 @@ class DrugListLoaded extends DrugListState {
   List<Object> get props => [
         this.screenMode,
         this.bottomBarKey,
-        this.items,
+        this.listKey,
+        this.groups,
         this.numberOfItemsTotal,
         this.numberOfItemsSelected,
         this.isDeleteButtonActive,

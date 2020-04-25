@@ -1,61 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_drugs/features/drug_list/bloc/drug_list_bloc.dart';
 import 'package:my_drugs/features/drug_list/drug_list_item.dart';
+import 'package:my_drugs/features/drug_list/widgets/drug_group_item_widget.dart';
 
-import 'drug_list_row.dart';
+import 'drug_heading_row_widget.dart';
 
-class DrugGroupWidget extends DrugListRow {
-  final DrugGroup item;
+class DrugGroupWidget extends StatelessWidget {
+  final DrugGroup group;
+  final Animation<double> editModeAnimation;
+  final Animation<double> listAnimation;
+  final Function(DrugGroupItem) onPresentContextMenuTap;
 
-  DrugGroupWidget({
-    @required bool isInEditMode,
-    @required this.item,
-    @required AnimationController editModeAnimationController,
-  }) : super(
-          key: item.key,
-          isInEditMode: isInEditMode,
-          editModeAnimationController: editModeAnimationController,
-        );
+  const DrugGroupWidget({
+    Key key,
+    @required this.group,
+    @required this.editModeAnimation,
+    @required this.listAnimation,
+    @required this.onPresentContextMenuTap,
+  }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => DrugHeadingRowState();
-}
-
-class DrugHeadingRowState extends DrugListRowState<DrugGroupWidget> {
-  @override
-  Widget buildScaffold(BuildContext context, Widget animatedChild) {
-    return GestureDetector(
-      onTap: widget.isInEditMode
-          ? () => BlocProvider.of<DrugListBloc>(context).add(
-                SelectDeselectGroup(
-                  widget.item,
-                ),
-              )
-          : null,
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
-        child: animatedChild,
-      ),
-    );
-  }
-
-  /// Group name block.
-  @override
-  Widget buildDynamicContent(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        widget.item.name,
-        style: TextStyle(
-          fontSize: 16,
-          color: Color(0xFFBABABA),
-          fontWeight: FontWeight.w500,
+  Widget build(BuildContext context) {
+    return SizeTransition(
+      sizeFactor: listAnimation,
+      child: FadeTransition(
+        opacity: listAnimation,
+        child: Column(
+          children: <Widget>[
+            DrugHeadingRowWidget(
+              item: group,
+              editModeAnimation: editModeAnimation,
+            ),
+            AnimatedList(
+              key: group.listKey,
+              // physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              initialItemCount: group.items.length,
+              itemBuilder: (context, itemIndex, itemAnimation) {
+                print(itemIndex);
+                final item = group.items[itemIndex];
+                return DrugGroupItemWidget(
+                  item: item,
+                  editModeAnimation: editModeAnimation,
+                  animation: itemAnimation,
+                  onPresentContextMenuTap: () => onPresentContextMenuTap(item),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
   }
-
-  @override
-  Widget buildStaticContent(BuildContext context) => Container();
 }

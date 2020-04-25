@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_drugs/data_access/data_access.dart';
 import 'package:my_drugs/features/drug_list/drug_list_item.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_group_widget.dart';
+import 'package:my_drugs/features/drug_list/widgets/drug_heading_row_widget.dart';
 import 'package:my_drugs/features/drug_list/widgets/drug_list_bottom_bar.dart';
 import 'package:my_drugs/models/drug.dart';
 
@@ -30,6 +30,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<ScreenMode> get screenMode => _screenModeStreamController.stream;
 
   final GlobalKey<DrugListBottomBarState> _bottomBarKey = GlobalKey();
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey();
 
   static final _firstDayOfCurrentMonth =
       DateTime(DateTime.now().year, DateTime.now().month, 1);
@@ -60,16 +61,11 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       if (_groups == null) {
         _groups = _buildGroups(_expiredDrugs, _notExpiredDrugs);
       }
-      List<DrugListItem> listItems = _groups.fold(
-        List(),
-        (previousValue, element) => previousValue
-          ..add(element)
-          ..addAll(element.items),
-      );
       return DrugListLoaded(
         _screenMode,
         _bottomBarKey,
-        listItems,
+        _listKey,
+        _groups,
         '${(_expiredDrugs.length + _notExpiredDrugs.length)} items',
         '${_selectedDrugsIds.length} selected',
         _selectedDrugsIds.isNotEmpty,
@@ -84,6 +80,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       result.add(
         DrugGroup(
           groupKey,
+          GlobalKey(),
           'EXPIRED',
           expired
               .map(
@@ -104,6 +101,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       result.add(
         DrugGroup(
           groupKey,
+          GlobalKey(),
           'NOT EXPIRED',
           notExpired
               .map(
@@ -132,6 +130,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       yield* _mapSelectDeselectDrugEventToState(event);
     } else if (event is SelectDeselectGroup) {
       yield* _mapSelectDeselectGroupEventToState(event);
+    } else if (event is DeleteDrugGroupItem) {
+      yield* _mapDeleteDrugGroupItemEventToState(event);
     }
   }
 
@@ -212,6 +212,50 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       _bottomBarKey.currentState.deleteButtonColorAnimationController.reverse();
     }
     yield _buildState();
+  }
+
+  Stream<DrugListState> _mapDeleteDrugGroupItemEventToState(
+    DeleteDrugGroupItem event,
+  ) async* {
+    int groupIndex = -1;
+    int itemIndex = -1;
+    for (var i = 0; i < _groups.length; i++) {
+      final group = _groups[i];
+      for (var j = 0; j < group.items.length; j++) {
+        final item = group.items[j];
+        if (item == event.item) {
+          groupIndex = i;
+          itemIndex = j;
+          break;
+        }
+      }
+      if (groupIndex != -1) {
+        break;
+      }
+    }
+    if (groupIndex == -1 || itemIndex == -1) {
+      print('Item not found');
+      return;
+    }
+    _expiredDrugs.removeWhere((element) => element.id == event.item.id);
+    _notExpiredDrugs.removeWhere((element) => element.id == event.item.id);
+    final group = _groups[groupIndex];
+    if (group.items.length == 1) {
+      // The group will become empty after item removal. Delete the entire group.
+      _groups.remove(group);
+      _listKey.currentState.removeItem(
+        groupIndex,
+        event.groupBuilder,
+        duration: Duration(milliseconds: 300),
+      );
+    } else {
+      group.items.remove(event.item);
+      group.listKey.currentState.removeItem(
+        itemIndex,
+        event.itemBuilder,
+        duration: Duration(milliseconds: 300),
+      );
+    }
   }
 
   /// Returns [true] if all group items are selected. [false] otherwise.
