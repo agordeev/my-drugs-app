@@ -7,9 +7,11 @@ import 'drug_list_row.dart';
 
 class DrugHeadingRowWidget extends DrugListRow {
   final DrugGroup item;
+  final bool isInEditMode;
 
   DrugHeadingRowWidget({
     @required this.item,
+    @required this.isInEditMode,
     @required Animation<double> editModeAnimation,
   }) : super(
           key: item.key,
@@ -24,7 +26,7 @@ class DrugHeadingRowState extends DrugListRowState<DrugHeadingRowWidget> {
   @override
   Widget buildScaffold(BuildContext context, Widget animatedChild) {
     return GestureDetector(
-      onTap: widget.editModeAnimation.isCompleted
+      onTap: widget.isInEditMode
           ? () => BlocProvider.of<DrugListBloc>(context).add(
                 SelectDeselectGroup(
                   widget.item,

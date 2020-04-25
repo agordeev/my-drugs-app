@@ -6,6 +6,7 @@ import 'drug_heading_row_widget.dart';
 
 class DrugGroupWidget extends StatelessWidget {
   final DrugGroup group;
+  final bool isInEditMode;
   final Animation<double> editModeAnimation;
   final Animation<double> listAnimation;
   final Function(DrugGroupItem) onPresentContextMenuTap;
@@ -13,6 +14,7 @@ class DrugGroupWidget extends StatelessWidget {
   const DrugGroupWidget({
     Key key,
     @required this.group,
+    @required this.isInEditMode,
     @required this.editModeAnimation,
     @required this.listAnimation,
     @required this.onPresentContextMenuTap,
@@ -28,6 +30,7 @@ class DrugGroupWidget extends StatelessWidget {
           children: <Widget>[
             DrugHeadingRowWidget(
               item: group,
+              isInEditMode: isInEditMode,
               editModeAnimation: editModeAnimation,
             ),
             AnimatedList(
@@ -39,6 +42,7 @@ class DrugGroupWidget extends StatelessWidget {
                 final item = group.items[itemIndex];
                 return DrugGroupItemWidget(
                   item: item,
+                  isInEditMode: isInEditMode,
                   editModeAnimation: editModeAnimation,
                   animation: itemAnimation,
                   onPresentContextMenuTap: () => onPresentContextMenuTap(item),

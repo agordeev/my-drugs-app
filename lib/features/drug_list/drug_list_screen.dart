@@ -107,6 +107,7 @@ class _DrugListScreenState extends State<DrugListScreen>
     BuildContext context,
     DrugListLoaded state,
   ) {
+    final isInEditMode = state.screenMode == ScreenMode.edit;
     return AnimatedList(
       key: state.listKey,
       padding: EdgeInsets.symmetric(
@@ -117,76 +118,96 @@ class _DrugListScreenState extends State<DrugListScreen>
       initialItemCount: state.groups.length,
       itemBuilder: (context, groupIndex, groupAnimation) => DrugGroupWidget(
         group: state.groups[groupIndex],
+        isInEditMode: isInEditMode,
         editModeAnimation: _screenModeAnimationController,
         listAnimation: groupAnimation,
-        onPresentContextMenuTap: (item) =>
-            (Theme.of(context).platform == TargetPlatform.iOS
-                ? _presentCupertinoBottomSheet(context)
-                : _presentAndroidBottomSheet(
-                    context,
-                    state.groups[groupIndex],
-                    item,
-                  )),
+        onPresentContextMenuTap: (item) => _presentBottomSheet(
+          context,
+          state.groups[groupIndex],
+          item,
+          isInEditMode,
+        ),
       ),
     );
   }
 
-  void _presentCupertinoBottomSheet(BuildContext context) {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (_) => CupertinoActionSheet(
-        actions: <Widget>[
-          CupertinoActionSheetAction(
-            child: Text('Edit'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          CupertinoActionSheetAction(
-            child: Text('Delete'),
-            isDestructiveAction: true,
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _presentAndroidBottomSheet(
+  void _presentBottomSheet(
     BuildContext context,
     DrugGroup group,
     DrugGroupItem item,
+    bool isInEditMode,
   ) {
-    showModalBottomSheet(
-      context: context,
-      builder: (_) => Wrap(
-        children: <Widget>[
-          SizedBox(height: 8),
-          _buildBottomSheetRow(
-            context,
-            Icons.edit,
-            'Edit',
-            () {},
-          ),
-          _buildBottomSheetRow(context, Icons.delete, 'Delete', () {
-            Navigator.of(context).pop();
-            BlocProvider.of<DrugListBloc>(context).add(
-              DeleteDrugGroupItem(
-                item,
-                (context, animation) => DrugGroupWidget(
-                  group: group,
-                  editModeAnimation: _screenModeAnimationController,
-                  listAnimation: animation,
-                  onPresentContextMenuTap: null,
-                ),
-                (context, animation) => DrugGroupItemWidget(
-                  item: item,
-                  editModeAnimation: _screenModeAnimationController,
-                  animation: animation,
-                  onPresentContextMenuTap: null,
-                ),
-              ),
-            );
-          }),
-        ],
+    final deleteButtonHandler = () => _onContextMenuDeletePressed(
+          context,
+          group,
+          item,
+          isInEditMode,
+        );
+    if (Theme.of(context).platform == TargetPlatform.iOS) {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (_) => CupertinoActionSheet(
+          actions: <Widget>[
+            CupertinoActionSheetAction(
+              child: Text('Edit'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            CupertinoActionSheetAction(
+              child: Text('Delete'),
+              isDestructiveAction: true,
+              onPressed: deleteButtonHandler,
+            ),
+          ],
+        ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        builder: (_) => Wrap(
+          children: <Widget>[
+            SizedBox(height: 8),
+            _buildBottomSheetRow(
+              context,
+              Icons.edit,
+              'Edit',
+              () {},
+            ),
+            _buildBottomSheetRow(
+              context,
+              Icons.delete,
+              'Delete',
+              deleteButtonHandler,
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  void _onContextMenuDeletePressed(
+    BuildContext context,
+    DrugGroup group,
+    DrugGroupItem item,
+    bool isInEditMode,
+  ) {
+    Navigator.of(context).pop();
+    BlocProvider.of<DrugListBloc>(context).add(
+      DeleteDrugGroupItem(
+        item,
+        (context, animation) => DrugGroupWidget(
+          group: group,
+          isInEditMode: isInEditMode,
+          editModeAnimation: _screenModeAnimationController,
+          listAnimation: animation,
+          onPresentContextMenuTap: null,
+        ),
+        (context, animation) => DrugGroupItemWidget(
+          item: item,
+          isInEditMode: isInEditMode,
+          editModeAnimation: _screenModeAnimationController,
+          animation: animation,
+          onPresentContextMenuTap: null,
+        ),
       ),
     );
   }

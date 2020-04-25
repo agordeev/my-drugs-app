@@ -7,6 +7,7 @@ import 'package:my_drugs/features/drug_list/widgets/drug_list_row.dart';
 
 class DrugGroupItemWidget extends DrugListRow {
   final DrugGroupItem item;
+  final bool isInEditMode;
 
   /// Animation comes from [AnimatedList].
   /// Used on removal.
@@ -19,6 +20,7 @@ class DrugGroupItemWidget extends DrugListRow {
 
   DrugGroupItemWidget({
     @required this.item,
+    @required this.isInEditMode,
     @required this.onPresentContextMenuTap,
     @required this.animation,
     @required Animation<double> editModeAnimation,
@@ -81,7 +83,7 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
           child: GestureDetector(
-            onTap: widget.editModeAnimation.isCompleted
+            onTap: widget.isInEditMode
                 ? () => BlocProvider.of<DrugListBloc>(context)
                         .add(SelectDeselectDrug(
                       widget.item,
