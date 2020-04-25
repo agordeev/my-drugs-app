@@ -41,6 +41,34 @@ void main() async {
         expiresOn: DateTime(2020, 11),
         createdAt: DateTime.now(),
       ),
+      Drug(
+        id: '5',
+        name:
+            'Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
+        expiresOn: DateTime(2020, 11),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '6',
+        name:
+            'Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
+        expiresOn: DateTime(2020, 11),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '7',
+        name:
+            'Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
+        expiresOn: DateTime(2020, 11),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '8',
+        name:
+            'Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
+        expiresOn: DateTime(2020, 11),
+        createdAt: DateTime.now(),
+      ),
     ],
   ));
 }

@@ -83,7 +83,10 @@ class _DrugListScreenState extends State<DrugListScreen>
             title: Text('My Drugs'),
             actions: actions,
           ),
-          body: body,
+          body: AnimatedSwitcher(
+            duration: Duration(milliseconds: 300),
+            child: body,
+          ),
           bottomNavigationBar: DrugListBottomBar(
             key: bottomBarKey,
             screenModeAnimationController: _screenModeAnimationController,
@@ -106,7 +109,10 @@ class _DrugListScreenState extends State<DrugListScreen>
   ) {
     return AnimatedList(
       key: state.listKey,
-      padding: EdgeInsets.fromLTRB(8, 12, 16, 12),
+      padding: EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 12,
+      ),
       shrinkWrap: true,
       initialItemCount: state.groups.length,
       itemBuilder: (context, groupIndex, groupAnimation) => DrugGroupWidget(

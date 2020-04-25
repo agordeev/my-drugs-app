@@ -31,6 +31,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
 
   final GlobalKey<DrugListBottomBarState> _bottomBarKey = GlobalKey();
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
+  final Duration _animationDuration = Duration(milliseconds: 300);
 
   static final _firstDayOfCurrentMonth =
       DateTime(DateTime.now().year, DateTime.now().month, 1);
@@ -243,17 +244,22 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     if (group.items.length == 1) {
       // The group will become empty after item removal. Delete the entire group.
       _groups.remove(group);
+
       _listKey.currentState.removeItem(
         groupIndex,
         event.groupBuilder,
-        duration: Duration(milliseconds: 300),
+        duration: _animationDuration,
       );
+      if (_groups.isEmpty) {
+        await Future.delayed(Duration(milliseconds: 300));
+        yield DrugListEmpty();
+      }
     } else {
       group.items.remove(event.item);
       group.listKey.currentState.removeItem(
         itemIndex,
         event.itemBuilder,
-        duration: Duration(milliseconds: 300),
+        duration: _animationDuration,
       );
     }
   }

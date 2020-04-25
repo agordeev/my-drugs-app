@@ -79,7 +79,7 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
       child: FadeTransition(
         opacity: widget.animation,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
           child: GestureDetector(
             onTap: widget.editModeAnimation.isCompleted
                 ? () => BlocProvider.of<DrugListBloc>(context)

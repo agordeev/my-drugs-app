@@ -32,11 +32,10 @@ class DrugGroupWidget extends StatelessWidget {
             ),
             AnimatedList(
               key: group.listKey,
-              // physics: NeverScrollableScrollPhysics(),
+              physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               initialItemCount: group.items.length,
               itemBuilder: (context, itemIndex, itemAnimation) {
-                print(itemIndex);
                 final item = group.items[itemIndex];
                 return DrugGroupItemWidget(
                   item: item,
