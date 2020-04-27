@@ -4,7 +4,7 @@ abstract class DrugListEvent extends Equatable {
   const DrugListEvent();
 }
 
-class SwitchScreenMode extends DrugListEvent {
+class DrugListScreenModeSwitchd extends DrugListEvent {
   @override
   List<Object> get props => [];
 }
@@ -22,10 +22,10 @@ class SelectDeselectDrug extends DrugListEvent {
       ];
 }
 
-class SelectDeselectGroup extends DrugListEvent {
+class DrugListGroupSelectionChanged extends DrugListEvent {
   final DrugGroup group;
 
-  SelectDeselectGroup(
+  DrugListGroupSelectionChanged(
     this.group,
   );
 
@@ -35,12 +35,12 @@ class SelectDeselectGroup extends DrugListEvent {
       ];
 }
 
-class DeleteDrugGroupItem extends DrugListEvent {
+class DrugListGroupItemDeleted extends DrugListEvent {
   final DrugGroupItem item;
   final AnimatedListRemovedItemBuilder groupBuilder;
   final AnimatedListRemovedItemBuilder itemBuilder;
 
-  DeleteDrugGroupItem(
+  DrugListGroupItemDeleted(
     this.item,
     this.groupBuilder,
     this.itemBuilder,
@@ -54,13 +54,13 @@ class DeleteDrugGroupItem extends DrugListEvent {
       ];
 }
 
-class DeleteSelectedItems extends DrugListEvent {
+class DrugListSelectedItemsDeleted extends DrugListEvent {
   final Widget Function(BuildContext, DrugGroup, Animation<double>)
       groupBuilder;
   final Widget Function(BuildContext, DrugGroupItem, Animation<double>)
       itemBuilder;
 
-  DeleteSelectedItems(
+  DrugListSelectedItemsDeleted(
     this.groupBuilder,
     this.itemBuilder,
   );

@@ -52,29 +52,31 @@ class _DrugListScreenState extends State<DrugListScreen>
         String numberOfItemsTotal = '';
         String numberOfItemsSelected = '';
         bool isDeleteButtonActive = false;
-        if (state is DrugListEmpty) {
-          body = _buildEmptyStateContent(context);
-          numberOfItemsTotal = 'No items';
-        } else if (state is DrugListLoaded) {
-          body = _buildLoadedStateContent(
-            context,
-            state,
-          );
-          actions = [
-            PlatformButton(
-              androidFlat: (context) => MaterialFlatButtonData(),
-              child: AnimatedIcon(
-                icon: AnimatedIcons.arrow_menu,
-                progress: _screenModeAnimationController,
+        if (state is DrugListInitial) {
+          if (state.isEmpty) {
+            body = _buildEmptyStateContent(context);
+            numberOfItemsTotal = 'No items';
+          } else {
+            body = _buildInitialStateContent(
+              context,
+              state,
+            );
+            actions = [
+              PlatformButton(
+                androidFlat: (context) => MaterialFlatButtonData(),
+                child: AnimatedIcon(
+                  icon: AnimatedIcons.arrow_menu,
+                  progress: _screenModeAnimationController,
+                ),
+                onPressed: () => BlocProvider.of<DrugListBloc>(context)
+                    .add(DrugListScreenModeSwitchd()),
               ),
-              onPressed: () => BlocProvider.of<DrugListBloc>(context)
-                  .add(SwitchScreenMode()),
-            ),
-          ];
-          numberOfItemsTotal = state.numberOfItemsTotal;
-          numberOfItemsSelected = state.numberOfItemsSelected;
-          isDeleteButtonActive = state.isDeleteButtonActive;
-          bottomBarKey = state.bottomBarKey;
+            ];
+            numberOfItemsTotal = state.numberOfItemsTotal;
+            numberOfItemsSelected = state.numberOfItemsSelected;
+            isDeleteButtonActive = state.isDeleteButtonActive;
+            bottomBarKey = state.bottomBarKey;
+          }
         } else {
           body = Container();
         }
@@ -105,9 +107,9 @@ class _DrugListScreenState extends State<DrugListScreen>
         child: Text('No drugs added yet'),
       );
 
-  Widget _buildLoadedStateContent(
+  Widget _buildInitialStateContent(
     BuildContext context,
-    DrugListLoaded state,
+    DrugListInitial state,
   ) {
     final isInEditMode = state.screenMode == ScreenMode.edit;
     return AnimatedList(
@@ -194,7 +196,7 @@ class _DrugListScreenState extends State<DrugListScreen>
   ) {
     Navigator.of(context).pop();
     BlocProvider.of<DrugListBloc>(context).add(
-      DeleteDrugGroupItem(
+      DrugListGroupItemDeleted(
         item,
         (context, animation) => DrugGroupWidget(
           group: group,
@@ -241,9 +243,9 @@ class _DrugListScreenState extends State<DrugListScreen>
       );
 
   void _deleteSelectedItems(BuildContext context, DrugListState state) {
-    if (state is DrugListLoaded) {
+    if (state is DrugListInitial) {
       final isInEditMode = state.screenMode == ScreenMode.edit;
-      BlocProvider.of<DrugListBloc>(context).add(DeleteSelectedItems(
+      BlocProvider.of<DrugListBloc>(context).add(DrugListSelectedItemsDeleted(
         (context, group, animation) => DrugGroupWidget(
           group: group,
           isInEditMode: isInEditMode,

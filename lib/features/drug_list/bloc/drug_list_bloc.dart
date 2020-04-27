@@ -65,23 +65,20 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   DrugListState get initialState => _buildState();
 
   DrugListState _buildState() {
-    if (_expiredDrugs.isEmpty && _notExpiredDrugs.isEmpty) {
-      return DrugListEmpty();
-    } else {
-      if (_groups == null) {
-        _groups = _buildGroups(_expiredDrugs, _notExpiredDrugs);
-      }
-      final selectedItemsCount = _selectedItemsCount;
-      return DrugListLoaded(
-        _screenMode,
-        _bottomBarKey,
-        _listKey,
-        _groups,
-        '${(_expiredDrugs.length + _notExpiredDrugs.length)} items',
-        '$selectedItemsCount selected',
-        selectedItemsCount > 0,
-      );
+    if (_groups == null) {
+      _groups = _buildGroups(_expiredDrugs, _notExpiredDrugs);
     }
+    final selectedItemsCount = _selectedItemsCount;
+    return DrugListInitial(
+      _expiredDrugs.isEmpty && _notExpiredDrugs.isEmpty,
+      _screenMode,
+      _bottomBarKey,
+      _listKey,
+      _groups,
+      '${(_expiredDrugs.length + _notExpiredDrugs.length)} items',
+      '$selectedItemsCount selected',
+      selectedItemsCount > 0,
+    );
   }
 
   List<DrugGroup> _buildGroups(List<Drug> expired, List<Drug> notExpired) {
@@ -139,15 +136,15 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> mapEventToState(
     DrugListEvent event,
   ) async* {
-    if (event is SwitchScreenMode) {
+    if (event is DrugListScreenModeSwitchd) {
       yield* _mapSwitchScreenModeEventToState();
     } else if (event is SelectDeselectDrug) {
       yield* _mapSelectDeselectDrugEventToState(event);
-    } else if (event is SelectDeselectGroup) {
+    } else if (event is DrugListGroupSelectionChanged) {
       yield* _mapSelectDeselectGroupEventToState(event);
-    } else if (event is DeleteDrugGroupItem) {
+    } else if (event is DrugListGroupItemDeleted) {
       yield* _mapDeleteDrugGroupItemEventToState(event);
-    } else if (event is DeleteSelectedItems) {
+    } else if (event is DrugListSelectedItemsDeleted) {
       yield* _mapDeleteSelectedItemsEventToState(event);
     }
   }
@@ -210,7 +207,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   }
 
   Stream<DrugListState> _mapSelectDeselectGroupEventToState(
-    SelectDeselectGroup event,
+    DrugListGroupSelectionChanged event,
   ) async* {
     event.group.isSelected = !event.group.isSelected;
     if (event.group.isSelected) {
@@ -236,7 +233,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   }
 
   Stream<DrugListState> _mapDeleteDrugGroupItemEventToState(
-    DeleteDrugGroupItem event,
+    DrugListGroupItemDeleted event,
   ) async* {
     int groupIndex = -1;
     int itemIndex = -1;
@@ -271,7 +268,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       );
       if (_groups.isEmpty) {
         await Future.delayed(Duration(milliseconds: 300));
-        yield DrugListEmpty();
+        yield _buildState();
       }
     } else {
       group.items.remove(event.item);
@@ -284,7 +281,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   }
 
   Stream<DrugListState> _mapDeleteSelectedItemsEventToState(
-    DeleteSelectedItems event,
+    DrugListSelectedItemsDeleted event,
   ) async* {
     int selectedGroupsCount = _groups.where((group) => group.isSelected).length;
     while (selectedGroupsCount > 0) {
@@ -300,7 +297,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
 
     if (_groups.isEmpty) {
       await Future.delayed(_animationDuration);
-      yield DrugListEmpty();
+      yield _buildState();
     } else {
       for (var group in _groups) {
         int selectedItemsCount =

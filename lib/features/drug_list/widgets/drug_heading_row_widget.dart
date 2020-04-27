@@ -28,7 +28,7 @@ class DrugHeadingRowState extends DrugListRowState<DrugHeadingRowWidget> {
     return GestureDetector(
       onTap: widget.isInEditMode
           ? () => BlocProvider.of<DrugListBloc>(context).add(
-                SelectDeselectGroup(
+                DrugListGroupSelectionChanged(
                   widget.item,
                 ),
               )

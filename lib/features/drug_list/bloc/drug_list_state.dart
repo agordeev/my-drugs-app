@@ -4,12 +4,8 @@ abstract class DrugListState extends Equatable {
   const DrugListState();
 }
 
-class DrugListEmpty extends DrugListState {
-  @override
-  List<Object> get props => [];
-}
-
-class DrugListLoaded extends DrugListState {
+class DrugListInitial extends DrugListState {
+  final bool isEmpty;
   final ScreenMode screenMode;
   final GlobalKey<DrugListBottomBarState> bottomBarKey;
   final GlobalKey<AnimatedListState> listKey;
@@ -18,7 +14,8 @@ class DrugListLoaded extends DrugListState {
   final String numberOfItemsSelected;
   final bool isDeleteButtonActive;
 
-  DrugListLoaded(
+  DrugListInitial(
+    this.isEmpty,
     this.screenMode,
     this.bottomBarKey,
     this.listKey,
@@ -30,6 +27,7 @@ class DrugListLoaded extends DrugListState {
 
   @override
   List<Object> get props => [
+        this.isEmpty,
         this.screenMode,
         this.bottomBarKey,
         this.listKey,
