@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_drugs/app/features/drug_list/bloc/drug_list_bloc.dart';
-import 'package:my_drugs/app/features/drug_list/drug_list_screen.dart';
+import 'package:my_drugs/app/routes/app_route_factory.dart';
+import 'package:my_drugs/app/routes/app_routes.dart';
 import 'package:my_drugs/data_access/data_access.dart';
 import 'package:my_drugs/models/drug.dart';
 import 'package:path/path.dart';
@@ -85,27 +84,24 @@ Future<Database> instantiateDatabase(String databasesPath) => openDatabase(
     );
 
 class MyApp extends StatelessWidget {
-  final AbstractDrugRepository repository;
-  final List<Drug> drugs;
+  final AppRouteFactory _routeFactory;
 
-  const MyApp({
+  MyApp({
     Key key,
-    @required this.repository,
-    @required this.drugs,
+    AbstractDrugRepository repository,
+    List<Drug> drugs,
   })  : assert(repository != null),
+        _routeFactory = AppRouteFactory(repository, drugs),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _routeFactory.navigatorKey,
       theme: _buildTheme(context),
-      home: BlocProvider<DrugListBloc>(
-        create: (context) => DrugListBloc(
-          repository,
-          drugs,
-        ),
-        child: DrugListScreen(),
-      ),
+      onGenerateRoute: (settings) =>
+          _routeFactory.generateRoute(settings, context),
+      initialRoute: AppRoutes.drugList,
     );
   }
 
