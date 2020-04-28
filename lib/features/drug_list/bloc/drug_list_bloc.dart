@@ -235,48 +235,54 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> _mapDeleteDrugGroupItemEventToState(
     DrugListGroupItemDeleted event,
   ) async* {
-    int groupIndex = -1;
-    int itemIndex = -1;
-    for (var i = 0; i < _groups.length; i++) {
-      final group = _groups[i];
-      for (var j = 0; j < group.items.length; j++) {
-        final item = group.items[j];
-        if (item == event.item) {
-          groupIndex = i;
-          itemIndex = j;
+    try {
+      await _repository.delete([event.item.id]);
+
+      int groupIndex = -1;
+      int itemIndex = -1;
+      for (var i = 0; i < _groups.length; i++) {
+        final group = _groups[i];
+        for (var j = 0; j < group.items.length; j++) {
+          final item = group.items[j];
+          if (item == event.item) {
+            groupIndex = i;
+            itemIndex = j;
+            break;
+          }
+        }
+        if (groupIndex != -1) {
           break;
         }
       }
-      if (groupIndex != -1) {
-        break;
+      if (groupIndex == -1 || itemIndex == -1) {
+        return;
       }
-    }
-    if (groupIndex == -1 || itemIndex == -1) {
-      return;
-    }
-    _expiredDrugs.removeWhere((element) => element.id == event.item.id);
-    _notExpiredDrugs.removeWhere((element) => element.id == event.item.id);
-    final group = _groups[groupIndex];
-    if (group.items.length == 1) {
-      // The group will become empty after item removal. Delete the entire group.
-      _groups.remove(group);
+      _expiredDrugs.removeWhere((element) => element.id == event.item.id);
+      _notExpiredDrugs.removeWhere((element) => element.id == event.item.id);
+      final group = _groups[groupIndex];
+      if (group.items.length == 1) {
+        // The group will become empty after item removal. Delete the entire group.
+        _groups.remove(group);
 
-      _listKey.currentState.removeItem(
-        groupIndex,
-        event.groupBuilder,
-        duration: _animationDuration,
-      );
-      if (_groups.isEmpty) {
-        await Future.delayed(Duration(milliseconds: 300));
-        yield _buildState();
+        _listKey.currentState.removeItem(
+          groupIndex,
+          event.groupBuilder,
+          duration: _animationDuration,
+        );
+        if (_groups.isEmpty) {
+          await Future.delayed(Duration(milliseconds: 300));
+          yield _buildState();
+        }
+      } else {
+        group.items.remove(event.item);
+        group.listKey.currentState.removeItem(
+          itemIndex,
+          event.itemBuilder,
+          duration: _animationDuration,
+        );
       }
-    } else {
-      group.items.remove(event.item);
-      group.listKey.currentState.removeItem(
-        itemIndex,
-        event.itemBuilder,
-        duration: _animationDuration,
-      );
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -286,6 +292,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     int selectedGroupsCount = _groups.where((group) => group.isSelected).length;
     while (selectedGroupsCount > 0) {
       final index = _groups.indexWhere((group) => group.isSelected);
+      await _repository.delete(_groups[index].items.map((e) => e.id).toList());
       final group = _groups.removeAt(index);
       _listKey.currentState.removeItem(
         index,
@@ -305,6 +312,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         while (selectedItemsCount > 0) {
           final index = group.items.indexWhere((item) => item.isSelected);
           final item = group.items.removeAt(index);
+          await _repository.delete([item.id]);
           group.listKey.currentState.removeItem(
             index,
             (context, animation) => event.itemBuilder(context, item, animation),

@@ -6,5 +6,5 @@ abstract class AbstractDrugRepository {
 
   Future<List<Drug>> fetchList();
   Future<Drug> store(Drug drug);
-  Future<void> delete(String drugId);
+  Future<void> delete(List<String> ids);
 }
