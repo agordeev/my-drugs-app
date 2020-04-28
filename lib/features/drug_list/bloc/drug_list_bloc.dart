@@ -40,7 +40,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
 
   final GlobalKey<DrugListBottomBarState> _bottomBarKey = GlobalKey();
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
-  final Duration _animationDuration = Duration(milliseconds: 5000);
+  final Duration _animationDuration = Duration(milliseconds: 300);
 
   static final _firstDayOfCurrentMonth =
       DateTime(DateTime.now().year, DateTime.now().month, 1);
