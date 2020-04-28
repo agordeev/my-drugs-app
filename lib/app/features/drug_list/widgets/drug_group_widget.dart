@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:my_drugs/features/drug_list/drug_list_item.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_group_item_widget.dart';
+import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/drug_group_item_widget.dart';
 
 import 'drug_heading_row_widget.dart';
 

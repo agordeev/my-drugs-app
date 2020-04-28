@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:my_drugs/features/drug_list/drug_list_item.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_group_item_widget.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_group_widget.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_list_bottom_bar.dart';
+import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/drug_group_item_widget.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/drug_group_widget.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
 
 import 'bloc/drug_list_bloc.dart';
 

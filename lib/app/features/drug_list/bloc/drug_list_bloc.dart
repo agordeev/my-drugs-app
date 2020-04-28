@@ -4,10 +4,10 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/drug_heading_row_widget.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
 import 'package:my_drugs/data_access/data_access.dart';
-import 'package:my_drugs/features/drug_list/drug_list_item.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_heading_row_widget.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_list_bottom_bar.dart';
 import 'package:my_drugs/models/drug.dart';
 
 part 'drug_list_event.dart';

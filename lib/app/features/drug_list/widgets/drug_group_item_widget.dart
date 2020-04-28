@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_drugs/features/drug_list/bloc/drug_list_bloc.dart';
-import 'package:my_drugs/features/drug_list/drug_list_item.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_list_row.dart';
+import 'package:my_drugs/app/features/drug_list/bloc/drug_list_bloc.dart';
+import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/drug_list_row.dart';
 
 class DrugGroupItemWidget extends DrugListRow {
   final DrugGroupItem item;
