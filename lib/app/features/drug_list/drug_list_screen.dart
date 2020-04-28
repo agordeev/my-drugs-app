@@ -6,6 +6,7 @@ import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_group_item_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_group_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
+import 'package:my_drugs/app/routes/app_routes.dart';
 
 import 'bloc/drug_list_bloc.dart';
 
@@ -95,7 +96,8 @@ class _DrugListScreenState extends State<DrugListScreen>
             numberOfItemsTotal: numberOfItemsTotal,
             numberOfItemsSelected: numberOfItemsSelected,
             isDeleteButtonActive: isDeleteButtonActive,
-            onAddButtonPressed: () {},
+            onAddButtonPressed: () =>
+                Navigator.of(context).pushNamed(AppRoutes.manageDrug),
             onDeleteButtonPressed: () => _deleteSelectedItems(context, state),
           ),
         );

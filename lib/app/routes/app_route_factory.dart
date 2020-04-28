@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:my_drugs/app/features/drug_list/bloc/drug_list_bloc.dart';
 import 'package:my_drugs/app/features/drug_list/drug_list_screen.dart';
+import 'package:my_drugs/app/features/manage_drug/manage_drug_screen.dart';
 import 'package:my_drugs/app/routes/app_routes.dart';
 import 'package:my_drugs/data_access/data_access.dart';
 import 'package:my_drugs/models/drug.dart';
@@ -17,12 +18,17 @@ class AppRouteFactory {
   AppRouteFactory(this.repository, this.drugs);
 
   Route<dynamic> generateRoute(RouteSettings settings, BuildContext context) {
-    final arguments = settings.arguments;
     switch (settings.name) {
       case AppRoutes.drugList:
         return PageRouteBuilder(
             settings: settings,
             pageBuilder: (context, _, __) => _buildDrugListScreen(context));
+      case AppRoutes.manageDrug:
+        return platformPageRoute(
+            context: context,
+            settings: settings,
+            fullscreenDialog: true,
+            builder: (context) => _buildManageDrugScreen(context));
     }
     return _buildUnknownRoute(
       context,
@@ -49,4 +55,9 @@ class AppRouteFactory {
         ),
         child: DrugListScreen(),
       );
+
+  Widget _buildManageDrugScreen(
+    BuildContext context,
+  ) =>
+      ManageDrugScreen();
 }
