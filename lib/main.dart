@@ -1,13 +1,75 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_drugs/data_access/data_access.dart';
+import 'package:my_drugs/features/drug_list/bloc/drug_list_bloc.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'features/drug_list/drug_list_screen.dart';
+import 'models/drug.dart';
+
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final database = await instantiateDatabase(await getDatabasesPath());
   final repository = AbstractDrugRepository.make(database);
   runApp(MyApp(
     repository: repository,
+    drugs: [
+      Drug(
+        id: '1',
+        name: 'Name',
+        expiresOn: DateTime(2020, 1),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '2',
+        name: 'Aspirin',
+        expiresOn: DateTime(2020, 10),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '3',
+        name: 'A medication with very long name to test multiline',
+        expiresOn: DateTime(2020, 4),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '4',
+        name:
+            '4 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
+        expiresOn: DateTime(2020, 11),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '5',
+        name:
+            '5 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
+        expiresOn: DateTime(2020, 11),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '6',
+        name:
+            '6 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
+        expiresOn: DateTime(2020, 11),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '7',
+        name:
+            '7 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
+        expiresOn: DateTime(2020, 11),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '8',
+        name:
+            '8 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
+        expiresOn: DateTime(2020, 11),
+        createdAt: DateTime.now(),
+      ),
+    ],
   ));
 }
 
@@ -25,65 +87,48 @@ Future<Database> instantiateDatabase(String databasesPath) => openDatabase(
 
 class MyApp extends StatelessWidget {
   final AbstractDrugRepository repository;
+  final List<Drug> drugs;
 
-  const MyApp({Key key, @required this.repository})
-      : assert(repository != null),
+  const MyApp({
+    Key key,
+    @required this.repository,
+    @required this.drugs,
+  })  : assert(repository != null),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+      theme: _buildTheme(context),
+      home: BlocProvider<DrugListBloc>(
+        create: (context) => DrugListBloc(
+          repository,
+          drugs,
+        ),
+        child: DrugListScreen(),
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
+  ThemeData _buildTheme(BuildContext context) {
+    final baseTheme = ThemeData.light();
+    final primarySwatch = Colors.teal;
+    return ThemeData(
+      primarySwatch: Colors.teal,
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+      colorScheme: baseTheme.colorScheme.copyWith(
+        surface: Color(0xFFFBFBFB),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+      appBarTheme: AppBarTheme(
+        brightness: Brightness.light,
+        color: Colors.white,
+        textTheme: Theme.of(context).textTheme,
+        iconTheme: IconThemeData(
+          color: Colors.teal,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+      cupertinoOverrideTheme: CupertinoThemeData(
+        primaryColor: primarySwatch,
       ),
     );
   }

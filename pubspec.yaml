@@ -16,6 +16,11 @@ dependencies:
   json_annotation: ^3.0.1
   sqflite:
   path:
+  provider:
+  flutter_bloc:
+  equatable:
+  intl:
+  flutter_platform_widgets: ^0.32.5
 
   cupertino_icons: ^0.1.3
 

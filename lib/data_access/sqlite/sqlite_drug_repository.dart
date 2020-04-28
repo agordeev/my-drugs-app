@@ -8,12 +8,16 @@ class SqliteDrugRepository implements AbstractDrugRepository {
   SqliteDrugRepository(this._database);
 
   @override
-  Future<void> delete(String drugId) async {
-    await _database.delete(
+  Future<void> delete(List<String> ids) async {
+    if (ids == null || ids.isEmpty) {
+      return;
+    }
+    final count = await _database.delete(
       _tableName,
-      where: "id = ?",
-      whereArgs: [drugId],
+      where: "id IN (?)",
+      whereArgs: ids,
     );
+    print('Deleted: $count');
   }
 
   @override
