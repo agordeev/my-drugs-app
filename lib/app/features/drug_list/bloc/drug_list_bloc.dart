@@ -136,7 +136,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> mapEventToState(
     DrugListEvent event,
   ) async* {
-    if (event is DrugListScreenModeSwitchd) {
+    if (event is DrugListScreenModeSwitched) {
       yield* _mapSwitchScreenModeEventToState();
     } else if (event is SelectDeselectDrug) {
       yield* _mapSelectDeselectDrugEventToState(event);

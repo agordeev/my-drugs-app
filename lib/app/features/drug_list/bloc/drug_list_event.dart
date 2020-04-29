@@ -4,7 +4,7 @@ abstract class DrugListEvent extends Equatable {
   const DrugListEvent();
 }
 
-class DrugListScreenModeSwitchd extends DrugListEvent {
+class DrugListScreenModeSwitched extends DrugListEvent {
   @override
   List<Object> get props => [];
 }

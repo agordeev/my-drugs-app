@@ -7,6 +7,7 @@ import 'package:my_drugs/app/features/drug_list/widgets/drug_group_item_widget.d
 import 'package:my_drugs/app/features/drug_list/widgets/drug_group_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
 import 'package:my_drugs/app/routes/app_routes.dart';
+import 'package:my_drugs/shared/painters/screen_mode_button_painter.dart';
 
 import 'bloc/drug_list_bloc.dart';
 
@@ -62,15 +63,18 @@ class _DrugListScreenState extends State<DrugListScreen>
               context,
               state,
             );
+
             actions = [
               PlatformButton(
                 androidFlat: (context) => MaterialFlatButtonData(),
-                child: AnimatedIcon(
-                  icon: AnimatedIcons.arrow_menu,
-                  progress: _screenModeAnimationController,
+                child: CustomPaint(
+                  size: Size(32, 32),
+                  painter: ScreenModeButtonPainter(
+                      Theme.of(context).colorScheme.primary,
+                      _screenModeAnimationController),
                 ),
                 onPressed: () => BlocProvider.of<DrugListBloc>(context)
-                    .add(DrugListScreenModeSwitchd()),
+                    .add(DrugListScreenModeSwitched()),
               ),
             ];
             numberOfItemsTotal = state.numberOfItemsTotal;
