@@ -68,7 +68,7 @@ class _DrugListScreenState extends State<DrugListScreen>
               PlatformButton(
                 androidFlat: (context) => MaterialFlatButtonData(),
                 child: CustomPaint(
-                  size: Size(32, 32),
+                  size: Size(24, 24),
                   painter: ScreenModeButtonPainter(
                       Theme.of(context).colorScheme.primary,
                       _screenModeAnimationController),
