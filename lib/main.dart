@@ -109,9 +109,10 @@ class MyApp extends StatelessWidget {
     final baseTheme = ThemeData.light();
     final primarySwatch = Colors.teal;
     return ThemeData(
-      primarySwatch: Colors.teal,
+      primarySwatch: primarySwatch,
       visualDensity: VisualDensity.adaptivePlatformDensity,
       colorScheme: baseTheme.colorScheme.copyWith(
+        primary: primarySwatch,
         surface: Color(0xFFFBFBFB),
       ),
       appBarTheme: AppBarTheme(
@@ -119,7 +120,7 @@ class MyApp extends StatelessWidget {
         color: Colors.white,
         textTheme: Theme.of(context).textTheme,
         iconTheme: IconThemeData(
-          color: Colors.teal,
+          color: primarySwatch,
         ),
       ),
       cupertinoOverrideTheme: CupertinoThemeData(
