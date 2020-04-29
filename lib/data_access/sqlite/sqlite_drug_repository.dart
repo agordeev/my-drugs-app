@@ -14,7 +14,7 @@ class SqliteDrugRepository implements AbstractDrugRepository {
     }
     final count = await _database.delete(
       _tableName,
-      where: "id IN (?)",
+      where: 'id IN (?)',
       whereArgs: ids,
     );
     print('Deleted: $count');
@@ -23,7 +23,7 @@ class SqliteDrugRepository implements AbstractDrugRepository {
   @override
   Future<List<Drug>> fetchList() async {
     final maps = await _database.query(_tableName);
-    List<Drug> result = [];
+    var result = <Drug>[];
     maps.forEach((e) {
       try {
         final drug = Drug.fromJson(e);

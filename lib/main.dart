@@ -76,7 +76,7 @@ Future<Database> instantiateDatabase(String databasesPath) => openDatabase(
       join(databasesPath, 'drugs_database.db'),
       // When the database is first created, create a table to store dogs.
       onCreate: (db, version) => db.execute(
-        "CREATE TABLE drugs(id TEXT PRIMARY KEY, name TEXT, expiresOn INTEGER, createdAt INTEGER)",
+        'CREATE TABLE drugs(id TEXT PRIMARY KEY, name TEXT, expiresOn INTEGER, createdAt INTEGER)',
       ),
       // Set the version. This executes the onCreate function and provides a
       // path to perform database upgrades and downgrades.
@@ -88,7 +88,7 @@ class MyApp extends StatelessWidget {
 
   MyApp({
     Key key,
-    AbstractDrugRepository repository,
+    @required AbstractDrugRepository repository,
     List<Drug> drugs,
   })  : assert(repository != null),
         _routeFactory = AppRouteFactory(repository, drugs),

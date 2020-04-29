@@ -48,12 +48,12 @@ class _DrugListScreenState extends State<DrugListScreen>
   Widget build(BuildContext context) {
     return BlocBuilder<DrugListBloc, DrugListState>(
       builder: (context, state) {
-        GlobalKey<DrugListBottomBarState> bottomBarKey = GlobalKey();
+        var bottomBarKey = GlobalKey<DrugListBottomBarState>();
         List<Widget> actions;
         Widget body;
-        String numberOfItemsTotal = '';
-        String numberOfItemsSelected = '';
-        bool isDeleteButtonActive = false;
+        var numberOfItemsTotal = '';
+        var numberOfItemsSelected = '';
+        var isDeleteButtonActive = false;
         if (state is DrugListInitial) {
           if (state.isEmpty) {
             body = _buildEmptyStateContent(context);

@@ -96,7 +96,7 @@ void main() {
         'should not throw an exception if a record with such id already exists',
         () async {
       // Arrange
-      _database.insert(
+      await _database.insert(
         'drugs',
         _testDrug.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace,

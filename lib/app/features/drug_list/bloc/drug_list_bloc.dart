@@ -34,8 +34,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
 
   final DateFormat _dateFormat = DateFormat('MMM yyyy');
   ScreenMode _screenMode = ScreenMode.normal;
-  StreamController<ScreenMode> _screenModeStreamController =
-      StreamController<ScreenMode>.broadcast();
+  final _screenModeStreamController = StreamController<ScreenMode>.broadcast();
   Stream<ScreenMode> get screenMode => _screenModeStreamController.stream;
 
   final GlobalKey<DrugListBottomBarState> _bottomBarKey = GlobalKey();
@@ -65,9 +64,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   DrugListState get initialState => _buildState();
 
   DrugListState _buildState() {
-    if (_groups == null) {
-      _groups = _buildGroups(_expiredDrugs, _notExpiredDrugs);
-    }
+    _groups ??= _buildGroups(_expiredDrugs, _notExpiredDrugs);
     final selectedItemsCount = _selectedItemsCount;
     return DrugListInitial(
       _expiredDrugs.isEmpty && _notExpiredDrugs.isEmpty,
@@ -82,7 +79,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   }
 
   List<DrugGroup> _buildGroups(List<Drug> expired, List<Drug> notExpired) {
-    List<DrugGroup> result = [];
+    var result = <DrugGroup>[];
     if (expired.isNotEmpty) {
       final groupKey = GlobalKey<DrugHeadingRowState>();
       result.add(
@@ -238,8 +235,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     try {
       await _repository.delete([event.item.id]);
 
-      int groupIndex = -1;
-      int itemIndex = -1;
+      var groupIndex = -1;
+      var itemIndex = -1;
       for (var i = 0; i < _groups.length; i++) {
         final group = _groups[i];
         for (var j = 0; j < group.items.length; j++) {
@@ -289,7 +286,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> _mapDeleteSelectedItemsEventToState(
     DrugListSelectedItemsDeleted event,
   ) async* {
-    int selectedGroupsCount = _groups.where((group) => group.isSelected).length;
+    var selectedGroupsCount = _groups.where((group) => group.isSelected).length;
     while (selectedGroupsCount > 0) {
       final index = _groups.indexWhere((group) => group.isSelected);
       await _repository.delete(_groups[index].items.map((e) => e.id).toList());
@@ -307,7 +304,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       yield _buildState();
     } else {
       for (var group in _groups) {
-        int selectedItemsCount =
+        var selectedItemsCount =
             group.items.where((item) => item.isSelected).length;
         while (selectedItemsCount > 0) {
           final index = group.items.indexWhere((item) => item.isSelected);
