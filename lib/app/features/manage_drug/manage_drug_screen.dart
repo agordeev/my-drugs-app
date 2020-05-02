@@ -108,8 +108,11 @@ class ManageDrugScreen extends StatelessWidget {
                     color: Theme.of(context).colorScheme.primary),
                 child: Text(
                   actionButtonTitle,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.1,
+                  ),
                 ),
                 onPressed: () => BlocProvider.of<ManageDrugBloc>(context)
                     .add(ManageDrugDrugStored()),
