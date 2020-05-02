@@ -60,7 +60,7 @@ class ManageDrugBloc extends Bloc<ManageDrugEvent, ManageDrugState> {
     final context = _formKey.currentState.context;
     FocusScope.of(context).unfocus();
     try {
-      final expiresOn = _dateFormat.parse('_expiresOnController.text');
+      final expiresOn = _dateFormat.parse(_expiresOnController.text);
       final drug = Drug(
         id: _drug?.id ?? Uuid().v4(),
         name: _nameController.text,

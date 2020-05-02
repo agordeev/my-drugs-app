@@ -72,11 +72,18 @@ class DrugListSelectedItemsDeleted extends DrugListEvent {
       ];
 }
 
-class DrugListItemAdded extends DrugListEvent {
-  final Drug item;
-
-  DrugListItemAdded(this.item);
+class DrugListAddingStarted extends DrugListEvent {
+  DrugListAddingStarted();
 
   @override
-  List<Object> get props => [item];
+  List<Object> get props => [];
+}
+
+class DrugListEditingStarted extends DrugListEvent {
+  final String id;
+
+  DrugListEditingStarted(this.id);
+
+  @override
+  List<Object> get props => [id];
 }

@@ -7,11 +7,18 @@ import 'package:my_drugs/app/misc/validators/validators.dart';
 import 'package:my_drugs/app/widgets/app_card.dart';
 
 class ManageDrugScreen extends StatelessWidget {
+  final String title;
+  final String actionButtonTitle;
+
+  const ManageDrugScreen(
+      {Key key, @required this.title, @required this.actionButtonTitle})
+      : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Drug'),
+        title: Text(title),
       ),
       body: SafeArea(
         child: BlocBuilder<ManageDrugBloc, ManageDrugState>(
@@ -100,7 +107,7 @@ class ManageDrugScreen extends StatelessWidget {
                 ios: (context) => CupertinoButtonData(
                     color: Theme.of(context).colorScheme.primary),
                 child: Text(
-                  'ADD',
+                  actionButtonTitle,
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                 ),

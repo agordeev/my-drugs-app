@@ -26,7 +26,7 @@ class AppRouteFactory {
             settings: settings,
             pageBuilder: (context, _, __) => _buildDrugListScreen(context));
       case AppRoutes.manageDrug:
-        return platformPageRoute(
+        return platformPageRoute<Drug>(
             context: context,
             settings: settings,
             fullscreenDialog: true,
@@ -53,6 +53,7 @@ class AppRouteFactory {
   ) =>
       BlocProvider<DrugListBloc>(
         create: (context) => DrugListBloc(
+          navigatorKey,
           repository,
           drugs,
         ),
@@ -69,6 +70,9 @@ class AppRouteFactory {
           repository,
           drug,
         ),
-        child: ManageDrugScreen(),
+        child: ManageDrugScreen(
+          title: drug == null ? 'Add Drug' : 'Edit Drug',
+          actionButtonTitle: drug == null ? 'ADD' : 'SAVE',
+        ),
       );
 }

@@ -22,7 +22,7 @@ class SqliteDrugRepository implements AbstractDrugRepository {
 
   @override
   Future<List<Drug>> fetchList() async {
-    final maps = await _database.query(_tableName);
+    final maps = await _database.query(_tableName, orderBy: 'expiresOn DESC');
     var result = <Drug>[];
     maps.forEach((e) {
       try {

@@ -6,7 +6,6 @@ import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_group_item_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_group_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
-import 'package:my_drugs/app/routes/app_routes.dart';
 import 'package:my_drugs/shared/painters/screen_mode_button_painter.dart';
 
 import 'bloc/drug_list_bloc.dart';
@@ -100,7 +99,8 @@ class _DrugListScreenState extends State<DrugListScreen>
             numberOfItemsTotal: numberOfItemsTotal,
             numberOfItemsSelected: numberOfItemsSelected,
             isDeleteButtonActive: isDeleteButtonActive,
-            onAddButtonPressed: _onAddButtonPressed,
+            onAddButtonPressed: () => BlocProvider.of<DrugListBloc>(context)
+                .add(DrugListAddingStarted()),
             onDeleteButtonPressed: () => _deleteSelectedItems(context, state),
           ),
         );
@@ -140,13 +140,6 @@ class _DrugListScreenState extends State<DrugListScreen>
     );
   }
 
-  void _onAddButtonPressed() async {
-    final drug = await Navigator.of(context).pushNamed(AppRoutes.manageDrug);
-    if (drug != null) {
-      BlocProvider.of<DrugListBloc>(context).add(DrugListItemAdded(drug));
-    }
-  }
-
   void _presentBottomSheet(
     BuildContext context,
     DrugGroup group,
@@ -166,7 +159,11 @@ class _DrugListScreenState extends State<DrugListScreen>
           actions: <Widget>[
             CupertinoActionSheetAction(
               child: Text('Edit'),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                Navigator.of(context).pop();
+                BlocProvider.of<DrugListBloc>(context)
+                    .add(DrugListEditingStarted(item.id));
+              },
             ),
             CupertinoActionSheetAction(
               child: Text('Delete'),
