@@ -27,13 +27,13 @@ class DrugListInitial extends DrugListState {
 
   @override
   List<Object> get props => [
-        this.isEmpty,
-        this.screenMode,
-        this.bottomBarKey,
-        this.listKey,
-        this.groups,
-        this.numberOfItemsTotal,
-        this.numberOfItemsSelected,
-        this.isDeleteButtonActive,
+        isEmpty,
+        screenMode,
+        bottomBarKey,
+        listKey,
+        groups,
+        numberOfItemsTotal,
+        numberOfItemsSelected,
+        isDeleteButtonActive,
       ];
 }

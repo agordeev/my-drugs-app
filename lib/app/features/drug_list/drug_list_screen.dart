@@ -2,10 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:my_drugs/features/drug_list/drug_list_item.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_group_item_widget.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_group_widget.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_list_bottom_bar.dart';
+import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/drug_group_item_widget.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/drug_group_widget.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
+import 'package:my_drugs/shared/painters/screen_mode_button_painter.dart';
 
 import 'bloc/drug_list_bloc.dart';
 
@@ -46,12 +47,12 @@ class _DrugListScreenState extends State<DrugListScreen>
   Widget build(BuildContext context) {
     return BlocBuilder<DrugListBloc, DrugListState>(
       builder: (context, state) {
-        GlobalKey<DrugListBottomBarState> bottomBarKey = GlobalKey();
+        var bottomBarKey = GlobalKey<DrugListBottomBarState>();
         List<Widget> actions;
         Widget body;
-        String numberOfItemsTotal = '';
-        String numberOfItemsSelected = '';
-        bool isDeleteButtonActive = false;
+        var numberOfItemsTotal = '';
+        var numberOfItemsSelected = '';
+        var isDeleteButtonActive = false;
         if (state is DrugListInitial) {
           if (state.isEmpty) {
             body = _buildEmptyStateContent(context);
@@ -61,15 +62,18 @@ class _DrugListScreenState extends State<DrugListScreen>
               context,
               state,
             );
+
             actions = [
               PlatformButton(
                 androidFlat: (context) => MaterialFlatButtonData(),
-                child: AnimatedIcon(
-                  icon: AnimatedIcons.arrow_menu,
-                  progress: _screenModeAnimationController,
+                child: CustomPaint(
+                  size: Size(24, 24),
+                  painter: ScreenModeButtonPainter(
+                      Theme.of(context).colorScheme.primary,
+                      _screenModeAnimationController),
                 ),
                 onPressed: () => BlocProvider.of<DrugListBloc>(context)
-                    .add(DrugListScreenModeSwitchd()),
+                    .add(DrugListScreenModeSwitched()),
               ),
             ];
             numberOfItemsTotal = state.numberOfItemsTotal;
@@ -85,17 +89,15 @@ class _DrugListScreenState extends State<DrugListScreen>
             title: Text('My Drugs'),
             actions: actions,
           ),
-          body: AnimatedSwitcher(
-            duration: Duration(milliseconds: 300),
-            child: body,
-          ),
+          body: body,
           bottomNavigationBar: DrugListBottomBar(
             key: bottomBarKey,
             screenModeAnimationController: _screenModeAnimationController,
             numberOfItemsTotal: numberOfItemsTotal,
             numberOfItemsSelected: numberOfItemsSelected,
             isDeleteButtonActive: isDeleteButtonActive,
-            onAddButtonPressed: () {},
+            onAddButtonPressed: () => BlocProvider.of<DrugListBloc>(context)
+                .add(DrugListAddingStarted()),
             onDeleteButtonPressed: () => _deleteSelectedItems(context, state),
           ),
         );
@@ -154,7 +156,11 @@ class _DrugListScreenState extends State<DrugListScreen>
           actions: <Widget>[
             CupertinoActionSheetAction(
               child: Text('Edit'),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                Navigator.of(context).pop();
+                BlocProvider.of<DrugListBloc>(context)
+                    .add(DrugListEditingStarted(item.id));
+              },
             ),
             CupertinoActionSheetAction(
               child: Text('Delete'),

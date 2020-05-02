@@ -12,18 +12,17 @@ class SqliteDrugRepository implements AbstractDrugRepository {
     if (ids == null || ids.isEmpty) {
       return;
     }
-    final count = await _database.delete(
+    await _database.delete(
       _tableName,
-      where: "id IN (?)",
+      where: 'id IN (?)',
       whereArgs: ids,
     );
-    print('Deleted: $count');
   }
 
   @override
   Future<List<Drug>> fetchList() async {
-    final maps = await _database.query(_tableName);
-    List<Drug> result = [];
+    final maps = await _database.query(_tableName, orderBy: 'expiresOn DESC');
+    var result = <Drug>[];
     maps.forEach((e) {
       try {
         final drug = Drug.fromJson(e);

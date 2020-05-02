@@ -2,27 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-class Checkmark extends StatelessWidget {
-  final AnimationController animationController;
-
-  const Checkmark({Key key, @required this.animationController})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 20,
-      height: 20,
-      child: CustomPaint(
-        painter: CheckmarkPainter(
-          Theme.of(context).colorScheme.primary,
-          animationController,
-        ),
-      ),
-    );
-  }
-}
-
+/// Draws a checkmark with animation.
 class CheckmarkPainter extends CustomPainter {
   final Color color;
   final Animation<double> _strokeWidth;
@@ -132,7 +112,7 @@ class CheckmarkPainter extends CustomPainter {
   ) {
     var currentLength = 0.0;
 
-    final path = new Path();
+    final path = Path();
 
     var metricsIterator = originalPath.computeMetrics().iterator;
 

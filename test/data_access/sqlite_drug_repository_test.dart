@@ -96,7 +96,7 @@ void main() {
         'should not throw an exception if a record with such id already exists',
         () async {
       // Arrange
-      _database.insert(
+      await _database.insert(
         'drugs',
         _testDrug.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace,
@@ -112,12 +112,12 @@ void main() {
     test('should call database.delete', () async {
       // Arrange
       // Act
-      await _sut.delete(_testDrug.id);
+      await _sut.delete([_testDrug.id]);
       // Assert
       verify(
         _database.delete(
           'drugs',
-          where: 'id = ?',
+          where: 'id IN (?)',
           whereArgs: [_testDrug.id],
         ),
       );

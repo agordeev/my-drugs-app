@@ -4,10 +4,11 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/drug_heading_row_widget.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
+import 'package:my_drugs/app/routes/app_routes.dart';
 import 'package:my_drugs/data_access/data_access.dart';
-import 'package:my_drugs/features/drug_list/drug_list_item.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_heading_row_widget.dart';
-import 'package:my_drugs/features/drug_list/widgets/drug_list_bottom_bar.dart';
 import 'package:my_drugs/models/drug.dart';
 
 part 'drug_list_event.dart';
@@ -16,9 +17,11 @@ part 'drug_list_state.dart';
 enum ScreenMode { normal, edit }
 
 class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
+  final GlobalKey<NavigatorState> _navigatorKey;
   final AbstractDrugRepository _repository;
-  final List<Drug> _expiredDrugs;
-  final List<Drug> _notExpiredDrugs;
+  // final List<Drug> _expiredDrugs;
+  // final List<Drug> _notExpiredDrugs;
+  final List<Drug> _drugs;
 
   List<DrugGroup> _groups;
   int get _selectedItemsCount => _groups.fold(
@@ -34,8 +37,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
 
   final DateFormat _dateFormat = DateFormat('MMM yyyy');
   ScreenMode _screenMode = ScreenMode.normal;
-  StreamController<ScreenMode> _screenModeStreamController =
-      StreamController<ScreenMode>.broadcast();
+  final _screenModeStreamController = StreamController<ScreenMode>.broadcast();
   Stream<ScreenMode> get screenMode => _screenModeStreamController.stream;
 
   final GlobalKey<DrugListBottomBarState> _bottomBarKey = GlobalKey();
@@ -46,14 +48,10 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       DateTime(DateTime.now().year, DateTime.now().month, 1);
 
   DrugListBloc(
+    this._navigatorKey,
     this._repository,
-    List<Drug> drugs,
-  )   : _expiredDrugs = drugs
-            .where((e) => e.expiresOn.compareTo(_firstDayOfCurrentMonth) <= 0)
-            .toList(),
-        _notExpiredDrugs = drugs
-            .where((e) => e.expiresOn.compareTo(_firstDayOfCurrentMonth) > 0)
-            .toList();
+    this._drugs,
+  );
 
   @override
   Future<void> close() {
@@ -65,24 +63,24 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   DrugListState get initialState => _buildState();
 
   DrugListState _buildState() {
-    if (_groups == null) {
-      _groups = _buildGroups(_expiredDrugs, _notExpiredDrugs);
-    }
+    _groups ??= _buildGroups(_drugs);
     final selectedItemsCount = _selectedItemsCount;
     return DrugListInitial(
-      _expiredDrugs.isEmpty && _notExpiredDrugs.isEmpty,
+      _drugs.isEmpty,
       _screenMode,
       _bottomBarKey,
       _listKey,
       _groups,
-      '${(_expiredDrugs.length + _notExpiredDrugs.length)} items',
+      '${(_drugs.length)} items',
       '$selectedItemsCount selected',
       selectedItemsCount > 0,
     );
   }
 
-  List<DrugGroup> _buildGroups(List<Drug> expired, List<Drug> notExpired) {
-    List<DrugGroup> result = [];
+  List<DrugGroup> _buildGroups(List<Drug> drugs) {
+    final expired = drugs.where(_isDrugExpired).toList();
+    final notExpired = drugs.where((e) => !_isDrugExpired(e)).toList();
+    var result = <DrugGroup>[];
     if (expired.isNotEmpty) {
       final groupKey = GlobalKey<DrugHeadingRowState>();
       result.add(
@@ -136,16 +134,20 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> mapEventToState(
     DrugListEvent event,
   ) async* {
-    if (event is DrugListScreenModeSwitchd) {
+    if (event is DrugListScreenModeSwitched) {
       yield* _mapSwitchScreenModeEventToState();
     } else if (event is SelectDeselectDrug) {
       yield* _mapSelectDeselectDrugEventToState(event);
     } else if (event is DrugListGroupSelectionChanged) {
       yield* _mapSelectDeselectGroupEventToState(event);
     } else if (event is DrugListGroupItemDeleted) {
-      yield* _mapDeleteDrugGroupItemEventToState(event);
+      yield* _mapGroupItemDeletedEventToState(event);
     } else if (event is DrugListSelectedItemsDeleted) {
-      yield* _mapDeleteSelectedItemsEventToState(event);
+      yield* _mapSelectedItemsDeletedEventToState(event);
+    } else if (event is DrugListAddingStarted) {
+      yield* _mapAddingStartedEventToState(event);
+    } else if (event is DrugListEditingStarted) {
+      yield* _mapEditingStartedEventToState(event);
     }
   }
 
@@ -232,14 +234,14 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     yield _buildState();
   }
 
-  Stream<DrugListState> _mapDeleteDrugGroupItemEventToState(
+  Stream<DrugListState> _mapGroupItemDeletedEventToState(
     DrugListGroupItemDeleted event,
   ) async* {
     try {
       await _repository.delete([event.item.id]);
 
-      int groupIndex = -1;
-      int itemIndex = -1;
+      var groupIndex = -1;
+      var itemIndex = -1;
       for (var i = 0; i < _groups.length; i++) {
         final group = _groups[i];
         for (var j = 0; j < group.items.length; j++) {
@@ -257,8 +259,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       if (groupIndex == -1 || itemIndex == -1) {
         return;
       }
-      _expiredDrugs.removeWhere((element) => element.id == event.item.id);
-      _notExpiredDrugs.removeWhere((element) => element.id == event.item.id);
+      _drugs.removeWhere((element) => element.id == event.item.id);
       final group = _groups[groupIndex];
       if (group.items.length == 1) {
         // The group will become empty after item removal. Delete the entire group.
@@ -281,15 +282,16 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
           duration: _animationDuration,
         );
       }
+      yield _buildState();
     } catch (e) {
       print(e);
     }
   }
 
-  Stream<DrugListState> _mapDeleteSelectedItemsEventToState(
+  Stream<DrugListState> _mapSelectedItemsDeletedEventToState(
     DrugListSelectedItemsDeleted event,
   ) async* {
-    int selectedGroupsCount = _groups.where((group) => group.isSelected).length;
+    var selectedGroupsCount = _groups.where((group) => group.isSelected).length;
     while (selectedGroupsCount > 0) {
       final index = _groups.indexWhere((group) => group.isSelected);
       await _repository.delete(_groups[index].items.map((e) => e.id).toList());
@@ -307,7 +309,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       yield _buildState();
     } else {
       for (var group in _groups) {
-        int selectedItemsCount =
+        var selectedItemsCount =
             group.items.where((item) => item.isSelected).length;
         while (selectedItemsCount > 0) {
           final index = group.items.indexWhere((item) => item.isSelected);
@@ -322,5 +324,54 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         }
       }
     }
+    yield _buildState();
+  }
+
+  Stream<DrugListState> _mapAddingStartedEventToState(
+    DrugListAddingStarted event,
+  ) async* {
+    final drug =
+        await _navigatorKey.currentState.pushNamed<Drug>(AppRoutes.manageDrug);
+    if (drug != null) {
+      _drugs.add(drug);
+      _sortDrugsByExpiredOn();
+      final oldGroupsLength = _groups.length;
+      _groups = _buildGroups(_drugs);
+      if (_groups.length > oldGroupsLength) {
+        // A new group was added.
+        final indexToAdd = _isDrugExpired(drug) ? 0 : 1;
+        _listKey.currentState?.insertItem(indexToAdd);
+      }
+      yield _buildState();
+    }
+  }
+
+  Stream<DrugListState> _mapEditingStartedEventToState(
+    DrugListEditingStarted event,
+  ) async* {
+    final index = _drugs.indexWhere((drug) => drug.id == event.id);
+    if (index == -1) {
+      print('Unable edit a drug ${event.id}: unable to find its index');
+      return;
+    }
+    final selectedDrug = _drugs[index];
+    final drug = await _navigatorKey.currentState
+        .pushNamed<Drug>(AppRoutes.manageDrug, arguments: selectedDrug);
+    if (drug != null) {
+      _drugs[index] = drug;
+      // Sort in case if [expiresOn] was updated.
+      _sortDrugsByExpiredOn();
+      _groups = _buildGroups(_drugs);
+      yield _buildState();
+    }
+  }
+
+  void _sortDrugsByExpiredOn() {
+    _drugs
+        .sort((first, second) => -first.expiresOn.compareTo(second.expiresOn));
+  }
+
+  bool _isDrugExpired(Drug drug) {
+    return drug.expiresOn.compareTo(_firstDayOfCurrentMonth) < 0;
   }
 }
