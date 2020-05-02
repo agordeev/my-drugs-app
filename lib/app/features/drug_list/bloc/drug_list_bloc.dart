@@ -141,9 +141,9 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     } else if (event is DrugListGroupSelectionChanged) {
       yield* _mapSelectDeselectGroupEventToState(event);
     } else if (event is DrugListGroupItemDeleted) {
-      yield* _mapDeleteDrugGroupItemEventToState(event);
+      yield* _mapGroupItemDeletedEventToState(event);
     } else if (event is DrugListSelectedItemsDeleted) {
-      yield* _mapDeleteSelectedItemsEventToState(event);
+      yield* _mapSelectedItemsDeletedEventToState(event);
     } else if (event is DrugListAddingStarted) {
       yield* _mapAddingStartedEventToState(event);
     } else if (event is DrugListEditingStarted) {
@@ -234,7 +234,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     yield _buildState();
   }
 
-  Stream<DrugListState> _mapDeleteDrugGroupItemEventToState(
+  Stream<DrugListState> _mapGroupItemDeletedEventToState(
     DrugListGroupItemDeleted event,
   ) async* {
     try {
@@ -282,12 +282,13 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
           duration: _animationDuration,
         );
       }
+      yield _buildState();
     } catch (e) {
       print(e);
     }
   }
 
-  Stream<DrugListState> _mapDeleteSelectedItemsEventToState(
+  Stream<DrugListState> _mapSelectedItemsDeletedEventToState(
     DrugListSelectedItemsDeleted event,
   ) async* {
     var selectedGroupsCount = _groups.where((group) => group.isSelected).length;
@@ -323,6 +324,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         }
       }
     }
+    yield _buildState();
   }
 
   Stream<DrugListState> _mapAddingStartedEventToState(
@@ -338,7 +340,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       if (_groups.length > oldGroupsLength) {
         // A new group was added.
         final indexToAdd = _isDrugExpired(drug) ? 0 : 1;
-        _listKey.currentState.insertItem(indexToAdd);
+        _listKey.currentState?.insertItem(indexToAdd);
       }
       yield _buildState();
     }
@@ -370,6 +372,6 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   }
 
   bool _isDrugExpired(Drug drug) {
-    return drug.expiresOn.compareTo(_firstDayOfCurrentMonth) <= 0;
+    return drug.expiresOn.compareTo(_firstDayOfCurrentMonth) < 0;
   }
 }

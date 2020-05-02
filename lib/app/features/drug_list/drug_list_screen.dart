@@ -89,10 +89,7 @@ class _DrugListScreenState extends State<DrugListScreen>
             title: Text('My Drugs'),
             actions: actions,
           ),
-          body: AnimatedSwitcher(
-            duration: Duration(milliseconds: 300),
-            child: body,
-          ),
+          body: body,
           bottomNavigationBar: DrugListBottomBar(
             key: bottomBarKey,
             screenModeAnimationController: _screenModeAnimationController,
