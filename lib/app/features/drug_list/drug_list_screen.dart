@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_group_item_widget.dart';
@@ -87,7 +88,7 @@ class _DrugListScreenState extends State<DrugListScreen>
         }
         return Scaffold(
           appBar: AppBar(
-            title: Text('My Drugs'),
+            title: Text(FlutterI18n.translate(context, 'app.title')),
             actions: actions,
           ),
           body: body,
