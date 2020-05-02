@@ -19,6 +19,17 @@ class ManageDrugScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
+        automaticallyImplyLeading:
+            Theme.of(context).platform == TargetPlatform.android,
+        actions: Theme.of(context).platform == TargetPlatform.android
+            ? null
+            : <Widget>[
+                PlatformButton(
+                  androidFlat: (context) => MaterialFlatButtonData(),
+                  child: Icon(Icons.clear),
+                  onPressed: () => Navigator.of(context).pop(),
+                )
+              ],
       ),
       body: SafeArea(
         child: BlocBuilder<ManageDrugBloc, ManageDrugState>(
