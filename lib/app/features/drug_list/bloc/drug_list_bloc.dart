@@ -10,6 +10,7 @@ import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dar
 import 'package:my_drugs/app/routes/app_routes.dart';
 import 'package:my_drugs/data_access/data_access.dart';
 import 'package:my_drugs/models/drug.dart';
+import 'package:uuid/uuid.dart';
 
 part 'drug_list_event.dart';
 part 'drug_list_state.dart';
@@ -36,7 +37,16 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       );
 
   final DateFormat _dateFormat = DateFormat('MMM yyyy');
+
+  /// Avoid to setting this property directly.
+  /// Use [setScreenMode()] instead to update the bottom bar state.
   ScreenMode _screenMode = ScreenMode.normal;
+
+  void _setScreenMode(ScreenMode screenMode) {
+    _screenMode = screenMode;
+    _screenModeStreamController.add(_screenMode);
+  }
+
   final _screenModeStreamController = StreamController<ScreenMode>.broadcast();
   Stream<ScreenMode> get screenMode => _screenModeStreamController.stream;
 
@@ -65,6 +75,9 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   DrugListState _buildState() {
     _groups ??= _buildGroups(_drugs);
     final selectedItemsCount = _selectedItemsCount;
+    if (_drugs.isEmpty) {
+      _setScreenMode(ScreenMode.normal);
+    }
     return DrugListInitial(
       _drugs.isEmpty,
       _screenMode,
@@ -153,9 +166,9 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
 
   Stream<DrugListState> _mapSwitchScreenModeEventToState() async* {
     if (_screenMode == ScreenMode.edit) {
-      _screenMode = ScreenMode.normal;
+      _setScreenMode(ScreenMode.normal);
     } else {
-      _screenMode = ScreenMode.edit;
+      _setScreenMode(ScreenMode.edit);
     }
     _groups.forEach((group) {
       group.isSelected = false;
@@ -166,7 +179,6 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       group.items.forEach((item) =>
           item.key.currentState.checkmarkAnimationController.reverse());
     });
-    _screenModeStreamController.add(_screenMode);
     yield _buildState();
   }
 
@@ -200,11 +212,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       group.isSelected = false;
       groupState.checkmarkAnimationController.reverse();
     }
-    if (_selectedItemsCount > 0) {
-      _bottomBarKey.currentState.deleteButtonColorAnimationController.forward();
-    } else {
-      _bottomBarKey.currentState.deleteButtonColorAnimationController.reverse();
-    }
+    _updateBottomBarDeleteButtonColor();
     yield _buildState();
   }
 
@@ -226,11 +234,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         item.key.currentState.checkmarkAnimationController.reverse();
       }
     });
-    if (_selectedItemsCount > 0) {
-      _bottomBarKey.currentState.deleteButtonColorAnimationController.forward();
-    } else {
-      _bottomBarKey.currentState.deleteButtonColorAnimationController.reverse();
-    }
+    _updateBottomBarDeleteButtonColor();
     yield _buildState();
   }
 
@@ -296,6 +300,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       final index = _groups.indexWhere((group) => group.isSelected);
       await _repository.delete(_groups[index].items.map((e) => e.id).toList());
       final group = _groups.removeAt(index);
+      group.items.forEach((item) => _drugs.removeWhere((e) => e.id == item.id));
       _listKey.currentState.removeItem(
         index,
         (context, animation) => event.groupBuilder(context, group, animation),
@@ -314,6 +319,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         while (selectedItemsCount > 0) {
           final index = group.items.indexWhere((item) => item.isSelected);
           final item = group.items.removeAt(index);
+          _drugs.removeWhere((e) => e.id == item.id);
           await _repository.delete([item.id]);
           group.listKey.currentState.removeItem(
             index,
@@ -324,14 +330,23 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         }
       }
     }
+    _setScreenMode(ScreenMode.normal);
+    _updateBottomBarDeleteButtonColor();
     yield _buildState();
   }
 
   Stream<DrugListState> _mapAddingStartedEventToState(
     DrugListAddingStarted event,
   ) async* {
-    final drug =
-        await _navigatorKey.currentState.pushNamed<Drug>(AppRoutes.manageDrug);
+    final drug = Drug(
+        id: Uuid().v4(),
+        name: 'Test',
+        expiresOn: DateTime(2020, 12),
+        createdAt: DateTime.now());
+    await _repository.store(drug);
+    // TODO: Uncomment
+    // final drug =
+    //     await _navigatorKey.currentState.pushNamed<Drug>(AppRoutes.manageDrug);
     if (drug != null) {
       _drugs.add(drug);
       _sortDrugsByExpiredOn();
@@ -373,5 +388,13 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
 
   bool _isDrugExpired(Drug drug) {
     return drug.expiresOn.compareTo(_firstDayOfCurrentMonth) < 0;
+  }
+
+  void _updateBottomBarDeleteButtonColor() {
+    if (_selectedItemsCount > 0) {
+      _bottomBarKey.currentState.deleteButtonColorAnimationController.forward();
+    } else {
+      _bottomBarKey.currentState.deleteButtonColorAnimationController.reverse();
+    }
   }
 }

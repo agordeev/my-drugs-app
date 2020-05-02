@@ -12,9 +12,10 @@ class SqliteDrugRepository implements AbstractDrugRepository {
     if (ids == null || ids.isEmpty) {
       return;
     }
+    final placeholders = List.generate(ids.length, (index) => '?').join(',');
     await _database.delete(
       _tableName,
-      where: 'id IN (?)',
+      where: 'id IN ($placeholders)',
       whereArgs: ids,
     );
   }
