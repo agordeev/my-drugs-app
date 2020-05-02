@@ -78,12 +78,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   }
 
   List<DrugGroup> _buildGroups(List<Drug> drugs) {
-    final expired = drugs
-        .where((e) => e.expiresOn.compareTo(_firstDayOfCurrentMonth) <= 0)
-        .toList();
-    final notExpired = drugs
-        .where((e) => e.expiresOn.compareTo(_firstDayOfCurrentMonth) > 0)
-        .toList();
+    final expired = drugs.where(_isDrugExpired).toList();
+    final notExpired = drugs.where((e) => !_isDrugExpired(e)).toList();
     var result = <DrugGroup>[];
     if (expired.isNotEmpty) {
       final groupKey = GlobalKey<DrugHeadingRowState>();
@@ -333,9 +329,18 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     DrugListAddingStarted event,
   ) async* {
     final drug =
-        await _navigatorKey.currentState.pushNamed(AppRoutes.manageDrug);
+        await _navigatorKey.currentState.pushNamed<Drug>(AppRoutes.manageDrug);
     if (drug != null) {
-      // Add to list
+      _drugs.add(drug);
+      _sortDrugsByExpiredOn();
+      final oldGroupsLength = _groups.length;
+      _groups = _buildGroups(_drugs);
+      if (_groups.length > oldGroupsLength) {
+        // A new group was added.
+        final indexToAdd = _isDrugExpired(drug) ? 0 : 1;
+        _listKey.currentState.insertItem(indexToAdd);
+      }
+      yield _buildState();
     }
   }
 
@@ -353,10 +358,18 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     if (drug != null) {
       _drugs[index] = drug;
       // Sort in case if [expiresOn] was updated.
-      _drugs.sort(
-          (first, second) => -first.expiresOn.compareTo(second.expiresOn));
+      _sortDrugsByExpiredOn();
       _groups = _buildGroups(_drugs);
       yield _buildState();
     }
+  }
+
+  void _sortDrugsByExpiredOn() {
+    _drugs
+        .sort((first, second) => -first.expiresOn.compareTo(second.expiresOn));
+  }
+
+  bool _isDrugExpired(Drug drug) {
+    return drug.expiresOn.compareTo(_firstDayOfCurrentMonth) <= 0;
   }
 }
