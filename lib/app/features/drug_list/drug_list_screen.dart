@@ -100,8 +100,7 @@ class _DrugListScreenState extends State<DrugListScreen>
             numberOfItemsTotal: numberOfItemsTotal,
             numberOfItemsSelected: numberOfItemsSelected,
             isDeleteButtonActive: isDeleteButtonActive,
-            onAddButtonPressed: () =>
-                Navigator.of(context).pushNamed(AppRoutes.manageDrug),
+            onAddButtonPressed: _onAddButtonPressed,
             onDeleteButtonPressed: () => _deleteSelectedItems(context, state),
           ),
         );
@@ -139,6 +138,13 @@ class _DrugListScreenState extends State<DrugListScreen>
         ),
       ),
     );
+  }
+
+  void _onAddButtonPressed() async {
+    final drug = await Navigator.of(context).pushNamed(AppRoutes.manageDrug);
+    if (drug != null) {
+      BlocProvider.of<DrugListBloc>(context).add(DrugListItemAdded(drug));
+    }
   }
 
   void _presentBottomSheet(

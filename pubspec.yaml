@@ -22,6 +22,7 @@ dependencies:
   intl:
   flutter_platform_widgets: ^0.32.5
   mask_text_input_formatter: ^1.0.6
+  uuid: ^2.0.4
 
   cupertino_icons: ^0.1.3
 

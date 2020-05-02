@@ -71,3 +71,12 @@ class DrugListSelectedItemsDeleted extends DrugListEvent {
         itemBuilder,
       ];
 }
+
+class DrugListItemAdded extends DrugListEvent {
+  final Drug item;
+
+  DrugListItemAdded(this.item);
+
+  @override
+  List<Object> get props => [item];
+}

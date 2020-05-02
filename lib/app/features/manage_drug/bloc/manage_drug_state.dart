@@ -5,6 +5,23 @@ abstract class ManageDrugState extends Equatable {
 }
 
 class ManageDrugInitial extends ManageDrugState {
+  final GlobalKey<FormState> formKey;
+  final TextEditingController nameController;
+  final TextEditingController expiresOnController;
+  final String expiresOnPlaceholderText;
+
+  ManageDrugInitial(
+    this.formKey,
+    this.nameController,
+    this.expiresOnController,
+    this.expiresOnPlaceholderText,
+  );
+
   @override
-  List<Object> get props => [];
+  List<Object> get props => [
+        formKey,
+        nameController,
+        expiresOnController,
+        expiresOnPlaceholderText,
+      ];
 }
