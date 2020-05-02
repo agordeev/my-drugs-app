@@ -12,12 +12,11 @@ class SqliteDrugRepository implements AbstractDrugRepository {
     if (ids == null || ids.isEmpty) {
       return;
     }
-    final count = await _database.delete(
+    await _database.delete(
       _tableName,
       where: 'id IN (?)',
       whereArgs: ids,
     );
-    print('Deleted: $count');
   }
 
   @override
