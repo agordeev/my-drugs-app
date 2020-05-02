@@ -57,16 +57,31 @@ class ManageDrugBloc extends Bloc<ManageDrugEvent, ManageDrugState> {
     if (!_formKey.currentState.validate()) {
       return;
     }
-    FocusScope.of(_formKey.currentState.context).unfocus();
-    // TODO: Handle parse error
-    final expiresOn = _dateFormat.parse(_expiresOnController.text);
-    final drug = Drug(
-      id: _drug?.id ?? Uuid().v4(),
-      name: _nameController.text,
-      expiresOn: expiresOn,
-      createdAt: _drug?.createdAt ?? DateTime.now(),
-    );
-    final storedDrug = await _repository.store(drug);
-    _navigatorKey.currentState.pop(storedDrug);
+    final context = _formKey.currentState.context;
+    FocusScope.of(context).unfocus();
+    try {
+      final expiresOn = _dateFormat.parse('_expiresOnController.text');
+      final drug = Drug(
+        id: _drug?.id ?? Uuid().v4(),
+        name: _nameController.text,
+        expiresOn: expiresOn,
+        createdAt: _drug?.createdAt ?? DateTime.now(),
+      );
+      final storedDrug = await _repository.store(drug);
+      _navigatorKey.currentState.pop(storedDrug);
+    } catch (e) {
+      print(e);
+      final snackBar = SnackBar(
+        content: Text(e.toString()),
+        backgroundColor: Theme.of(context).colorScheme.error,
+        action: SnackBarAction(
+          label: 'Close',
+          textColor: Theme.of(context).colorScheme.onError,
+          onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
+        ),
+        behavior: SnackBarBehavior.floating,
+      );
+      Scaffold.of(context).showSnackBar(snackBar);
+    }
   }
 }
