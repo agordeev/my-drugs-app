@@ -57,11 +57,7 @@ class ManageDrugScreen extends StatelessWidget {
                     TextFormField(
                       controller: state.nameController,
                       decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 8.0,
-                        ),
                         hintText: 'Aspirin',
-                        border: OutlineInputBorder(),
                       ),
                       textCapitalization: TextCapitalization.words,
                       validator: (value) =>
@@ -76,11 +72,7 @@ class ManageDrugScreen extends StatelessWidget {
                     TextFormField(
                       controller: state.expiresOnController,
                       decoration: InputDecoration(
-                        contentPadding: EdgeInsets.all(
-                          12.0,
-                        ),
                         hintText: state.expiresOnPlaceholderText,
-                        border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
                       inputFormatters: [

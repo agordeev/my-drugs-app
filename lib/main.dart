@@ -62,6 +62,18 @@ class MyApp extends StatelessWidget {
         primary: primarySwatch,
         surface: Color(0xFFFBFBFB),
       ),
+      inputDecorationTheme: InputDecorationTheme(
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: 8.0,
+        ),
+        hintStyle: TextStyle(color: Colors.grey[400]),
+        border: OutlineInputBorder(),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.grey[350],
+          ),
+        ),
+      ),
       appBarTheme: AppBarTheme(
         brightness: Brightness.light,
         color: Colors.white,
