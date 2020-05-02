@@ -68,7 +68,7 @@ class ManageDrugScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'NAME:',
+                      'NAME',
                       style: labelTextStyle,
                     ),
                     SizedBox(height: 8.0),
@@ -83,7 +83,7 @@ class ManageDrugScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 16.0),
                     Text(
-                      'EXPIRES ON:',
+                      'EXPIRES ON',
                       style: labelTextStyle,
                     ),
                     SizedBox(height: 8.0),
