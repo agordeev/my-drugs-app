@@ -195,13 +195,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.2.0"
-  flutter_i18n:
-    dependency: "direct main"
-    description:
-      name: flutter_i18n
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.14.0"
   flutter_localizations:
     dependency: "direct main"
     description: flutter
@@ -268,6 +261,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.16.1"
+  intl_translation:
+    dependency: "direct main"
+    description:
+      name: intl_translation
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.17.9"
   io:
     dependency: transitive
     description:
@@ -574,13 +574,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.6.1"
-  xml2json:
-    dependency: transitive
-    description:
-      name: xml2json
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.2.0"
   yaml:
     dependency: transitive
     description:

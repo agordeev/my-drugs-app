@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_group_item_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_group_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
+import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/shared/painters/screen_mode_button_painter.dart';
 
 import 'bloc/drug_list_bloc.dart';
@@ -88,7 +88,7 @@ class _DrugListScreenState extends State<DrugListScreen>
         }
         return Scaffold(
           appBar: AppBar(
-            title: Text(FlutterI18n.translate(context, 'app.title')),
+            title: Text(S.of(context).appTitle),
             actions: actions,
           ),
           body: body,
