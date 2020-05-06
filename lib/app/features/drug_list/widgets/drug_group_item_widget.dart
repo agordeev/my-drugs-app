@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_drugs/app/features/drug_list/bloc/drug_list_bloc.dart';
 import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_row.dart';
+import 'package:my_drugs/generated/l10n.dart';
 
 class DrugGroupItemWidget extends DrugListRow {
   final DrugGroupItem item;
@@ -125,7 +126,7 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                'EXPIRES ON',
+                S.of(context).drugListExpiresOnLabel.toUpperCase(),
                 style: TextStyle(
                   color: Color(0xFFBABABA),
                   fontSize: 10,

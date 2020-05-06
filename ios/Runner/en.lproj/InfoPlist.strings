@@ -1,0 +1,8 @@
+/* 
+  InfoPlist.strings
+  Runner
+
+  Created by Andrey Gordeev on 06.05.2020.
+  
+*/
+"CFBundleDisplayName" = "My Drugs";

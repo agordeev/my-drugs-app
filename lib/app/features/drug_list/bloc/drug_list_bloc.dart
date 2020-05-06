@@ -9,8 +9,8 @@ import 'package:my_drugs/app/features/drug_list/widgets/drug_heading_row_widget.
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
 import 'package:my_drugs/app/routes/app_routes.dart';
 import 'package:my_drugs/data_access/data_access.dart';
+import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/models/drug.dart';
-import 'package:uuid/uuid.dart';
 
 part 'drug_list_event.dart';
 part 'drug_list_state.dart';
@@ -18,6 +18,7 @@ part 'drug_list_state.dart';
 enum ScreenMode { normal, edit }
 
 class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
+  final S _localizations;
   final GlobalKey<NavigatorState> _navigatorKey;
   final AbstractDrugRepository _repository;
   // final List<Drug> _expiredDrugs;
@@ -36,7 +37,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
             ),
       );
 
-  final DateFormat _dateFormat = DateFormat('MMM yyyy');
+  final DateFormat _dateFormat = DateFormat('MMMM yyyy');
 
   /// Avoid to setting this property directly.
   /// Use [setScreenMode()] instead to update the bottom bar state.
@@ -58,6 +59,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       DateTime(DateTime.now().year, DateTime.now().month, 1);
 
   DrugListBloc(
+    this._localizations,
     this._navigatorKey,
     this._repository,
     this._drugs,
@@ -84,8 +86,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       _bottomBarKey,
       _listKey,
       _groups,
-      '${(_drugs.length)} items',
-      '$selectedItemsCount selected',
+      _localizations.drugListTotalItems(_drugs.length),
+      _localizations.drugListTotalItemsSelected(selectedItemsCount),
       selectedItemsCount > 0,
     );
   }
@@ -100,7 +102,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         DrugGroup(
           groupKey,
           GlobalKey(),
-          'EXPIRED',
+          _localizations.drugListExpiredGroupTitle.toUpperCase(),
           expired
               .map(
                 (e) => DrugGroupItem(
@@ -123,7 +125,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         DrugGroup(
           groupKey,
           GlobalKey(),
-          'NOT EXPIRED',
+          _localizations.drugListNotExpiredGroupTitle.toUpperCase(),
           notExpired
               .map(
                 (e) => DrugGroupItem(
@@ -338,15 +340,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> _mapAddingStartedEventToState(
     DrugListAddingStarted event,
   ) async* {
-    final drug = Drug(
-        id: Uuid().v4(),
-        name: 'Test',
-        expiresOn: DateTime(2020, 12),
-        createdAt: DateTime.now());
-    await _repository.store(drug);
-    // TODO: Uncomment
-    // final drug =
-    //     await _navigatorKey.currentState.pushNamed<Drug>(AppRoutes.manageDrug);
+    final drug =
+        await _navigatorKey.currentState.pushNamed<Drug>(AppRoutes.manageDrug);
     if (drug != null) {
       _drugs.add(drug);
       _sortDrugsByExpiredOn();

@@ -6,6 +6,7 @@ import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_group_item_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_group_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
+import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/shared/painters/screen_mode_button_painter.dart';
 
 import 'bloc/drug_list_bloc.dart';
@@ -57,7 +58,7 @@ class _DrugListScreenState extends State<DrugListScreen>
         if (state is DrugListInitial) {
           if (state.isEmpty) {
             body = _buildEmptyStateContent(context);
-            numberOfItemsTotal = 'No items';
+            numberOfItemsTotal = S.of(context).drugListTotalItems(0);
           } else {
             body = _buildInitialStateContent(
               context,
@@ -87,7 +88,7 @@ class _DrugListScreenState extends State<DrugListScreen>
         }
         return Scaffold(
           appBar: AppBar(
-            title: Text('My Drugs'),
+            title: Text(S.of(context).appTitle),
             actions: actions,
           ),
           body: body,
@@ -107,7 +108,9 @@ class _DrugListScreenState extends State<DrugListScreen>
   }
 
   Widget _buildEmptyStateContent(BuildContext context) => Center(
-        child: Text('No drugs added yet'),
+        child: Text(
+          S.of(context).drugListNoItems,
+        ),
       );
 
   Widget _buildInitialStateContent(
@@ -168,7 +171,9 @@ class _DrugListScreenState extends State<DrugListScreen>
         builder: (_) => CupertinoActionSheet(
           actions: <Widget>[
             CupertinoActionSheetAction(
-              child: Text('Edit'),
+              child: Text(
+                S.of(context).buttonEdit,
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
                 BlocProvider.of<DrugListBloc>(context)
@@ -176,7 +181,9 @@ class _DrugListScreenState extends State<DrugListScreen>
               },
             ),
             CupertinoActionSheetAction(
-              child: Text('Delete'),
+              child: Text(
+                S.of(context).buttonDelete,
+              ),
               isDestructiveAction: true,
               onPressed: deleteButtonHandler,
             ),
@@ -192,13 +199,13 @@ class _DrugListScreenState extends State<DrugListScreen>
             _buildBottomSheetRow(
               context,
               Icons.edit,
-              'Edit',
+              S.of(context).buttonEdit,
               () {},
             ),
             _buildBottomSheetRow(
               context,
               Icons.delete,
-              'Delete',
+              S.of(context).buttonDelete,
               deleteButtonHandler,
             ),
           ],

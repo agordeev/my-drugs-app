@@ -5,6 +5,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:my_drugs/app/features/manage_drug/bloc/manage_drug_bloc.dart';
 import 'package:my_drugs/app/misc/validators/validators.dart';
 import 'package:my_drugs/app/widgets/app_card.dart';
+import 'package:my_drugs/generated/l10n.dart';
 
 class ManageDrugScreen extends StatelessWidget {
   final String title;
@@ -51,9 +52,6 @@ class ManageDrugScreen extends StatelessWidget {
     BuildContext context,
     ManageDrugInitial state,
   ) {
-    final labelTextStyle = Theme.of(context).textTheme.subtitle2.copyWith(
-          color: Theme.of(context).hintColor,
-        );
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Form(
@@ -67,29 +65,24 @@ class ManageDrugScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      'NAME',
-                      style: labelTextStyle,
-                    ),
                     SizedBox(height: 8.0),
                     TextFormField(
+                      autofocus: true,
                       controller: state.nameController,
                       decoration: InputDecoration(
-                        hintText: 'Aspirin',
+                        labelText: S.of(context).manageDrugNameFieldLabel,
+                        hintText: S.of(context).manageDrugNameFieldHint,
                       ),
                       textCapitalization: TextCapitalization.words,
                       validator: (value) =>
                           RequiredFieldValidator.validate(context, value),
                     ),
                     SizedBox(height: 16.0),
-                    Text(
-                      'EXPIRES ON',
-                      style: labelTextStyle,
-                    ),
                     SizedBox(height: 8.0),
                     TextFormField(
                       controller: state.expiresOnController,
                       decoration: InputDecoration(
+                        labelText: S.of(context).manageDrugExpiresOnFieldLabel,
                         hintText: state.expiresOnPlaceholderText,
                       ),
                       keyboardType: TextInputType.number,
@@ -118,7 +111,7 @@ class ManageDrugScreen extends StatelessWidget {
                 ios: (context) => CupertinoButtonData(
                     color: Theme.of(context).colorScheme.primary),
                 child: Text(
-                  actionButtonTitle,
+                  actionButtonTitle.toUpperCase(),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onPrimary,
                     fontWeight: FontWeight.w600,
