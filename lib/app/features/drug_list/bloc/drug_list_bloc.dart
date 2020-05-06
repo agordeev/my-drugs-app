@@ -340,13 +340,6 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> _mapAddingStartedEventToState(
     DrugListAddingStarted event,
   ) async* {
-    // final drug = Drug(
-    //     id: Uuid().v4(),
-    //     name: 'Test',
-    //     expiresOn: DateTime(2020, 12),
-    //     createdAt: DateTime.now());
-    // await _repository.store(drug);
-    // TODO: Uncomment
     final drug =
         await _navigatorKey.currentState.pushNamed<Drug>(AppRoutes.manageDrug);
     if (drug != null) {

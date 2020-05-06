@@ -52,9 +52,6 @@ class ManageDrugScreen extends StatelessWidget {
     BuildContext context,
     ManageDrugInitial state,
   ) {
-    final labelTextStyle = Theme.of(context).textTheme.subtitle2.copyWith(
-          color: Theme.of(context).hintColor,
-        );
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Form(
