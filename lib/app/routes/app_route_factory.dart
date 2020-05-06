@@ -7,6 +7,7 @@ import 'package:my_drugs/app/features/manage_drug/bloc/manage_drug_bloc.dart';
 import 'package:my_drugs/app/features/manage_drug/manage_drug_screen.dart';
 import 'package:my_drugs/app/routes/app_routes.dart';
 import 'package:my_drugs/data_access/data_access.dart';
+import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/models/drug.dart';
 
 class AppRouteFactory {
@@ -52,7 +53,8 @@ class AppRouteFactory {
     BuildContext context,
   ) =>
       BlocProvider<DrugListBloc>(
-        create: (context) => DrugListBloc(
+        create: (_) => DrugListBloc(
+          S.of(context),
           navigatorKey,
           repository,
           drugs,
@@ -71,8 +73,12 @@ class AppRouteFactory {
           drug,
         ),
         child: ManageDrugScreen(
-          title: drug == null ? 'Add Drug' : 'Edit Drug',
-          actionButtonTitle: drug == null ? 'ADD' : 'SAVE',
+          title: drug == null
+              ? S.of(context).manageDrugAddDrugModeTitle
+              : S.of(context).manageDrugEditDrugModeTitle,
+          actionButtonTitle: drug == null
+              ? S.of(context).manageDrugAddDrugModeActionButtonTitle
+              : S.of(context).manageDrugAddDrugModeActionButtonTitle,
         ),
       );
 }

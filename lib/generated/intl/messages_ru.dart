@@ -19,8 +19,27 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'ru';
 
+  static m0(itemsCount) => "${Intl.plural(itemsCount, zero: 'Нет лекарств', one: '${itemsCount} лекарство', few: '${itemsCount} лекарства', many: '${itemsCount} лекарств', other: '${itemsCount} лекарств')}";
+
+  static m1(itemsCount) => "${Intl.plural(itemsCount, zero: 'Выбрано 0 лекарств', one: 'Выбрано ${itemsCount} лекарство', few: 'Выбрано ${itemsCount} лекарства', many: 'Выбрано ${itemsCount} лекарств', other: 'Выбрано ${itemsCount} лекарств')}";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
-    "appTitle" : MessageLookupByLibrary.simpleMessage("Мои лекарства")
+    "appTitle" : MessageLookupByLibrary.simpleMessage("Мои лекарства"),
+    "buttonDelete" : MessageLookupByLibrary.simpleMessage("Удалить"),
+    "buttonEdit" : MessageLookupByLibrary.simpleMessage("Изменить"),
+    "drugListExpiredGroupTitle" : MessageLookupByLibrary.simpleMessage("Просроченные"),
+    "drugListExpiresOnLabel" : MessageLookupByLibrary.simpleMessage("Годен до"),
+    "drugListNoItems" : MessageLookupByLibrary.simpleMessage("Нет добавленных лекарств"),
+    "drugListNotExpiredGroupTitle" : MessageLookupByLibrary.simpleMessage("Непросроченные"),
+    "drugListTotalItems" : m0,
+    "drugListTotalItemsSelected" : m1,
+    "manageDrugAddDrugModeActionButtonTitle" : MessageLookupByLibrary.simpleMessage("Добавить"),
+    "manageDrugAddDrugModeTitle" : MessageLookupByLibrary.simpleMessage("Добавить лекарство"),
+    "manageDrugEditDrugModeActionButtonTitle" : MessageLookupByLibrary.simpleMessage("Сохранить"),
+    "manageDrugEditDrugModeTitle" : MessageLookupByLibrary.simpleMessage("Изменить лекарство"),
+    "manageDrugExpiresOnFieldLabel" : MessageLookupByLibrary.simpleMessage("Годен до"),
+    "manageDrugNameFieldHint" : MessageLookupByLibrary.simpleMessage("Аспирин"),
+    "manageDrugNameFieldLabel" : MessageLookupByLibrary.simpleMessage("Наименование")
   };
 }

@@ -1,3 +1,18 @@
 {
-  "appTitle": "Мои лекарства"
+  "appTitle": "Мои лекарства",
+  "buttonEdit": "Изменить",
+  "buttonDelete": "Удалить",
+  "drugListTotalItems": "{itemsCount, plural, zero{Нет лекарств} one{{itemsCount} лекарство} few{{itemsCount} лекарства} many{{itemsCount} лекарств} other{{itemsCount} лекарств}}",
+  "drugListTotalItemsSelected": "{itemsCount, plural, zero{Выбрано 0 лекарств} one{Выбрано {itemsCount} лекарство} few{Выбрано {itemsCount} лекарства} many{Выбрано {itemsCount} лекарств} other{Выбрано {itemsCount} лекарств}}",
+  "drugListNoItems": "Нет добавленных лекарств",
+  "drugListExpiredGroupTitle": "Просроченные",
+  "drugListNotExpiredGroupTitle": "Непросроченные",
+  "drugListExpiresOnLabel": "Годен до",
+  "manageDrugAddDrugModeTitle": "Добавить лекарство",
+  "manageDrugAddDrugModeActionButtonTitle": "Добавить",
+  "manageDrugEditDrugModeTitle": "Изменить лекарство",
+  "manageDrugEditDrugModeActionButtonTitle": "Сохранить",
+  "manageDrugNameFieldLabel": "Наименование",
+  "manageDrugNameFieldHint": "Аспирин",
+  "manageDrugExpiresOnFieldLabel": "Годен до"
 }

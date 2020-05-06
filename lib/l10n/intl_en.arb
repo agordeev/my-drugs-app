@@ -1,3 +1,18 @@
 {
-  "appTitle": "My Drugs"
+  "appTitle": "My Drugs",
+  "buttonEdit": "Edit",
+  "buttonDelete": "Delete",
+  "drugListTotalItems": "{itemsCount, plural, zero{No items} one{1 item} other{{itemsCount} items}}",
+  "drugListTotalItemsSelected": "{itemsCount, plural, zero{No items selected} one{1 item selected} other{{itemsCount} items selected}}",
+  "drugListNoItems": "No drugs added yet",
+  "drugListExpiredGroupTitle": "Expired",
+  "drugListNotExpiredGroupTitle": "Not Expired",
+  "drugListExpiresOnLabel": "Expires On",
+  "manageDrugAddDrugModeTitle": "Add Drug",
+  "manageDrugAddDrugModeActionButtonTitle": "Add",
+  "manageDrugEditDrugModeTitle": "Edit Drug",
+  "manageDrugEditDrugModeActionButtonTitle": "Save",
+  "manageDrugNameFieldLabel": "Name",
+  "manageDrugNameFieldHint": "Aspirin",
+  "manageDrugExpiresOnFieldLabel": "Expires On"
 }

@@ -35,6 +35,147 @@ class S {
       args: [],
     );
   }
+
+  String get buttonEdit {
+    return Intl.message(
+      'Edit',
+      name: 'buttonEdit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get buttonDelete {
+    return Intl.message(
+      'Delete',
+      name: 'buttonDelete',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String drugListTotalItems(num itemsCount) {
+    return Intl.plural(
+      itemsCount,
+      zero: 'No items',
+      one: '1 item',
+      other: '$itemsCount items',
+      name: 'drugListTotalItems',
+      desc: '',
+      args: [itemsCount],
+    );
+  }
+
+  String drugListTotalItemsSelected(num itemsCount) {
+    return Intl.plural(
+      itemsCount,
+      zero: 'No items selected',
+      one: '1 item selected',
+      other: '$itemsCount items selected',
+      name: 'drugListTotalItemsSelected',
+      desc: '',
+      args: [itemsCount],
+    );
+  }
+
+  String get drugListNoItems {
+    return Intl.message(
+      'No drugs added yet',
+      name: 'drugListNoItems',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get drugListExpiredGroupTitle {
+    return Intl.message(
+      'Expired',
+      name: 'drugListExpiredGroupTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get drugListNotExpiredGroupTitle {
+    return Intl.message(
+      'Not Expired',
+      name: 'drugListNotExpiredGroupTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get drugListExpiresOnLabel {
+    return Intl.message(
+      'Expires On',
+      name: 'drugListExpiresOnLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get manageDrugAddDrugModeTitle {
+    return Intl.message(
+      'Add Drug',
+      name: 'manageDrugAddDrugModeTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get manageDrugAddDrugModeActionButtonTitle {
+    return Intl.message(
+      'Add',
+      name: 'manageDrugAddDrugModeActionButtonTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get manageDrugEditDrugModeTitle {
+    return Intl.message(
+      'Edit Drug',
+      name: 'manageDrugEditDrugModeTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get manageDrugEditDrugModeActionButtonTitle {
+    return Intl.message(
+      'Save',
+      name: 'manageDrugEditDrugModeActionButtonTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get manageDrugNameFieldLabel {
+    return Intl.message(
+      'Name',
+      name: 'manageDrugNameFieldLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get manageDrugNameFieldHint {
+    return Intl.message(
+      'Aspirin',
+      name: 'manageDrugNameFieldHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get manageDrugExpiresOnFieldLabel {
+    return Intl.message(
+      'Expires On',
+      name: 'manageDrugExpiresOnFieldLabel',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
