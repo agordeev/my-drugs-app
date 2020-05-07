@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_drugs/generated/l10n.dart';
 
 class RequiredFieldValidator {
   RequiredFieldValidator._();
@@ -6,7 +7,7 @@ class RequiredFieldValidator {
   /// Returns error message if the value is invalid.
   /// Otherwise returns [null].
   static String validate(BuildContext context, dynamic value) {
-    final errorMessage = 'Please fill this field';
+    final errorMessage = S.of(context).validationEmptyRequiredField;
     if (value == null) {
       return errorMessage;
     }

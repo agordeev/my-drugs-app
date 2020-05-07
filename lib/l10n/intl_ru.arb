@@ -3,6 +3,8 @@
   "expiryDateFormat": "MM.yyyy",
   "buttonEdit": "Изменить",
   "buttonDelete": "Удалить",
+  "validationEmptyRequiredField": "Заполните это поле",
+  "validationInvalidExpiryDate": "Введите верный срок годности",
   "drugListTotalItems": "{itemsCount, plural, zero{Нет лекарств} one{{itemsCount} лекарство} few{{itemsCount} лекарства} many{{itemsCount} лекарств} other{{itemsCount} лекарств}}",
   "drugListTotalItemsSelected": "{itemsCount, plural, zero{Выбрано 0 лекарств} one{Выбрано {itemsCount} лекарство} few{Выбрано {itemsCount} лекарства} many{Выбрано {itemsCount} лекарств} other{Выбрано {itemsCount} лекарств}}",
   "drugListNoItems": "Нет добавленных лекарств",

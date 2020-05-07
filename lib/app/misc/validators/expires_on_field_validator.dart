@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_drugs/generated/l10n.dart';
 
 class ExpiresOnFieldValidator {
   ExpiresOnFieldValidator._();
@@ -7,11 +8,11 @@ class ExpiresOnFieldValidator {
   /// Otherwise returns [null].
   static String validate(BuildContext context, String value) {
     if (value == null || value.isEmpty) {
-      return 'Please fill this field';
+      return S.of(context).validationEmptyRequiredField;
     }
     final regexp = RegExp(r'(0[1-9]|10|11|12)/20[0-9]{2}$');
     if (!regexp.hasMatch(value)) {
-      return 'Please enter a valid expiry date';
+      return S.of(context).validationInvalidExpiryDate;
     }
     return null;
   }

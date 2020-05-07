@@ -1,8 +1,10 @@
 {
   "appTitle": "My Drugs",
+  "expiryDateFormat": "MM/yyyy",
   "buttonEdit": "Edit",
   "buttonDelete": "Delete",
-  "expiryDateFormat": "MM/yyyy",
+  "validationEmptyRequiredField": "Please fill this field",
+  "validationInvalidExpiryDate": "Please enter a valid expiry date",
   "drugListTotalItems": "{itemsCount, plural, zero{No items} one{1 item} other{{itemsCount} items}}",
   "drugListTotalItemsSelected": "{itemsCount, plural, zero{No items selected} one{1 item selected} other{{itemsCount} items selected}}",
   "drugListNoItems": "No drugs added yet",

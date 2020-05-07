@@ -41,6 +41,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "manageDrugEditDrugModeTitle" : MessageLookupByLibrary.simpleMessage("Edit Drug"),
     "manageDrugExpiresOnFieldLabel" : MessageLookupByLibrary.simpleMessage("Expires On"),
     "manageDrugNameFieldHint" : MessageLookupByLibrary.simpleMessage("Aspirin"),
-    "manageDrugNameFieldLabel" : MessageLookupByLibrary.simpleMessage("Name")
+    "manageDrugNameFieldLabel" : MessageLookupByLibrary.simpleMessage("Name"),
+    "validationEmptyRequiredField" : MessageLookupByLibrary.simpleMessage("Please fill this field"),
+    "validationInvalidExpiryDate" : MessageLookupByLibrary.simpleMessage("Please enter a valid expiry date")
   };
 }

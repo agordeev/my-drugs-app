@@ -36,6 +36,15 @@ class S {
     );
   }
 
+  String get expiryDateFormat {
+    return Intl.message(
+      'MM/yyyy',
+      name: 'expiryDateFormat',
+      desc: '',
+      args: [],
+    );
+  }
+
   String get buttonEdit {
     return Intl.message(
       'Edit',
@@ -54,10 +63,19 @@ class S {
     );
   }
 
-  String get expiryDateFormat {
+  String get validationEmptyRequiredField {
     return Intl.message(
-      'MM/yyyy',
-      name: 'expiryDateFormat',
+      'Please fill this field',
+      name: 'validationEmptyRequiredField',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get validationInvalidExpiryDate {
+    return Intl.message(
+      'Please enter a valid expiry date',
+      name: 'validationInvalidExpiryDate',
       desc: '',
       args: [],
     );
