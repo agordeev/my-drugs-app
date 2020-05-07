@@ -4,36 +4,36 @@
 // Selenium/WebDriver for web, Espresso for Android or UI Automation for iOS,
 // this is simply Flutter's version of that.
 
+import 'dart:io';
+
 import 'package:flutter_driver/flutter_driver.dart';
-import 'package:screenshots/screenshots.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('end-to-end test', () {
+  group('screenshots', () {
     FlutterDriver driver;
-    final config = Config();
 
     setUpAll(() async {
       // Connect to a running Flutter application instance.
       driver = await FlutterDriver.connect();
+      await sleep(Duration(seconds: 5));
     });
 
     tearDownAll(() async {
       if (driver != null) await driver.close();
     });
 
-    test('tap on the floating action button; verify counter', () async {
-      // // Finds the floating action button (fab) to tap on
-      // var fab = find.byTooltip(localizations['counterIncrementButtonTooltip']);
-
-      // // Wait for the floating action button to appear
-      // await driver.waitFor(fab);
-
-      // // take screenshot before number is incremented
-      await screenshot(driver, config, '0');
+    test('make screenshots', () async {
+      await driver.waitFor(find.byValueKey('add'));
+      await _makeScreenshot(driver, 0);
 
       // // Tap on the fab
-      // await driver.tap(fab);
+      // print(addButton);
+
+      // await driver.waitFor(find.text(''));
+      // await driver.enterText('Aspirin');
+
+      // await _makeScreenshot(driver, 1);
 
       // // Wait for text to change to the desired value
       // await driver.waitFor(find.text('1'));
@@ -45,4 +45,10 @@ void main() {
       // // on slow running emulators in cloud
     }, timeout: Timeout(Duration(seconds: 120)));
   });
+}
+
+void _makeScreenshot(FlutterDriver driver, int index) async {
+  final pixels = await driver.screenshot();
+  final file = await File('tmp/screenshot$index.png').create(recursive: true);
+  await file.writeAsBytes(pixels);
 }
