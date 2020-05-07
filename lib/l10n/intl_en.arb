@@ -5,6 +5,7 @@
   "buttonDelete": "Delete",
   "validationEmptyRequiredField": "Please fill this field",
   "validationInvalidExpiryDate": "Please enter a valid expiry date",
+  "unknownRouteMessage": "We're sorry, but there was an error in navigation.\nPlease try again or contact us.",
   "drugListTotalItems": "{itemsCount, plural, zero{No items} one{1 item} other{{itemsCount} items}}",
   "drugListTotalItemsSelected": "{itemsCount, plural, zero{No items selected} one{1 item selected} other{{itemsCount} items selected}}",
   "drugListNoItems": "No drugs added yet",

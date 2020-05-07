@@ -81,6 +81,15 @@ class S {
     );
   }
 
+  String get unknownRouteMessage {
+    return Intl.message(
+      'We\'re sorry, but there was an error in navigation.\nPlease try again or contact us.',
+      name: 'unknownRouteMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
   String drugListTotalItems(num itemsCount) {
     return Intl.plural(
       itemsCount,

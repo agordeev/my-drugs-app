@@ -42,6 +42,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "manageDrugExpiresOnFieldLabel" : MessageLookupByLibrary.simpleMessage("Годен до"),
     "manageDrugNameFieldHint" : MessageLookupByLibrary.simpleMessage("Аспирин"),
     "manageDrugNameFieldLabel" : MessageLookupByLibrary.simpleMessage("Наименование"),
+    "unknownRouteMessage" : MessageLookupByLibrary.simpleMessage("Произошла ошибка навигации.\nПожалуйста, попробуйте еще раз или свяжитесь с нами."),
     "validationEmptyRequiredField" : MessageLookupByLibrary.simpleMessage("Заполните это поле"),
     "validationInvalidExpiryDate" : MessageLookupByLibrary.simpleMessage("Введите верный срок годности")
   };

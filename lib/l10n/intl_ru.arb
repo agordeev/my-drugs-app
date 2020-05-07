@@ -5,6 +5,7 @@
   "buttonDelete": "Удалить",
   "validationEmptyRequiredField": "Заполните это поле",
   "validationInvalidExpiryDate": "Введите верный срок годности",
+  "unknownRouteMessage": "Произошла ошибка навигации.\nПожалуйста, попробуйте еще раз или свяжитесь с нами.",
   "drugListTotalItems": "{itemsCount, plural, zero{Нет лекарств} one{{itemsCount} лекарство} few{{itemsCount} лекарства} many{{itemsCount} лекарств} other{{itemsCount} лекарств}}",
   "drugListTotalItemsSelected": "{itemsCount, plural, zero{Выбрано 0 лекарств} one{Выбрано {itemsCount} лекарство} few{Выбрано {itemsCount} лекарства} many{Выбрано {itemsCount} лекарств} other{Выбрано {itemsCount} лекарств}}",
   "drugListNoItems": "Нет добавленных лекарств",

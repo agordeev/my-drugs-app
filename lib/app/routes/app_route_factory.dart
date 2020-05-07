@@ -6,6 +6,7 @@ import 'package:my_drugs/app/features/drug_list/drug_list_screen.dart';
 import 'package:my_drugs/app/features/manage_drug/bloc/manage_drug_bloc.dart';
 import 'package:my_drugs/app/features/manage_drug/manage_drug_screen.dart';
 import 'package:my_drugs/app/routes/app_routes.dart';
+import 'package:my_drugs/app/widgets/unknown_route_screen.dart';
 import 'package:my_drugs/data_access/data_access.dart';
 import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/models/drug.dart';
@@ -35,18 +36,17 @@ class AppRouteFactory {
         break;
     }
     return _buildUnknownRoute(
+      settings,
       context,
     );
   }
 
-  // TODO: Improve appearance
-  Route<dynamic> _buildUnknownRoute(BuildContext context) => platformPageRoute(
+  Route<dynamic> _buildUnknownRoute(
+          RouteSettings settings, BuildContext context) =>
+      platformPageRoute(
+        settings: settings,
         context: context,
-        builder: (_) => Container(
-          child: Center(
-            child: Text('Unknown route'),
-          ),
-        ),
+        builder: (_) => UnknownRouteScreen(),
       );
 
   Widget _buildDrugListScreen(
