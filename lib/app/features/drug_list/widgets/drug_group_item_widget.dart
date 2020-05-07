@@ -37,6 +37,7 @@ class DrugGroupItemWidget extends DrugListRow {
 class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
   final double _expiresOnWidth = 90;
   final double _height = 68;
+  final _backgroundColor = Colors.white;
 
   /// Drug name block.
   @override
@@ -44,29 +45,32 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
     final widgetWidth =
         MediaQuery.of(context).size.width - widget.horizontalPadding * 2;
     final textWidth = widgetWidth - (_expiresOnWidth + 16 + 8);
-    return Container(
-      height: _height,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 4,
-            color: Color(0xFFD7D7D7),
-          ),
-        ],
-      ),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: SizedBox(
-          width: textWidth,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 16.0),
-            child: Text(
-              widget.item.name,
-              maxLines: 2,
-              style: TextStyle(
-                fontSize: 16,
+    return Opacity(
+      opacity: widget.item.isExpired ? 0.6 : 1.0,
+      child: Container(
+        height: _height,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          color: _backgroundColor,
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 4,
+              color: Color(0xFFD7D7D7),
+            ),
+          ],
+        ),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: SizedBox(
+            width: textWidth,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16.0),
+              child: Text(
+                widget.item.name,
+                maxLines: 2,
+                style: TextStyle(
+                  fontSize: 16,
+                ),
               ),
             ),
           ),
@@ -110,7 +114,7 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.white.withOpacity(0), Colors.white],
+                colors: [_backgroundColor.withOpacity(0), _backgroundColor],
                 stops: [0.0, 1.0],
               ),
             ),
@@ -120,7 +124,7 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
           padding: EdgeInsets.symmetric(horizontal: 8),
           width: _expiresOnWidth,
           height: _height,
-          color: Colors.white,
+          color: _backgroundColor,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,

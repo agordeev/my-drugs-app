@@ -111,6 +111,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
                   e.id,
                   e.name,
                   _dateFormat.format(e.expiresOn),
+                  true,
                   false,
                 ),
               )
@@ -134,6 +135,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
                   e.id,
                   e.name,
                   _dateFormat.format(e.expiresOn),
+                  false,
                   false,
                 ),
               )

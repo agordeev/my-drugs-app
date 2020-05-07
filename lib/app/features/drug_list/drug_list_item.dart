@@ -24,6 +24,7 @@ class DrugGroupItem {
   final String id;
   final String name;
   final String expiresOn;
+  final bool isExpired;
   bool isSelected;
 
   DrugGroupItem(
@@ -32,6 +33,7 @@ class DrugGroupItem {
     this.id,
     this.name,
     this.expiresOn,
+    this.isExpired,
     this.isSelected,
   );
 }
