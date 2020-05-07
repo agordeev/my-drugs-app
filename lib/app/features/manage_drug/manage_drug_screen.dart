@@ -59,48 +59,50 @@ class ManageDrugScreen extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Expanded(
-                child: AppCard(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    SizedBox(height: 8.0),
-                    TextFormField(
-                      autofocus: true,
-                      controller: state.nameController,
-                      decoration: InputDecoration(
-                        labelText: S.of(context).manageDrugNameFieldLabel,
-                        hintText: S.of(context).manageDrugNameFieldHint,
-                      ),
-                      textCapitalization: TextCapitalization.words,
-                      validator: (value) =>
-                          RequiredFieldValidator.validate(context, value),
-                    ),
-                    SizedBox(height: 16.0),
-                    SizedBox(height: 8.0),
-                    TextFormField(
-                      controller: state.expiresOnController,
-                      decoration: InputDecoration(
-                        labelText: S.of(context).manageDrugExpiresOnFieldLabel,
-                        hintText: state.expiresOnPlaceholderText,
-                      ),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        MaskTextInputFormatter(
-                          mask: state.expiresOnMask,
-                          filter: {
-                            '#': RegExp(r'[0-9]'),
-                          },
+              child: AppCard(
+                child: ScrollConfiguration(
+                  behavior: _InvisibleScrollBehavior(),
+                  child: ListView(
+                    padding: const EdgeInsets.all(16.0),
+                    children: <Widget>[
+                      SizedBox(height: 8.0),
+                      TextFormField(
+                        autofocus: true,
+                        controller: state.nameController,
+                        decoration: InputDecoration(
+                          labelText: S.of(context).manageDrugNameFieldLabel,
+                          hintText: S.of(context).manageDrugNameFieldHint,
                         ),
-                      ],
-                      validator: (value) =>
-                          ExpiresOnFieldValidator.validate(context, value),
-                    ),
-                  ],
+                        textCapitalization: TextCapitalization.words,
+                        validator: (value) =>
+                            RequiredFieldValidator.validate(context, value),
+                      ),
+                      SizedBox(height: 16.0),
+                      SizedBox(height: 8.0),
+                      TextFormField(
+                        controller: state.expiresOnController,
+                        decoration: InputDecoration(
+                          labelText:
+                              S.of(context).manageDrugExpiresOnFieldLabel,
+                          hintText: state.expiresOnPlaceholderText,
+                        ),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          MaskTextInputFormatter(
+                            mask: state.expiresOnMask,
+                            filter: {
+                              '#': RegExp(r'[0-9]'),
+                            },
+                          ),
+                        ],
+                        validator: (value) =>
+                            ExpiresOnFieldValidator.validate(context, value),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            )),
+            ),
             SizedBox(height: 16.0),
             SizedBox(
               width: double.infinity,
@@ -127,4 +129,18 @@ class ManageDrugScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Hides scroll glow on Android and removes overscroll (bounce) effect on iOS.
+/// That makes the scroll unnoticable to the user.
+class _InvisibleScrollBehavior extends ScrollBehavior {
+  @override
+  Widget buildViewportChrome(
+      BuildContext context, Widget child, AxisDirection axisDirection) {
+    return child;
+  }
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) =>
+      ClampingScrollPhysics();
 }
