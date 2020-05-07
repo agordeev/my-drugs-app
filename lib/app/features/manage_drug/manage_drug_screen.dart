@@ -88,7 +88,7 @@ class ManageDrugScreen extends StatelessWidget {
                       keyboardType: TextInputType.number,
                       inputFormatters: [
                         MaskTextInputFormatter(
-                          mask: '##/####',
+                          mask: state.expiresOnMask,
                           filter: {
                             '#': RegExp(r'[0-9]'),
                           },

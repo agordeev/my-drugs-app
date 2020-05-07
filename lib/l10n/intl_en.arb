@@ -2,6 +2,7 @@
   "appTitle": "My Drugs",
   "buttonEdit": "Edit",
   "buttonDelete": "Delete",
+  "expiryDateFormat": "MM/yyyy",
   "drugListTotalItems": "{itemsCount, plural, zero{No items} one{1 item} other{{itemsCount} items}}",
   "drugListTotalItemsSelected": "{itemsCount, plural, zero{No items selected} one{1 item selected} other{{itemsCount} items selected}}",
   "drugListNoItems": "No drugs added yet",

@@ -67,7 +67,8 @@ class AppRouteFactory {
     Drug drug,
   ) =>
       BlocProvider<ManageDrugBloc>(
-        create: (context) => ManageDrugBloc(
+        create: (_) => ManageDrugBloc(
+          S.of(context),
           navigatorKey,
           repository,
           drug,

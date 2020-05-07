@@ -8,12 +8,14 @@ class ManageDrugInitial extends ManageDrugState {
   final GlobalKey<FormState> formKey;
   final TextEditingController nameController;
   final TextEditingController expiresOnController;
+  final String expiresOnMask;
   final String expiresOnPlaceholderText;
 
   ManageDrugInitial(
     this.formKey,
     this.nameController,
     this.expiresOnController,
+    this.expiresOnMask,
     this.expiresOnPlaceholderText,
   );
 
@@ -22,6 +24,7 @@ class ManageDrugInitial extends ManageDrugState {
         formKey,
         nameController,
         expiresOnController,
+        expiresOnMask,
         expiresOnPlaceholderText,
       ];
 }

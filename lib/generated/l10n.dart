@@ -54,6 +54,15 @@ class S {
     );
   }
 
+  String get expiryDateFormat {
+    return Intl.message(
+      'MM/yyyy',
+      name: 'expiryDateFormat',
+      desc: '',
+      args: [],
+    );
+  }
+
   String drugListTotalItems(num itemsCount) {
     return Intl.plural(
       itemsCount,

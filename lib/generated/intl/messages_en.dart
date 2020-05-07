@@ -34,6 +34,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "drugListNotExpiredGroupTitle" : MessageLookupByLibrary.simpleMessage("Not Expired"),
     "drugListTotalItems" : m0,
     "drugListTotalItemsSelected" : m1,
+    "expiryDateFormat" : MessageLookupByLibrary.simpleMessage("MM/yyyy"),
     "manageDrugAddDrugModeActionButtonTitle" : MessageLookupByLibrary.simpleMessage("Add"),
     "manageDrugAddDrugModeTitle" : MessageLookupByLibrary.simpleMessage("Add Drug"),
     "manageDrugEditDrugModeActionButtonTitle" : MessageLookupByLibrary.simpleMessage("Save"),

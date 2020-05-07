@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_drugs/data_access/data_access.dart';
+import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/models/drug.dart';
 import 'package:uuid/uuid.dart';
 
@@ -20,13 +21,14 @@ class ManageDrugBloc extends Bloc<ManageDrugEvent, ManageDrugState> {
   final _nameController = TextEditingController();
   final _expiresOnController = TextEditingController();
 
-  final _dateFormat = DateFormat('MM/yyyy');
+  final DateFormat _dateFormat;
 
   ManageDrugBloc(
+    S localization,
     this._navigatorKey,
     this._repository,
     this._drug,
-  );
+  ) : _dateFormat = DateFormat(localization.expiryDateFormat);
 
   @override
   ManageDrugState get initialState {
@@ -38,6 +40,7 @@ class ManageDrugBloc extends Bloc<ManageDrugEvent, ManageDrugState> {
       _formKey,
       _nameController,
       _expiresOnController,
+      _dateFormat.pattern.replaceAll(RegExp('[a-zA-Z]'), '#'),
       _dateFormat.format(
         DateTime.utc(2020, 5, 30),
       ),
