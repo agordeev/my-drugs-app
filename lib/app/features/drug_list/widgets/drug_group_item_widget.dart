@@ -68,6 +68,7 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
               child: Text(
                 widget.item.name,
                 maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 16,
                 ),

@@ -70,9 +70,17 @@ class ManageDrugScreen extends StatelessWidget {
                         autofocus: true,
                         controller: state.nameController,
                         decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 16.0,
+                          ),
                           labelText: S.of(context).manageDrugNameFieldLabel,
                           hintText: S.of(context).manageDrugNameFieldHint,
+                          counterText: '',
+                          alignLabelWithHint: true,
                         ),
+                        maxLines: null,
+                        maxLength: 200,
                         textCapitalization: TextCapitalization.words,
                         validator: (value) =>
                             RequiredFieldValidator.validate(context, value),
