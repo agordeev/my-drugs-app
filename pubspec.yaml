@@ -23,7 +23,7 @@ dependencies:
   equatable:
   intl:
   intl_translation:
-  flutter_platform_widgets: ^0.32.5
+  flutter_platform_widgets: ^0.40.0
   mask_text_input_formatter: ^1.0.6
   uuid: ^2.0.4
   firebase_core: ^0.4.4+3
