@@ -1,6 +1,7 @@
 {
   "appTitle": "My Drugs",
   "expiryDateFormat": "MM/yyyy",
+  "dateDelimeter": "/",
   "buttonEdit": "Edit",
   "buttonDelete": "Delete",
   "validationEmptyRequiredField": "Please fill this field",
