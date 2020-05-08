@@ -19,6 +19,7 @@ void main() async {
   final drugs = await repository.fetchList();
   runApp(MyApp(
     repository: repository,
+    analytics: FirebaseAnalytics(),
     drugs: drugs,
   ));
 }
@@ -37,21 +38,24 @@ Future<Database> instantiateDatabase(String databasesPath) => openDatabase(
 
 class MyApp extends StatelessWidget {
   final AppRouteFactory _routeFactory;
-  final analytics = FirebaseAnalytics();
+  final FirebaseAnalytics _analytics;
 
   MyApp({
     Key key,
     @required AbstractDrugRepository repository,
+    @required FirebaseAnalytics analytics,
     List<Drug> drugs,
   })  : assert(repository != null),
-        _routeFactory = AppRouteFactory(repository, drugs),
+        assert(analytics != null),
+        _analytics = analytics,
+        _routeFactory = AppRouteFactory(repository, analytics, drugs),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorObservers: [
-        FirebaseAnalyticsObserver(analytics: analytics),
+        FirebaseAnalyticsObserver(analytics: _analytics),
       ],
       localizationsDelegates: [
         S.delegate,

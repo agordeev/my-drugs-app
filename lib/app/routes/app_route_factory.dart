@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -16,9 +17,10 @@ class AppRouteFactory {
   final navigatorKey = GlobalKey<NavigatorState>();
 
   final AbstractDrugRepository repository;
+  final FirebaseAnalytics analytics;
   final List<Drug> drugs;
 
-  AppRouteFactory(this.repository, this.drugs);
+  AppRouteFactory(this.repository, this.analytics, this.drugs);
 
   Route<dynamic> generateRoute(RouteSettings settings, BuildContext context) {
     final arguments = settings.arguments;
@@ -57,6 +59,7 @@ class AppRouteFactory {
           S.of(context),
           navigatorKey,
           repository,
+          analytics,
           drugs,
         ),
         child: DrugListScreen(),

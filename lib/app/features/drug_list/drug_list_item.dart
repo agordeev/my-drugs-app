@@ -7,6 +7,7 @@ class DrugGroup {
   final GlobalKey<AnimatedListState> listKey;
   final String name;
   final List<DrugGroupItem> items;
+  final bool isExpired;
   bool isSelected;
 
   DrugGroup(
@@ -14,6 +15,7 @@ class DrugGroup {
     this.listKey,
     this.name,
     this.items,
+    this.isExpired,
     this.isSelected,
   );
 }

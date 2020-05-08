@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
@@ -21,8 +22,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   final S _localizations;
   final GlobalKey<NavigatorState> _navigatorKey;
   final AbstractDrugRepository _repository;
-  // final List<Drug> _expiredDrugs;
-  // final List<Drug> _notExpiredDrugs;
+  final FirebaseAnalytics _analytics;
   final List<Drug> _drugs;
 
   List<DrugGroup> _groups;
@@ -62,8 +62,11 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     this._localizations,
     this._navigatorKey,
     this._repository,
+    this._analytics,
     this._drugs,
-  );
+  ) {
+    _sentScreenAnalytics();
+  }
 
   @override
   Future<void> close() {
@@ -116,6 +119,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
                 ),
               )
               .toList(),
+          true,
           false,
         ),
       );
@@ -140,6 +144,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
                 ),
               )
               .toList(),
+          true,
           false,
         ),
       );
@@ -290,6 +295,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
           duration: _animationDuration,
         );
       }
+      _sentScreenAnalytics();
       yield _buildState();
     } catch (e) {
       print(e);
@@ -336,6 +342,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     }
     _setScreenMode(ScreenMode.normal);
     _updateBottomBarDeleteButtonColor();
+    _sentScreenAnalytics();
     yield _buildState();
   }
 
@@ -354,6 +361,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         final indexToAdd = _isDrugExpired(drug) ? 0 : 1;
         _listKey.currentState?.insertItem(indexToAdd);
       }
+      _sentScreenAnalytics();
       yield _buildState();
     }
   }
@@ -374,6 +382,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       // Sort in case if [expiresOn] was updated.
       _sortDrugsByExpiredOn();
       _groups = _buildGroups(_drugs);
+      _sentScreenAnalytics();
       yield _buildState();
     }
   }
@@ -393,5 +402,29 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     } else {
       _bottomBarKey.currentState.deleteButtonColorAnimationController.reverse();
     }
+  }
+
+  void _sentScreenAnalytics() {
+    _analytics.setUserProperty(
+      name: 'drugs_count_total',
+      value: '${_drugs.length}',
+    );
+    var expiredDrugsCount = 0;
+    var notExpiredDrugsCount = 0;
+    _groups.forEach((group) {
+      if (group.isExpired) {
+        expiredDrugsCount = group.items.length;
+      } else {
+        notExpiredDrugsCount = group.items.length;
+      }
+    });
+    _analytics.setUserProperty(
+      name: 'drugs_count_expired',
+      value: '$expiredDrugsCount',
+    );
+    _analytics.setUserProperty(
+      name: 'drugs_count_not_expired',
+      value: '$notExpiredDrugsCount',
+    );
   }
 }
