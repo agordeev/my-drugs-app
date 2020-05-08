@@ -74,12 +74,12 @@ class MyApp extends StatelessWidget {
 
   ThemeData _buildTheme(BuildContext context) {
     final baseTheme = ThemeData.light();
-    final primarySwatch = Colors.teal;
+    final primaryColor = Color(0xFFf05b6c);
     return ThemeData(
-      primarySwatch: primarySwatch,
+      primaryColor: primaryColor,
       visualDensity: VisualDensity.adaptivePlatformDensity,
       colorScheme: baseTheme.colorScheme.copyWith(
-        primary: primarySwatch,
+        primary: primaryColor,
         surface: Color(0xFFFBFBFB),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -99,11 +99,11 @@ class MyApp extends StatelessWidget {
         color: Colors.white,
         textTheme: Theme.of(context).textTheme,
         iconTheme: IconThemeData(
-          color: primarySwatch,
+          color: primaryColor,
         ),
       ),
       cupertinoOverrideTheme: CupertinoThemeData(
-        primaryColor: primarySwatch,
+        primaryColor: primaryColor,
       ),
     );
   }

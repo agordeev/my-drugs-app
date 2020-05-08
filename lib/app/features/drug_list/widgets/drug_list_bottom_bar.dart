@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -129,7 +130,9 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
             widget.numberOfItemsSelectedOffset,
             widget.numberOfItemsSelected,
             Icon(
-              Icons.delete,
+              Theme.of(context).platform == TargetPlatform.iOS
+                  ? CupertinoIcons.delete
+                  : Icons.delete,
               color: _colorAnimation.value,
             ),
             _colorAnimation.value,
