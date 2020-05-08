@@ -140,7 +140,7 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
               ),
               SizedBox(height: 4),
               Text(
-                widget.item.expiresOn,
+                widget.item.expiresOn.replaceFirst(' ', '\n'),
                 style: TextStyle(
                   color: Color(0xFF8C8C8C),
                   fontSize: 14,
