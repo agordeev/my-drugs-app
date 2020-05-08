@@ -82,7 +82,7 @@ class AppRouteFactory {
               : S.of(context).manageDrugEditDrugModeTitle,
           actionButtonTitle: drug == null
               ? S.of(context).manageDrugAddDrugModeActionButtonTitle
-              : S.of(context).manageDrugAddDrugModeActionButtonTitle,
+              : S.of(context).manageDrugEditDrugModeActionButtonTitle,
         ),
       );
 }
