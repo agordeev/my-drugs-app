@@ -78,6 +78,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   DrugListState get initialState => _buildState();
 
   DrugListState _buildState() {
+    _sortDrugs();
     _groups ??= _buildGroups(_drugs);
     final selectedItemsCount = _selectedItemsCount;
     if (_drugs.isEmpty) {
@@ -353,7 +354,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         await _navigatorKey.currentState.pushNamed<Drug>(AppRoutes.manageDrug);
     if (drug != null) {
       _drugs.add(drug);
-      _sortDrugsByExpiredOn();
+      _sortDrugs();
       final oldGroupsLength = _groups.length;
       _groups = _buildGroups(_drugs);
       if (_groups.length > oldGroupsLength) {
@@ -380,16 +381,22 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     if (drug != null) {
       _drugs[index] = drug;
       // Sort in case if [expiresOn] was updated.
-      _sortDrugsByExpiredOn();
+      _sortDrugs();
       _groups = _buildGroups(_drugs);
       _sentScreenAnalytics();
       yield _buildState();
     }
   }
 
-  void _sortDrugsByExpiredOn() {
-    _drugs
-        .sort((first, second) => -first.expiresOn.compareTo(second.expiresOn));
+  void _sortDrugs() {
+    _drugs.sort((first, second) {
+      final expiresOnCompare = first.expiresOn.compareTo(second.expiresOn);
+      if (expiresOnCompare == 0) {
+        return first.name.compareTo(second.name);
+      } else {
+        return expiresOnCompare;
+      }
+    });
   }
 
   bool _isDrugExpired(Drug drug) {
