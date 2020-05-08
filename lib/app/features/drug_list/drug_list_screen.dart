@@ -165,6 +165,11 @@ class _DrugListScreenState extends State<DrugListScreen>
           item,
           isInEditMode,
         );
+    final editButtonHandler = () {
+      Navigator.of(context).pop();
+      BlocProvider.of<DrugListBloc>(context)
+          .add(DrugListEditingStarted(item.id));
+    };
     if (Theme.of(context).platform == TargetPlatform.iOS) {
       showCupertinoModalPopup(
         context: context,
@@ -174,11 +179,7 @@ class _DrugListScreenState extends State<DrugListScreen>
               child: Text(
                 S.of(context).buttonEdit,
               ),
-              onPressed: () {
-                Navigator.of(context).pop();
-                BlocProvider.of<DrugListBloc>(context)
-                    .add(DrugListEditingStarted(item.id));
-              },
+              onPressed: editButtonHandler,
             ),
             CupertinoActionSheetAction(
               child: Text(
@@ -200,7 +201,7 @@ class _DrugListScreenState extends State<DrugListScreen>
               context,
               Icons.edit,
               S.of(context).buttonEdit,
-              () {},
+              editButtonHandler,
             ),
             _buildBottomSheetRow(
               context,
