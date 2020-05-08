@@ -88,6 +88,7 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
           child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: widget.isInEditMode
                 ? () => BlocProvider.of<DrugListBloc>(context)
                         .add(SelectDeselectDrug(
