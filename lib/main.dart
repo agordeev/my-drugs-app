@@ -1,3 +1,5 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -35,6 +37,7 @@ Future<Database> instantiateDatabase(String databasesPath) => openDatabase(
 
 class MyApp extends StatelessWidget {
   final AppRouteFactory _routeFactory;
+  final analytics = FirebaseAnalytics();
 
   MyApp({
     Key key,
@@ -47,6 +50,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: analytics),
+      ],
       localizationsDelegates: [
         S.delegate,
         GlobalMaterialLocalizations.delegate,
