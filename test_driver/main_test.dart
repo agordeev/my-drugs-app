@@ -7,11 +7,13 @@
 import 'dart:io';
 
 import 'package:flutter_driver/flutter_driver.dart';
+import 'package:screenshots/screenshots.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('screenshots', () {
     FlutterDriver driver;
+    final config = Config();
 
     setUpAll(() async {
       // Connect to a running Flutter application instance.
@@ -25,30 +27,24 @@ void main() {
 
     test('make screenshots', () async {
       await driver.waitFor(find.byValueKey('add'));
-      await _makeScreenshot(driver, 0);
+      await screenshot(driver, config, '0');
+
+      await driver.tap(find.byValueKey('add'));
 
       // // Tap on the fab
       // print(addButton);
 
-      // await driver.waitFor(find.text(''));
-      // await driver.enterText('Aspirin');
+      await driver.waitFor(find.text(''));
 
-      // await _makeScreenshot(driver, 1);
+      await driver.enterText('Аспирин');
+
+      await screenshot(driver, config, '1');
 
       // // Wait for text to change to the desired value
       // await driver.waitFor(find.text('1'));
 
       // // take screenshot after number is incremented
       // await screenshot(driver, config, '1');
-
-      // // increase timeout from 30 seconds for testing
-      // // on slow running emulators in cloud
-    }, timeout: Timeout(Duration(seconds: 120)));
+    }, timeout: Timeout(Duration(seconds: 45)));
   });
-}
-
-void _makeScreenshot(FlutterDriver driver, int index) async {
-  final pixels = await driver.screenshot();
-  final file = await File('tmp/screenshot$index.png').create(recursive: true);
-  await file.writeAsBytes(pixels);
 }

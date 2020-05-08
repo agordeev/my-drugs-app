@@ -122,7 +122,7 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
           animation: _colorAnimation,
           builder: (BuildContext context, Widget child) => _buildRow(
             context,
-            'add',
+            'delete',
             widget.screenModeAnimationController.status ==
                 AnimationStatus.dismissed,
             widget.numberOfItemsSelectedOpacity,
@@ -138,7 +138,7 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
         ),
         _buildRow(
           context,
-          'delete',
+          'add',
           widget.screenModeAnimationController.status ==
               AnimationStatus.completed,
           widget.numberOfItemsTotalOpacity,
