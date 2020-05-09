@@ -102,9 +102,6 @@ class MyApp extends StatelessWidget {
           color: primaryColor,
         ),
       ),
-      cupertinoOverrideTheme: CupertinoThemeData(
-        primaryColor: primaryColor,
-      ),
     );
   }
 }
