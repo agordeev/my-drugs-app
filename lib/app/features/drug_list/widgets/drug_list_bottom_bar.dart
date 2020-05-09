@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -122,13 +123,16 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
           animation: _colorAnimation,
           builder: (BuildContext context, Widget child) => _buildRow(
             context,
+            'delete',
             widget.screenModeAnimationController.status ==
                 AnimationStatus.dismissed,
             widget.numberOfItemsSelectedOpacity,
             widget.numberOfItemsSelectedOffset,
             widget.numberOfItemsSelected,
             Icon(
-              Icons.delete,
+              Theme.of(context).platform == TargetPlatform.iOS
+                  ? CupertinoIcons.delete
+                  : Icons.delete,
               color: _colorAnimation.value,
             ),
             _colorAnimation.value,
@@ -137,6 +141,7 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
         ),
         _buildRow(
           context,
+          'add',
           widget.screenModeAnimationController.status ==
               AnimationStatus.completed,
           widget.numberOfItemsTotalOpacity,
@@ -152,6 +157,7 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
 
   Widget _buildRow(
     BuildContext context,
+    String buttonKey,
     bool ignoreTaps,
     Animation<double> opacity,
     Animation<Offset> position,
@@ -189,10 +195,9 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
                       width: _height,
                       height: _height,
                       child: PlatformButton(
+                        key: Key(buttonKey),
                         androidFlat: (context) => MaterialFlatButtonData(),
                         padding: const EdgeInsets.all(0.0),
-                        // color: color,
-                        // disabledColor: color,
                         child: icon,
                         onPressed: onPressed,
                       ),

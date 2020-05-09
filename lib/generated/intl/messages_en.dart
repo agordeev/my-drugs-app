@@ -28,6 +28,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appTitle" : MessageLookupByLibrary.simpleMessage("My Drugs"),
     "buttonDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
     "buttonEdit" : MessageLookupByLibrary.simpleMessage("Edit"),
+    "dateDelimeter" : MessageLookupByLibrary.simpleMessage("/"),
     "drugListExpiredGroupTitle" : MessageLookupByLibrary.simpleMessage("Expired"),
     "drugListExpiresOnLabel" : MessageLookupByLibrary.simpleMessage("Expires On"),
     "drugListNoItems" : MessageLookupByLibrary.simpleMessage("No drugs added yet"),

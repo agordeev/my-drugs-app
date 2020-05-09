@@ -68,6 +68,7 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
               child: Text(
                 widget.item.name,
                 maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 16,
                 ),
@@ -88,6 +89,7 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
           child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: widget.isInEditMode
                 ? () => BlocProvider.of<DrugListBloc>(context)
                         .add(SelectDeselectDrug(
@@ -139,7 +141,7 @@ class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
               ),
               SizedBox(height: 4),
               Text(
-                widget.item.expiresOn,
+                widget.item.expiresOn.replaceFirst(' ', '\n'),
                 style: TextStyle(
                   color: Color(0xFF8C8C8C),
                   fontSize: 14,

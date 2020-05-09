@@ -1,6 +1,7 @@
 {
   "appTitle": "Мои лекарства",
   "expiryDateFormat": "MM.yyyy",
+  "dateDelimeter": ".",
   "buttonEdit": "Изменить",
   "buttonDelete": "Удалить",
   "validationEmptyRequiredField": "Заполните это поле",

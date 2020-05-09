@@ -10,7 +10,8 @@ class ExpiresOnFieldValidator {
     if (value == null || value.isEmpty) {
       return S.of(context).validationEmptyRequiredField;
     }
-    final regexp = RegExp(r'(0[1-9]|10|11|12)/20[0-9]{2}$');
+    final delimeter = S.of(context).dateDelimeter;
+    final regexp = RegExp('(0[1-9]|10|11|12)${delimeter}20[0-9]{2}\$');
     if (!regexp.hasMatch(value)) {
       return S.of(context).validationInvalidExpiryDate;
     }

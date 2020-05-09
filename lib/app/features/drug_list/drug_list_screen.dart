@@ -57,10 +57,10 @@ class _DrugListScreenState extends State<DrugListScreen>
         var isDeleteButtonActive = false;
         if (state is DrugListInitial) {
           if (state.isEmpty) {
-            body = _buildEmptyStateContent(context);
+            body = _buildEmptyState(context);
             numberOfItemsTotal = S.of(context).drugListTotalItems(0);
           } else {
-            body = _buildInitialStateContent(
+            body = _buildInitialState(
               context,
               state,
             );
@@ -107,13 +107,44 @@ class _DrugListScreenState extends State<DrugListScreen>
     );
   }
 
-  Widget _buildEmptyStateContent(BuildContext context) => Center(
-        child: Text(
-          S.of(context).drugListNoItems,
+  Widget _buildEmptyState(BuildContext context) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image.asset(
+              'assets/images/drug_list_empty_state.png',
+              width: 145.0,
+            ),
+            SizedBox(height: 16.0),
+            Text(
+              S.of(context).drugListNoItems,
+              style: TextStyle(
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 16.0),
+            SizedBox(
+              width: 240,
+              child: PlatformButton(
+                padding: EdgeInsets.zero,
+                android: (context) => MaterialRaisedButtonData(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                ios: (context) => CupertinoButtonData(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                child: Text(
+                  S.of(context).manageDrugAddDrugModeActionButtonTitle,
+                ),
+                onPressed: () => BlocProvider.of<DrugListBloc>(context)
+                    .add(DrugListAddingStarted()),
+              ),
+            )
+          ],
         ),
       );
 
-  Widget _buildInitialStateContent(
+  Widget _buildInitialState(
     BuildContext context,
     DrugListInitial state,
   ) {
@@ -165,6 +196,11 @@ class _DrugListScreenState extends State<DrugListScreen>
           item,
           isInEditMode,
         );
+    final editButtonHandler = () {
+      Navigator.of(context).pop();
+      BlocProvider.of<DrugListBloc>(context)
+          .add(DrugListEditingStarted(item.id));
+    };
     if (Theme.of(context).platform == TargetPlatform.iOS) {
       showCupertinoModalPopup(
         context: context,
@@ -174,11 +210,7 @@ class _DrugListScreenState extends State<DrugListScreen>
               child: Text(
                 S.of(context).buttonEdit,
               ),
-              onPressed: () {
-                Navigator.of(context).pop();
-                BlocProvider.of<DrugListBloc>(context)
-                    .add(DrugListEditingStarted(item.id));
-              },
+              onPressed: editButtonHandler,
             ),
             CupertinoActionSheetAction(
               child: Text(
@@ -200,7 +232,7 @@ class _DrugListScreenState extends State<DrugListScreen>
               context,
               Icons.edit,
               S.of(context).buttonEdit,
-              () {},
+              editButtonHandler,
             ),
             _buildBottomSheetRow(
               context,

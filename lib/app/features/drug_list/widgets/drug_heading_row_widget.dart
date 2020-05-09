@@ -26,6 +26,7 @@ class DrugHeadingRowState extends DrugListRowState<DrugHeadingRowWidget> {
   @override
   Widget buildScaffold(BuildContext context, Widget animatedChild) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: widget.isInEditMode
           ? () => BlocProvider.of<DrugListBloc>(context).add(
                 DrugListGroupSelectionChanged(

@@ -1,3 +1,5 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -17,6 +19,7 @@ void main() async {
   final drugs = await repository.fetchList();
   runApp(MyApp(
     repository: repository,
+    analytics: FirebaseAnalytics(),
     drugs: drugs,
   ));
 }
@@ -35,18 +38,25 @@ Future<Database> instantiateDatabase(String databasesPath) => openDatabase(
 
 class MyApp extends StatelessWidget {
   final AppRouteFactory _routeFactory;
+  final FirebaseAnalytics _analytics;
 
   MyApp({
     Key key,
     @required AbstractDrugRepository repository,
+    @required FirebaseAnalytics analytics,
     List<Drug> drugs,
   })  : assert(repository != null),
-        _routeFactory = AppRouteFactory(repository, drugs),
+        assert(analytics != null),
+        _analytics = analytics,
+        _routeFactory = AppRouteFactory(repository, analytics, drugs),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: _analytics),
+      ],
       localizationsDelegates: [
         S.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -64,12 +74,12 @@ class MyApp extends StatelessWidget {
 
   ThemeData _buildTheme(BuildContext context) {
     final baseTheme = ThemeData.light();
-    final primarySwatch = Colors.teal;
+    final primaryColor = Color(0xFFf05b6c);
     return ThemeData(
-      primarySwatch: primarySwatch,
+      primaryColor: primaryColor,
       visualDensity: VisualDensity.adaptivePlatformDensity,
       colorScheme: baseTheme.colorScheme.copyWith(
-        primary: primarySwatch,
+        primary: primaryColor,
         surface: Color(0xFFFBFBFB),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -89,11 +99,8 @@ class MyApp extends StatelessWidget {
         color: Colors.white,
         textTheme: Theme.of(context).textTheme,
         iconTheme: IconThemeData(
-          color: primarySwatch,
+          color: primaryColor,
         ),
-      ),
-      cupertinoOverrideTheme: CupertinoThemeData(
-        primaryColor: primarySwatch,
       ),
     );
   }

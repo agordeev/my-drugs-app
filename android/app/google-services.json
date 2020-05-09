@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "250492017891",
+    "firebase_url": "https://my-drugs-3256c.firebaseio.com",
+    "project_id": "my-drugs-3256c",
+    "storage_bucket": "my-drugs-3256c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:250492017891:android:2308487c5a18ba087ab9d6",
+        "android_client_info": {
+          "package_name": "com.andreygordeev.mydrugs"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "250492017891-32kgdtid5q633lln9m302masrjq7eq6f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1n7iUDrpLvqkNhteN9A4tcSJ-IS0f-mM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "250492017891-32kgdtid5q633lln9m302masrjq7eq6f.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "250492017891-gpf6gakhmijlif6731hsfkf4qr9gtf5p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.andreygordeev.mydrugs",
+                "app_store_id": "1512377175"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

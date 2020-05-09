@@ -45,6 +45,15 @@ class S {
     );
   }
 
+  String get dateDelimeter {
+    return Intl.message(
+      '/',
+      name: 'dateDelimeter',
+      desc: '',
+      args: [],
+    );
+  }
+
   String get buttonEdit {
     return Intl.message(
       'Edit',

@@ -1,0 +1,28 @@
+# A list of screen capture tests
+tests:
+# Note: flutter driver expects a pair of files eg, main1.dart and main1_test.dart
+  - test_driver/main.dart 
+
+# Interim location of screenshots from tests
+staging: /tmp/screenshots
+
+# A list of locales supported by the app
+locales:
+  - ru-RU
+
+# A map of devices to emulate
+devices:
+  ios:
+    iPhone 8 Plus:
+      frame: false
+    iPhone 11 Pro Max:
+      frame: false
+    iPad Pro:
+      frame: false
+  android:
+    Pixel_2_XL_Oreo:
+      frame: false
+    Tablet_10:
+      frame: false
+    Tablet_7:
+      frame: false
