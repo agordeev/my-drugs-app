@@ -18,7 +18,7 @@ void main() async {
   // See https://flutter.io/testing/ for more info.
   enableFlutterDriverExtension(handler: handler);
   WidgetsApp.debugAllowBannerOverride = false;
-  final locale = Locale('ru');
+  final locale = Locale('en');
   final repository = TestDrugRepository(locale);
   final drugs = await repository.fetchList();
   runApp(MyApp(

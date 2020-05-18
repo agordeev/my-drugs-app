@@ -36,7 +36,7 @@ void main() {
 
       await driver.waitFor(find.text(''));
 
-      await driver.enterText('Аспирин');
+      await driver.enterText('Aspirin');
 
       await screenshot(driver, config, '1');
 

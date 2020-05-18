@@ -8,7 +8,7 @@ staging: /tmp/screenshots
 
 # A list of locales supported by the app
 locales:
-  - ru-RU
+  - en-US
 
 # A map of devices to emulate
 devices:
@@ -19,10 +19,10 @@ devices:
       frame: false
     iPad Pro:
       frame: false
-  android:
-    Pixel_2_XL_Oreo:
-      frame: false
-    Tablet_10:
-      frame: false
-    Tablet_7:
-      frame: false
+  # android:
+  #   Pixel_2_XL_Oreo:
+  #     frame: false
+  #   Tablet_10:
+  #     frame: false
+  #   Tablet_7:
+  #     frame: false
