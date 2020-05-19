@@ -5,3 +5,5 @@
 _(Currently available in Russian stores only)_
 
 An iOS/Android app that helps you to track expired medicines in your medicine cabinet.
+
+<img src="resources/img/screenshots.png" width="490" alt="My Drugs iOS/Android app screenshots"/>
