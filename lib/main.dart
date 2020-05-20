@@ -20,7 +20,61 @@ void main() async {
   runApp(MyApp(
     repository: repository,
     analytics: FirebaseAnalytics(),
-    drugs: drugs,
+    drugs: [
+      Drug(
+        id: '1',
+        name: 'Name',
+        expiresOn: DateTime(2020, 1),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '2',
+        name: 'Aspirin',
+        expiresOn: DateTime(2020, 10),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '3',
+        name: 'A medication with very long name to test multiline',
+        expiresOn: DateTime(2020, 4),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '4',
+        name:
+            '4 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
+        expiresOn: DateTime(2020, 11),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '5',
+        name:
+            '5 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
+        expiresOn: DateTime(2020, 11),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '6',
+        name:
+            '6 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
+        expiresOn: DateTime(2020, 11),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '7',
+        name:
+            '7 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
+        expiresOn: DateTime(2020, 11),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '8',
+        name:
+            '8 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
+        expiresOn: DateTime(2020, 11),
+        createdAt: DateTime.now(),
+      ),
+    ],
   ));
 }
 

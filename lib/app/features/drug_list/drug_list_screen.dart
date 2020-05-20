@@ -149,35 +149,27 @@ class _DrugListScreenState extends State<DrugListScreen>
     DrugListInitial state,
   ) {
     final isInEditMode = state.screenMode == ScreenMode.edit;
-    return Container(
-      height: double.infinity,
-      child: Scrollbar(
+    return Scrollbar(
+      controller: _scrollController,
+      child: AnimatedList(
         controller: _scrollController,
-        child: SingleChildScrollView(
-          controller: _scrollController,
-          physics: AlwaysScrollableScrollPhysics(),
-          child: AnimatedList(
-            key: state.listKey,
-            physics: NeverScrollableScrollPhysics(),
-            padding: EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 12,
-            ),
-            shrinkWrap: true,
-            initialItemCount: state.groups.length,
-            itemBuilder: (context, groupIndex, groupAnimation) =>
-                DrugGroupWidget(
-              group: state.groups[groupIndex],
-              isInEditMode: isInEditMode,
-              editModeAnimation: _screenModeAnimationController,
-              listAnimation: groupAnimation,
-              onPresentContextMenuTap: (item) => _presentBottomSheet(
-                context,
-                state.groups[groupIndex],
-                item,
-                isInEditMode,
-              ),
-            ),
+        key: state.listKey,
+        physics: AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.symmetric(
+          horizontal: 8,
+          vertical: 12,
+        ),
+        initialItemCount: state.groups.length,
+        itemBuilder: (context, groupIndex, groupAnimation) => DrugGroupWidget(
+          group: state.groups[groupIndex],
+          isInEditMode: isInEditMode,
+          editModeAnimation: _screenModeAnimationController,
+          listAnimation: groupAnimation,
+          onPresentContextMenuTap: (item) => _presentBottomSheet(
+            context,
+            state.groups[groupIndex],
+            item,
+            isInEditMode,
           ),
         ),
       ),
