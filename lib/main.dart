@@ -7,7 +7,7 @@ import 'package:my_drugs/app/routes/app_route_factory.dart';
 import 'package:my_drugs/app/routes/app_routes.dart';
 import 'package:my_drugs/data_access/data_access.dart';
 import 'package:my_drugs/models/drug.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as Path;
 import 'package:sqflite/sqflite.dart';
 
 import 'generated/l10n.dart';
@@ -57,13 +57,31 @@ void main() async {
         expiresOn: DateTime(2021, 6),
         createdAt: DateTime.now(),
       ),
+      Drug(
+        id: '1 exp',
+        name: '1 exp',
+        expiresOn: DateTime(2020, 1),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '2 exp',
+        name: '2 exp',
+        expiresOn: DateTime(2020, 2),
+        createdAt: DateTime.now(),
+      ),
+      Drug(
+        id: '3 exp',
+        name: '3 exp',
+        expiresOn: DateTime(2020, 3),
+        createdAt: DateTime.now(),
+      ),
     ],
   ));
 }
 
 Future<Database> instantiateDatabase(String databasesPath) => openDatabase(
       // Set the path to the database.
-      join(databasesPath, 'drugs_database.db'),
+      Path.join(databasesPath, 'drugs_database.db'),
       // When the database is first created, create a table to store dogs.
       onCreate: (db, version) => db.execute(
         'CREATE TABLE drugs(id TEXT PRIMARY KEY, name TEXT, expiresOn INTEGER, createdAt INTEGER)',
@@ -73,7 +91,7 @@ Future<Database> instantiateDatabase(String databasesPath) => openDatabase(
       version: 1,
     );
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final AppRouteFactory _routeFactory;
   final FirebaseAnalytics _analytics;
 
@@ -89,10 +107,24 @@ class MyApp extends StatelessWidget {
         super(key: key);
 
   @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void didChangeDependencies() async {
+    await precacheImage(
+      AssetImage('assets/images/drug_list_empty_state.png'),
+      context,
+    );
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorObservers: [
-        FirebaseAnalyticsObserver(analytics: _analytics),
+        FirebaseAnalyticsObserver(analytics: widget._analytics),
       ],
       localizationsDelegates: [
         S.delegate,
@@ -101,10 +133,10 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: S.delegate.supportedLocales,
-      navigatorKey: _routeFactory.navigatorKey,
+      navigatorKey: widget._routeFactory.navigatorKey,
       theme: _buildTheme(context),
       onGenerateRoute: (settings) =>
-          _routeFactory.generateRoute(settings, context),
+          widget._routeFactory.generateRoute(settings, context),
       initialRoute: AppRoutes.drugList,
     );
   }
