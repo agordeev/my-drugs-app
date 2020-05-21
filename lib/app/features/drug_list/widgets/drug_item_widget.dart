@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_drugs/app/features/drug_list/bloc/drug_list_bloc.dart';
-import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_item.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_row.dart';
 import 'package:my_drugs/generated/l10n.dart';
 
-class DrugGroupItemWidget extends DrugListRow {
-  final DrugGroupItem item;
+class DrugItemWidget extends DrugListRow {
+  final DrugItem item;
   final bool isInEditMode;
 
   /// Animation comes from [AnimatedList].
@@ -19,7 +19,7 @@ class DrugGroupItemWidget extends DrugListRow {
 
   final VoidCallback onPresentContextMenuTap;
 
-  DrugGroupItemWidget({
+  DrugItemWidget({
     @required this.item,
     @required this.isInEditMode,
     @required this.onPresentContextMenuTap,
@@ -34,7 +34,7 @@ class DrugGroupItemWidget extends DrugListRow {
   DrugListRowState createState() => DrugItemRowState();
 }
 
-class DrugItemRowState extends DrugListRowState<DrugGroupItemWidget> {
+class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
   final double _expiresOnWidth = 90;
   final double _height = 68;
   final _backgroundColor = Colors.white;

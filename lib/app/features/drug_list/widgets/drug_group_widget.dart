@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
-import 'package:my_drugs/app/features/drug_list/widgets/drug_group_item_widget.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_item.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_item_group.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/drug_item_widget.dart';
 
 import 'drug_heading_row_widget.dart';
 
-class DrugGroupWidget extends StatelessWidget {
-  final DrugGroup group;
+class DrugItemGroupWidget extends StatelessWidget {
+  final DrugItemGroup group;
   final bool isInEditMode;
   final Animation<double> editModeAnimation;
   final Animation<double> listAnimation;
-  final Function(DrugGroupItem) onPresentContextMenuTap;
+  final Function(DrugItem) onPresentContextMenuTap;
 
-  const DrugGroupWidget({
+  const DrugItemGroupWidget({
     Key key,
     @required this.group,
     @required this.isInEditMode,
@@ -40,7 +41,7 @@ class DrugGroupWidget extends StatelessWidget {
               initialItemCount: group.items.length,
               itemBuilder: (context, itemIndex, itemAnimation) {
                 final item = group.items[itemIndex];
-                return DrugGroupItemWidget(
+                return DrugItemWidget(
                   item: item,
                   isInEditMode: isInEditMode,
                   editModeAnimation: editModeAnimation,

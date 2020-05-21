@@ -10,7 +10,7 @@ class DrugListScreenModeSwitched extends DrugListEvent {
 }
 
 class SelectDeselectDrug extends DrugListEvent {
-  final DrugGroupItem item;
+  final DrugItem item;
 
   SelectDeselectDrug(
     this.item,
@@ -23,7 +23,7 @@ class SelectDeselectDrug extends DrugListEvent {
 }
 
 class DrugListGroupSelectionChanged extends DrugListEvent {
-  final DrugGroup group;
+  final DrugItemGroup group;
 
   DrugListGroupSelectionChanged(
     this.group,
@@ -36,11 +36,13 @@ class DrugListGroupSelectionChanged extends DrugListEvent {
 }
 
 class DrugListGroupItemDeleted extends DrugListEvent {
-  final DrugGroupItem item;
+  final DrugItemGroup group;
+  final DrugItem item;
   final AnimatedListRemovedItemBuilder groupBuilder;
   final AnimatedListRemovedItemBuilder itemBuilder;
 
   DrugListGroupItemDeleted(
+    this.group,
     this.item,
     this.groupBuilder,
     this.itemBuilder,
@@ -48,6 +50,7 @@ class DrugListGroupItemDeleted extends DrugListEvent {
 
   @override
   List<Object> get props => [
+        group,
         item,
         groupBuilder,
         itemBuilder,
@@ -55,10 +58,9 @@ class DrugListGroupItemDeleted extends DrugListEvent {
 }
 
 class DrugListSelectedItemsDeleted extends DrugListEvent {
-  final Widget Function(BuildContext, DrugGroup, Animation<double>)
+  final Widget Function(BuildContext, DrugItemGroup, Animation<double>)
       groupBuilder;
-  final Widget Function(BuildContext, DrugGroupItem, Animation<double>)
-      itemBuilder;
+  final Widget Function(BuildContext, DrugItem, Animation<double>) itemBuilder;
 
   DrugListSelectedItemsDeleted(
     this.groupBuilder,
@@ -90,8 +92,7 @@ class DrugListEditingStarted extends DrugListEvent {
 
 class DrugListSearchTextFieldUpdated extends DrugListEvent {
   final String text;
-  final Widget Function(BuildContext, DrugGroupItem, Animation<double>)
-      itemBuilder;
+  final Widget Function(BuildContext, DrugItem, Animation<double>) itemBuilder;
 
   DrugListSearchTextFieldUpdated(
     this.text,

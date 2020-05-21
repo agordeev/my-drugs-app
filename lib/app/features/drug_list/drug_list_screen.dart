@@ -2,9 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
-import 'package:my_drugs/app/features/drug_list/widgets/drug_group_item_widget.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_item.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_item_group.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_group_widget.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/drug_item_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
 import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/shared/painters/screen_mode_button_painter.dart';
@@ -33,7 +34,7 @@ class _DrugListScreenState extends State<DrugListScreen>
       () => BlocProvider.of<DrugListBloc>(context).add(
         DrugListSearchTextFieldUpdated(
           _searchTextController.text,
-          (context, item, animation) => DrugGroupItemWidget(
+          (context, item, animation) => DrugItemWidget(
             item: item,
             isInEditMode: false,
             editModeAnimation: _screenModeAnimationController,
@@ -179,7 +180,8 @@ class _DrugListScreenState extends State<DrugListScreen>
           vertical: 12,
         ),
         initialItemCount: state.groups.length,
-        itemBuilder: (context, groupIndex, groupAnimation) => DrugGroupWidget(
+        itemBuilder: (context, groupIndex, groupAnimation) =>
+            DrugItemGroupWidget(
           group: state.groups[groupIndex],
           isInEditMode: isInEditMode,
           editModeAnimation: _screenModeAnimationController,
@@ -197,8 +199,8 @@ class _DrugListScreenState extends State<DrugListScreen>
 
   void _presentBottomSheet(
     BuildContext context,
-    DrugGroup group,
-    DrugGroupItem item,
+    DrugItemGroup group,
+    DrugItem item,
     bool isInEditMode,
   ) {
     final deleteButtonHandler = () => _onContextMenuDeletePressed(
@@ -259,22 +261,23 @@ class _DrugListScreenState extends State<DrugListScreen>
 
   void _onContextMenuDeletePressed(
     BuildContext context,
-    DrugGroup group,
-    DrugGroupItem item,
+    DrugItemGroup group,
+    DrugItem item,
     bool isInEditMode,
   ) {
     Navigator.of(context).pop();
     BlocProvider.of<DrugListBloc>(context).add(
       DrugListGroupItemDeleted(
+        group,
         item,
-        (context, animation) => DrugGroupWidget(
+        (context, animation) => DrugItemGroupWidget(
           group: group,
           isInEditMode: isInEditMode,
           editModeAnimation: _screenModeAnimationController,
           listAnimation: animation,
           onPresentContextMenuTap: null,
         ),
-        (context, animation) => DrugGroupItemWidget(
+        (context, animation) => DrugItemWidget(
           item: item,
           isInEditMode: isInEditMode,
           editModeAnimation: _screenModeAnimationController,
@@ -315,14 +318,14 @@ class _DrugListScreenState extends State<DrugListScreen>
     if (state is DrugListInitial) {
       final isInEditMode = state.screenMode == ScreenMode.edit;
       BlocProvider.of<DrugListBloc>(context).add(DrugListSelectedItemsDeleted(
-        (context, group, animation) => DrugGroupWidget(
+        (context, group, animation) => DrugItemGroupWidget(
           group: group,
           isInEditMode: isInEditMode,
           editModeAnimation: _screenModeAnimationController,
           listAnimation: animation,
           onPresentContextMenuTap: null,
         ),
-        (context, item, animation) => DrugGroupItemWidget(
+        (context, item, animation) => DrugItemWidget(
           item: item,
           isInEditMode: isInEditMode,
           editModeAnimation: _screenModeAnimationController,

@@ -5,7 +5,8 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:my_drugs/app/features/drug_list/drug_list_item.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_item.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_item_group.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_heading_row_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
 import 'package:my_drugs/app/routes/app_routes.dart';
@@ -30,7 +31,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   /// The array of drugs that is currently visible.
   List<Drug> _filteredDrugs;
 
-  List<DrugGroup> _groups;
+  List<DrugItemGroup> _groups;
   int get _selectedItemsCount => _groups.fold(
         0,
         (previousValue, group) =>
@@ -101,56 +102,52 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     );
   }
 
-  List<DrugGroup> _buildGroups(List<Drug> drugs) {
+  List<DrugItemGroup> _buildGroups(List<Drug> drugs) {
     final expired = drugs.where(_isDrugExpired).toList();
     final notExpired = drugs.where((e) => !_isDrugExpired(e)).toList();
-    var result = <DrugGroup>[];
+    var result = <DrugItemGroup>[];
     if (expired.isNotEmpty) {
       final groupKey = GlobalKey<DrugHeadingRowState>();
       result.add(
-        DrugGroup(
+        DrugItemGroup(
           groupKey,
           GlobalKey(),
           _localizations.drugListExpiredGroupTitle.toUpperCase(),
           expired
               .map(
-                (e) => DrugGroupItem(
+                (e) => DrugItem(
                   GlobalKey(),
                   groupKey,
                   e.id,
                   e.name,
                   _dateFormat.format(e.expiresOn),
                   true,
-                  false,
                 ),
               )
               .toList(),
           true,
-          false,
         ),
       );
     }
     if (notExpired.isNotEmpty) {
       final groupKey = GlobalKey<DrugHeadingRowState>();
       result.add(
-        DrugGroup(
+        DrugItemGroup(
           groupKey,
           GlobalKey(),
           _localizations.drugListNotExpiredGroupTitle.toUpperCase(),
           notExpired
               .map(
-                (e) => DrugGroupItem(
+                (e) => DrugItem(
                   GlobalKey(),
                   groupKey,
                   e.id,
                   e.name,
                   _dateFormat.format(e.expiresOn),
                   false,
-                  false,
                 ),
               )
               .toList(),
-          false,
           false,
         ),
       );
@@ -187,22 +184,13 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     } else {
       _setScreenMode(ScreenMode.edit);
     }
-    _groups.forEach((group) {
-      group.isSelected = false;
-      group.items.forEach((item) => item.isSelected = false);
-    });
-    _groups.forEach((group) {
-      group.key.currentState.checkmarkAnimationController.reverse();
-      group.items.forEach((item) =>
-          item.key.currentState.checkmarkAnimationController.reverse());
-    });
+    _groups.forEach((group) => group.deselect());
     yield _buildState();
   }
 
   Stream<DrugListState> _mapSelectDeselectDrugEventToState(
     SelectDeselectDrug event,
   ) async* {
-    final groupState = event.item.groupKey.currentState;
     final group = _groups.firstWhere(
       (element) => element.key == event.item.groupKey,
       orElse: () => null,
@@ -210,25 +198,9 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     if (group == null) {
       return;
     }
-    // If not selected.
-    if (!event.item.isSelected) {
-      event.item.isSelected = true;
-      // Animate checkmark to "ON".
-      event.item.key.currentState.checkmarkAnimationController.forward();
-    } else {
-      event.item.isSelected = false;
-      event.item.key.currentState.checkmarkAnimationController.reverse();
-    }
-    // If all drugs from the current group are selected, then update group checkmark too.
-    final areAllSelected = group.items.length ==
-        group.items.where((item) => item.isSelected).length;
-    if (areAllSelected) {
-      group.isSelected = true;
-      groupState.checkmarkAnimationController.forward();
-    } else {
-      group.isSelected = false;
-      groupState.checkmarkAnimationController.reverse();
-    }
+    event.item.toggleSelection(!event.item.isSelected);
+    // If all drugs from the current group are selected, then mark it as selected too.
+    group.toggleSelection(group.areAllItemsSelected);
     _updateBottomBarDeleteButtonColor();
     yield _buildState();
   }
@@ -236,21 +208,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> _mapSelectDeselectGroupEventToState(
     DrugListGroupSelectionChanged event,
   ) async* {
-    event.group.isSelected = !event.group.isSelected;
-    if (event.group.isSelected) {
-      event.group.key.currentState.checkmarkAnimationController.forward();
-    } else {
-      event.group.key.currentState.checkmarkAnimationController.reverse();
-    }
-    event.group.items.forEach((item) {
-      if (event.group.isSelected) {
-        item.isSelected = true;
-        item.key.currentState.checkmarkAnimationController.forward();
-      } else {
-        item.isSelected = false;
-        item.key.currentState.checkmarkAnimationController.reverse();
-      }
-    });
+    event.group.toggleSelection(!event.group.isSelected);
+    event.group.updateItemsSelection();
     _updateBottomBarDeleteButtonColor();
     yield _buildState();
   }
@@ -260,48 +219,26 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   ) async* {
     try {
       await _repository.delete([event.item.id]);
-
-      var groupIndex = -1;
-      var itemIndex = -1;
-      for (var i = 0; i < _groups.length; i++) {
-        final group = _groups[i];
-        for (var j = 0; j < group.items.length; j++) {
-          final item = group.items[j];
-          if (item == event.item) {
-            groupIndex = i;
-            itemIndex = j;
-            break;
-          }
-        }
-        if (groupIndex != -1) {
-          break;
-        }
-      }
-      if (groupIndex == -1 || itemIndex == -1) {
-        return;
-      }
       _filteredDrugs.removeWhere((element) => element.id == event.item.id);
-      final group = _groups[groupIndex];
+
+      final group = event.group;
       if (group.items.length == 1) {
         // The group will become empty after item removal. Delete the entire group.
-        _groups.remove(group);
-
-        _listKey.currentState.removeItem(
-          groupIndex,
-          event.groupBuilder,
-          duration: _animationDuration,
-        );
-        if (_groups.isEmpty) {
-          await Future.delayed(Duration(milliseconds: 300));
-          yield _buildState();
+        final groupIndex = _groups.indexOf(group);
+        if (groupIndex > -1) {
+          _groups.removeAt(groupIndex);
+          _listKey.currentState.removeItem(
+            groupIndex,
+            event.groupBuilder,
+            duration: _animationDuration,
+          );
+          if (_groups.isEmpty) {
+            await Future.delayed(Duration(milliseconds: 300));
+            yield _buildState();
+          }
         }
       } else {
-        group.items.remove(event.item);
-        group.listKey.currentState.removeItem(
-          itemIndex,
-          event.itemBuilder,
-          duration: _animationDuration,
-        );
+        group.removeItem(event.item, event.itemBuilder);
       }
       _sendScreenAnalytics();
       yield _buildState();
@@ -333,20 +270,10 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       yield _buildState();
     } else {
       for (var group in _groups) {
-        var selectedItemsCount =
-            group.items.where((item) => item.isSelected).length;
-        while (selectedItemsCount > 0) {
-          final index = group.items.indexWhere((item) => item.isSelected);
-          final item = group.items.removeAt(index);
-          _filteredDrugs.removeWhere((e) => e.id == item.id);
-          await _repository.delete([item.id]);
-          group.listKey.currentState.removeItem(
-            index,
-            (context, animation) => event.itemBuilder(context, item, animation),
-            duration: _animationDuration,
-          );
-          selectedItemsCount -= 1;
-        }
+        final selectedItemsIds = group.selectedItemsIds;
+        await _repository.delete(selectedItemsIds);
+        _filteredDrugs.removeWhere((e) => selectedItemsIds.contains(e.id));
+        group.removeSelectedItems(event.itemBuilder);
       }
     }
     _setScreenMode(ScreenMode.normal);
@@ -442,14 +369,13 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       }
 
       for (var drug in drugsToAdd) {
-        final itemToAdd = DrugGroupItem(
+        final itemToAdd = DrugItem(
           GlobalKey(),
           group.key,
           drug.id,
           drug.name,
           _dateFormat.format(drug.expiresOn),
           true,
-          false,
         );
         group.items.add(itemToAdd);
         group.items.sort((first, second) {

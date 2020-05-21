@@ -9,7 +9,7 @@ class DrugListInitial extends DrugListState {
   final ScreenMode screenMode;
   final GlobalKey<DrugListBottomBarState> bottomBarKey;
   final GlobalKey<AnimatedListState> listKey;
-  final List<DrugGroup> groups;
+  final List<DrugItemGroup> groups;
   final String numberOfItemsTotal;
   final String numberOfItemsSelected;
   final bool isDeleteButtonActive;
