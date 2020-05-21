@@ -69,7 +69,7 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
             child: Padding(
               padding: const EdgeInsets.only(left: 16.0),
               child: Text(
-                widget.item.name,
+                widget.item.drug.name,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -145,7 +145,7 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
               ),
               SizedBox(height: 4),
               Text(
-                widget.item.expiresOn.replaceFirst(' ', '\n'),
+                widget.item.formattedExpiresOn.replaceFirst(' ', '\n'),
                 style: TextStyle(
                   color: Color(0xFF8C8C8C),
                   fontSize: 14,

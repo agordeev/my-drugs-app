@@ -199,7 +199,7 @@ class _DrugListScreenState extends State<DrugListScreen>
     final editButtonHandler = () {
       Navigator.of(context).pop();
       BlocProvider.of<DrugListBloc>(context)
-          .add(DrugListEditingStarted(item.id));
+          .add(DrugListEditingStarted(item.drug.id));
     };
     if (Theme.of(context).platform == TargetPlatform.iOS) {
       showCupertinoModalPopup(

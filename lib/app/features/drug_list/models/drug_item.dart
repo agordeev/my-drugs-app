@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:my_drugs/app/features/drug_list/models/selectable.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_item_widget.dart';
+import 'package:my_drugs/models/drug.dart';
 
-class DrugItem extends Selectable {
+class DrugItem extends Selectable implements Comparable {
   final GlobalKey<DrugItemRowState> key;
-  final String id;
-  final String name;
-  final String expiresOn;
+  final Drug drug;
+  final String formattedExpiresOn;
   final bool isExpired;
 
   @override
@@ -15,9 +15,17 @@ class DrugItem extends Selectable {
 
   DrugItem(
     this.key,
-    this.id,
-    this.name,
-    this.expiresOn,
+    this.drug,
+    this.formattedExpiresOn,
     this.isExpired,
   );
+
+  @override
+  int compareTo(other) {
+    if (other is DrugItem) {
+      return drug.compareTo(other.drug);
+    } else {
+      return 0;
+    }
+  }
 }

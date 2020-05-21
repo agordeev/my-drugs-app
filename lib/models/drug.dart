@@ -6,7 +6,7 @@ part 'drug.g.dart';
 
 /// The main model. Represents a med.
 @JsonSerializable()
-class Drug extends Model {
+class Drug extends Model implements Comparable {
   @JsonKey(required: true, disallowNullValue: true)
   final String name;
   @JsonKey(required: true, disallowNullValue: true)
@@ -34,4 +34,19 @@ class Drug extends Model {
   factory Drug.fromJson(Map json) => _$DrugFromJson(json);
 
   Map<String, dynamic> toJson() => _$DrugToJson(this);
+
+  @override
+  int compareTo(other) {
+    if (other is Drug) {
+      // Compare by [expiresOn] first. If they are equal, compare by [name].
+      final expiresOnCompare = expiresOn.compareTo(other.expiresOn);
+      if (expiresOnCompare == 0) {
+        return name.compareTo(other.name);
+      } else {
+        return expiresOnCompare;
+      }
+    } else {
+      return 0;
+    }
+  }
 }

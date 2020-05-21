@@ -26,7 +26,7 @@ class DrugItemGroup extends Selectable {
       items.length == items.where((item) => item.isSelected).length;
 
   List<String> get selectedItemsIds =>
-      items.where((e) => e.isSelected).map((e) => e.id).toList();
+      items.where((e) => e.isSelected).map((e) => e.drug.id).toList();
 
   DrugItemGroup(
     this.key,
@@ -83,11 +83,11 @@ class DrugItemGroup extends Selectable {
     }
     final idsToRemove = <String>[];
     final drugsToAdd = <Drug>[];
-    final itemsIds = items.map((e) => e.id).toList();
+    final itemsIds = items.map((e) => e.drug.id).toList();
     final filteredDrugsIds = filteredDrugs.map((e) => e.id).toList();
     for (var item in items) {
-      if (!filteredDrugsIds.contains(item.id)) {
-        idsToRemove.add(item.id);
+      if (!filteredDrugsIds.contains(item.drug.id)) {
+        idsToRemove.add(item.drug.id);
       }
     }
     for (var drug in filteredDrugs) {
@@ -97,7 +97,7 @@ class DrugItemGroup extends Selectable {
     }
 
     for (var id in idsToRemove) {
-      final index = items.indexWhere((item) => item.id == id);
+      final index = items.indexWhere((item) => item.drug.id == id);
       if (index > -1) {
         final item = items.removeAt(index);
         listKey.currentState.removeItem(
@@ -111,31 +111,22 @@ class DrugItemGroup extends Selectable {
     for (var drug in drugsToAdd) {
       final itemToAdd = DrugItem(
         GlobalKey(),
-        drug.id,
-        drug.name,
+        drug,
         expiresOnDateFormat.format(drug.expiresOn),
         true,
       );
-      items.add(itemToAdd);
-      items.sort((first, second) {
-        /// TODO: Refactor this extremely ugly code.
-        final firstExpiresOn = expiresOnDateFormat.parse(first.expiresOn);
-        final secondExpiresOn = expiresOnDateFormat.parse(second.expiresOn);
-        final expiresOnCompare = firstExpiresOn.compareTo(secondExpiresOn);
-        if (expiresOnCompare == 0) {
-          return first.name.compareTo(second.name);
-        } else {
-          return expiresOnCompare;
-        }
-      });
-
-      final index = items.indexOf(itemToAdd);
-      if (index > -1) {
-        listKey.currentState.insertItem(
-          index,
-          duration: _searchAnimationDuration,
-        );
+      // Find the first index of item that needs to be displayed above [itemToAdd].
+      var indexToInsert =
+          items.indexWhere((item) => item.compareTo(itemToAdd) == 1);
+      if (indexToInsert == -1) {
+        // If there's no such item, [itemToAdd] needs to be the top item.
+        indexToInsert = items.length;
       }
+      items.insert(indexToInsert, itemToAdd);
+      listKey.currentState.insertItem(
+        indexToInsert,
+        duration: _searchAnimationDuration,
+      );
     }
   }
 }

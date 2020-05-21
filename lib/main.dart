@@ -23,55 +23,38 @@ void main() async {
     drugs: [
       Drug(
         id: '1',
-        name: 'Name',
-        expiresOn: DateTime(2020, 1),
+        name: '1',
+        expiresOn: DateTime(2021, 1),
         createdAt: DateTime.now(),
       ),
       Drug(
         id: '2',
-        name: 'Aspirin',
-        expiresOn: DateTime(2020, 10),
+        name: '2',
+        expiresOn: DateTime(2021, 2),
         createdAt: DateTime.now(),
       ),
       Drug(
         id: '3',
-        name: 'A medication with very long name to test multiline',
-        expiresOn: DateTime(2020, 4),
+        name: '3',
+        expiresOn: DateTime(2021, 3),
         createdAt: DateTime.now(),
       ),
       Drug(
         id: '4',
-        name:
-            '4 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
-        expiresOn: DateTime(2020, 11),
+        name: '4',
+        expiresOn: DateTime(2021, 4),
         createdAt: DateTime.now(),
       ),
       Drug(
         id: '5',
-        name:
-            '5 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
-        expiresOn: DateTime(2020, 11),
+        name: '5',
+        expiresOn: DateTime(2021, 5),
         createdAt: DateTime.now(),
       ),
       Drug(
         id: '6',
-        name:
-            '6 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
-        expiresOn: DateTime(2020, 11),
-        createdAt: DateTime.now(),
-      ),
-      Drug(
-        id: '7',
-        name:
-            '7 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
-        expiresOn: DateTime(2020, 11),
-        createdAt: DateTime.now(),
-      ),
-      Drug(
-        id: '8',
-        name:
-            '8 Irst art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier art ier',
-        expiresOn: DateTime(2020, 11),
+        name: '6',
+        expiresOn: DateTime(2021, 6),
         createdAt: DateTime.now(),
       ),
     ],

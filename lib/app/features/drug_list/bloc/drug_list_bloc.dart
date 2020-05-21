@@ -85,7 +85,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   DrugListState get initialState => _buildState();
 
   DrugListState _buildState() {
-    _sortDrugs();
+    _filteredDrugs.sort();
     _groups ??= _buildGroups(_filteredDrugs);
     final selectedItemsCount = _selectedItemsCount;
     if (_filteredDrugs.isEmpty) {
@@ -118,8 +118,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
               .map(
                 (e) => DrugItem(
                   GlobalKey(),
-                  e.id,
-                  e.name,
+                  e,
                   expiresOnDateFormat.format(e.expiresOn),
                   true,
                 ),
@@ -140,8 +139,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
               .map(
                 (e) => DrugItem(
                   GlobalKey(),
-                  e.id,
-                  e.name,
+                  e,
                   expiresOnDateFormat.format(e.expiresOn),
                   false,
                 ),
@@ -211,8 +209,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     DrugListGroupItemDeleted event,
   ) async* {
     try {
-      await _repository.delete([event.item.id]);
-      _filteredDrugs.removeWhere((element) => element.id == event.item.id);
+      await _repository.delete([event.item.drug.id]);
+      _filteredDrugs.removeWhere((element) => element.id == event.item.drug.id);
 
       final group = event.group;
       if (group.items.length == 1) {
@@ -246,10 +244,11 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     var selectedGroupsCount = _groups.where((group) => group.isSelected).length;
     while (selectedGroupsCount > 0) {
       final index = _groups.indexWhere((group) => group.isSelected);
-      await _repository.delete(_groups[index].items.map((e) => e.id).toList());
+      await _repository
+          .delete(_groups[index].items.map((e) => e.drug.id).toList());
       final group = _groups.removeAt(index);
       group.items.forEach(
-          (item) => _filteredDrugs.removeWhere((e) => e.id == item.id));
+          (item) => _filteredDrugs.removeWhere((e) => e.id == item.drug.id));
       _listKey.currentState.removeItem(
         index,
         (context, animation) => event.groupBuilder(context, group, animation),
@@ -283,7 +282,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         await _navigatorKey.currentState.pushNamed<Drug>(AppRoutes.manageDrug);
     if (drug != null) {
       _filteredDrugs.add(drug);
-      _sortDrugs();
+      _filteredDrugs.sort();
       final oldGroupsLength = _groups.length;
       _groups = _buildGroups(_filteredDrugs);
       if (_groups.length > oldGroupsLength) {
@@ -310,7 +309,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     if (drug != null) {
       _filteredDrugs[index] = drug;
       // Sort in case if [expiresOn] was updated.
-      _sortDrugs();
+      // Sorting uses the default [Comparator]. See [Drug.compareTo] for more info.
+      _filteredDrugs.sort();
       _groups = _buildGroups(_filteredDrugs);
       _sendScreenAnalytics();
       yield _buildState();
@@ -363,17 +363,6 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
           expectedDrugsForGroup,
           event.itemBuilder,
         );
-      }
-    });
-  }
-
-  void _sortDrugs() {
-    _drugs.sort((first, second) {
-      final expiresOnCompare = first.expiresOn.compareTo(second.expiresOn);
-      if (expiresOnCompare == 0) {
-        return first.name.compareTo(second.name);
-      } else {
-        return expiresOnCompare;
       }
     });
   }
