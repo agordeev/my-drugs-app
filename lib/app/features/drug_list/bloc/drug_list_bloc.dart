@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
 import 'package:my_drugs/app/features/drug_list/models/drug_item.dart';
 import 'package:my_drugs/app/features/drug_list/models/drug_item_group.dart';
@@ -18,6 +19,8 @@ part 'drug_list_event.dart';
 part 'drug_list_state.dart';
 
 enum ScreenMode { normal, edit }
+
+DateFormat expiresOnDateFormat = DateFormat('MMMM yyyy');
 
 class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   final S _localizations;
@@ -42,8 +45,6 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
                   previousValue + (item.isSelected ? 1 : 0),
             ),
       );
-
-  final DateFormat _dateFormat = DateFormat('MMMM yyyy');
 
   /// Avoid to setting this property directly.
   /// Use [setScreenMode()] instead to update the bottom bar state.
@@ -119,7 +120,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
                   GlobalKey(),
                   e.id,
                   e.name,
-                  _dateFormat.format(e.expiresOn),
+                  expiresOnDateFormat.format(e.expiresOn),
                   true,
                 ),
               )
@@ -141,7 +142,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
                   GlobalKey(),
                   e.id,
                   e.name,
-                  _dateFormat.format(e.expiresOn),
+                  expiresOnDateFormat.format(e.expiresOn),
                   false,
                 ),
               )
@@ -319,81 +320,51 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> _mapSearchTextFieldUpdatedEventToState(
     DrugListSearchTextFieldUpdated event,
   ) async* {
-    _filteredDrugs = _drugs
-        .where(
-          (e) => e.lowercasedName.contains(
-            event.text.toLowerCase(),
-          ),
-        )
-        .toList();
-
-    for (var group in _groups) {
-      final idsToRemove = <String>[];
-      final drugsToAdd = <Drug>[];
-      final idsForGroup = group.items.map((e) => e.id).toList();
-      final expectedDrugsForGroup = _filteredDrugs.where((e) {
-        if (group.isExpired) {
-          return _isDrugExpired(e);
-        } else {
-          return !_isDrugExpired(e);
-        }
-      }).toList();
-      for (var item in group.items) {
-        if (!expectedDrugsForGroup.map((e) => e.id).contains(item.id)) {
-          idsToRemove.add(item.id);
-        }
-      }
-      for (var drug in expectedDrugsForGroup) {
-        if (!idsForGroup.contains(drug.id)) {
-          drugsToAdd.add(drug);
-        }
-      }
-
-      for (var id in idsToRemove) {
-        final index = group.items.indexWhere((item) => item.id == id);
-        if (index > -1) {
-          final item = group.items.removeAt(index);
-          group.listKey.currentState.removeItem(
-            index,
-            (context, animation) =>
-                event.itemBuilder(context, group, item, animation),
-            duration: _animationDuration,
-          );
-        }
-      }
-
-      for (var drug in drugsToAdd) {
-        final itemToAdd = DrugItem(
-          GlobalKey(),
-          drug.id,
-          drug.name,
-          _dateFormat.format(drug.expiresOn),
-          true,
-        );
-        group.items.add(itemToAdd);
-        group.items.sort((first, second) {
-          /// TODO: Refactor this extremely ugly code.
-          final firstExpiresOn = _dateFormat.parse(first.expiresOn);
-          final secondExpiresOn = _dateFormat.parse(second.expiresOn);
-          final expiresOnCompare = firstExpiresOn.compareTo(secondExpiresOn);
-          if (expiresOnCompare == 0) {
-            return first.name.compareTo(second.name);
-          } else {
-            return expiresOnCompare;
-          }
-        });
-
-        final index = group.items.indexOf(itemToAdd);
-        if (index > -1) {
-          group.listKey.currentState.insertItem(
-            index,
-            duration: _animationDuration,
-          );
-        }
-      }
+    if (event.text.isEmpty) {
+      _filteredDrugs = _drugs;
+    } else {
+      _filteredDrugs = _drugs
+          .where(
+            (e) => e.lowercasedName.contains(
+              event.text.toLowerCase(),
+            ),
+          )
+          .toList();
     }
 
     yield _buildState();
+    if (_filteredDrugs.isEmpty) {
+      for (var group in _groups) {
+        final expectedDrugsForGroup = _filteredDrugs.where((e) {
+          if (group.isExpired) {
+            return _isDrugExpired(e);
+          } else {
+            return !_isDrugExpired(e);
+          }
+        }).toList();
+        group.filterItems(
+          expectedDrugsForGroup,
+          event.itemBuilder,
+        );
+      }
+    } else {}
+    // Wait until the animated lists are visible back, then start adding/removing items.
+    // Otherwise app state would be null.
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      for (var group in _groups) {
+        final expectedDrugsForGroup = _filteredDrugs.where((e) {
+          if (group.isExpired) {
+            return _isDrugExpired(e);
+          } else {
+            return !_isDrugExpired(e);
+          }
+        }).toList();
+        group.filterItems(
+          expectedDrugsForGroup,
+          event.itemBuilder,
+        );
+      }
+    });
   }
 
   void _sortDrugs() {

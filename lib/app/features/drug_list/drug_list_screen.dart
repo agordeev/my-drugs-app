@@ -30,21 +30,6 @@ class _DrugListScreenState extends State<DrugListScreen>
       vsync: this,
       duration: _animationDuration,
     );
-    _searchTextController.addListener(
-      () => BlocProvider.of<DrugListBloc>(context).add(
-        DrugListSearchTextFieldUpdated(
-          _searchTextController.text,
-          (context, group, item, animation) => DrugItemWidget(
-            group: group,
-            item: item,
-            isInEditMode: false,
-            editModeAnimation: _screenModeAnimationController,
-            animation: animation,
-            onPresentContextMenuTap: null,
-          ),
-        ),
-      ),
-    );
 
     BlocProvider.of<DrugListBloc>(context).screenMode.listen((screenMode) {
       if (screenMode == ScreenMode.edit) {
@@ -110,6 +95,7 @@ class _DrugListScreenState extends State<DrugListScreen>
             actions: actions,
             bottom: SearchBar(
               controller: _searchTextController,
+              onChanged: _onSearchTextFieldUpdated,
             ),
           ),
           body: body,
@@ -290,6 +276,22 @@ class _DrugListScreenState extends State<DrugListScreen>
     );
   }
 
+  void _onSearchTextFieldUpdated(String text) {
+    BlocProvider.of<DrugListBloc>(context).add(
+      DrugListSearchTextFieldUpdated(
+        text,
+        (context, group, item, animation) => DrugItemWidget(
+          group: group,
+          item: item,
+          isInEditMode: false,
+          editModeAnimation: _screenModeAnimationController,
+          animation: animation,
+          onPresentContextMenuTap: null,
+        ),
+      ),
+    );
+  }
+
   Widget _buildBottomSheetRow(
     BuildContext context,
     IconData icon,
@@ -340,10 +342,16 @@ class _DrugListScreenState extends State<DrugListScreen>
   }
 }
 
+// TODO: Move to a separate file
 class SearchBar extends StatelessWidget implements PreferredSizeWidget {
   final TextEditingController controller;
+  final void Function(String) onChanged;
 
-  const SearchBar({Key key, @required this.controller}) : super(key: key);
+  const SearchBar({
+    Key key,
+    @required this.controller,
+    this.onChanged,
+  }) : super(key: key);
 
   @override
   Size get preferredSize => Size(
@@ -374,6 +382,7 @@ class SearchBar extends StatelessWidget implements PreferredSizeWidget {
           child: TextField(
             controller: controller,
             textAlignVertical: TextAlignVertical.center,
+            onChanged: onChanged,
             decoration: InputDecoration(
               filled: true,
               fillColor: Color(0xFF767680).withOpacity(0.12),
@@ -397,7 +406,11 @@ class SearchBar extends StatelessWidget implements PreferredSizeWidget {
               disabledBorder: border,
               suffixIcon: CupertinoButton(
                 padding: EdgeInsets.zero,
-                onPressed: () => controller.text = '',
+                onPressed: () {
+                  controller.text = '';
+                  onChanged(controller.text);
+                  FocusScope.of(context).unfocus();
+                },
                 child: Icon(
                   CupertinoIcons.clear_circled_solid,
                   size: 16,

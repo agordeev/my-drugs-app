@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:my_drugs/app/features/drug_list/bloc/drug_list_bloc.dart';
 import 'package:my_drugs/app/features/drug_list/models/drug_item.dart';
 import 'package:my_drugs/app/features/drug_list/models/selectable.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_heading_row_widget.dart';
+import 'package:my_drugs/models/drug.dart';
 
 /// A group of [DrugItem].
 class DrugItemGroup extends Selectable {
@@ -10,12 +12,14 @@ class DrugItemGroup extends Selectable {
   final String name;
   final List<DrugItem> items;
   final bool isExpired;
+  final AnimatedListState state;
 
   @override
   AnimationController get checkmarkAnimationController =>
       key.currentState.checkmarkAnimationController;
 
-  final _animationDuration = Duration(milliseconds: 300);
+  final _defaultAnimationDuration = Duration(milliseconds: 300);
+  final _searchAnimationDuration = Duration(milliseconds: 100);
 
   /// Return [true] if all the [items] are selected.
   bool get areAllItemsSelected =>
@@ -30,7 +34,7 @@ class DrugItemGroup extends Selectable {
     this.name,
     this.items,
     this.isExpired,
-  );
+  ) : state = listKey.currentState;
 
   void removeItem(
     DrugItem item,
@@ -42,7 +46,7 @@ class DrugItemGroup extends Selectable {
       listKey.currentState.removeItem(
         index,
         itemBuilder,
-        duration: _animationDuration,
+        duration: _defaultAnimationDuration,
       );
     }
   }
@@ -56,7 +60,7 @@ class DrugItemGroup extends Selectable {
       listKey.currentState.removeItem(
         index,
         (context, animation) => itemBuilder(context, item, animation),
-        duration: _animationDuration,
+        duration: _defaultAnimationDuration,
       );
       selectedItemsCount -= 1;
     }
@@ -66,5 +70,72 @@ class DrugItemGroup extends Selectable {
   /// Calles when the user selects/deselects the entire group.
   void updateItemsSelection() {
     items.forEach((item) => item.toggleSelection(isSelected));
+  }
+
+  /// [filteredDrugs] - a list of filtered drugs for this group.
+  void filterItems(
+    List<Drug> filteredDrugs,
+    Widget Function(BuildContext, DrugItemGroup, DrugItem, Animation<double>)
+        itemBuilder,
+  ) {
+    if (listKey.currentState == null) {
+      return;
+    }
+    final idsToRemove = <String>[];
+    final drugsToAdd = <Drug>[];
+    final itemsIds = items.map((e) => e.id).toList();
+    final filteredDrugsIds = filteredDrugs.map((e) => e.id).toList();
+    for (var item in items) {
+      if (!filteredDrugsIds.contains(item.id)) {
+        idsToRemove.add(item.id);
+      }
+    }
+    for (var drug in filteredDrugs) {
+      if (!itemsIds.contains(drug.id)) {
+        drugsToAdd.add(drug);
+      }
+    }
+
+    for (var id in idsToRemove) {
+      final index = items.indexWhere((item) => item.id == id);
+      if (index > -1) {
+        final item = items.removeAt(index);
+        listKey.currentState.removeItem(
+          index,
+          (context, animation) => itemBuilder(context, this, item, animation),
+          duration: _searchAnimationDuration,
+        );
+      }
+    }
+
+    for (var drug in drugsToAdd) {
+      final itemToAdd = DrugItem(
+        GlobalKey(),
+        drug.id,
+        drug.name,
+        expiresOnDateFormat.format(drug.expiresOn),
+        true,
+      );
+      items.add(itemToAdd);
+      items.sort((first, second) {
+        /// TODO: Refactor this extremely ugly code.
+        final firstExpiresOn = expiresOnDateFormat.parse(first.expiresOn);
+        final secondExpiresOn = expiresOnDateFormat.parse(second.expiresOn);
+        final expiresOnCompare = firstExpiresOn.compareTo(secondExpiresOn);
+        if (expiresOnCompare == 0) {
+          return first.name.compareTo(second.name);
+        } else {
+          return expiresOnCompare;
+        }
+      });
+
+      final index = items.indexOf(itemToAdd);
+      if (index > -1) {
+        listKey.currentState.insertItem(
+          index,
+          duration: _searchAnimationDuration,
+        );
+      }
+    }
   }
 }
