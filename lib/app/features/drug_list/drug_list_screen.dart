@@ -34,7 +34,8 @@ class _DrugListScreenState extends State<DrugListScreen>
       () => BlocProvider.of<DrugListBloc>(context).add(
         DrugListSearchTextFieldUpdated(
           _searchTextController.text,
-          (context, item, animation) => DrugItemWidget(
+          (context, group, item, animation) => DrugItemWidget(
+            group: group,
             item: item,
             isInEditMode: false,
             editModeAnimation: _screenModeAnimationController,
@@ -278,6 +279,7 @@ class _DrugListScreenState extends State<DrugListScreen>
           onPresentContextMenuTap: null,
         ),
         (context, animation) => DrugItemWidget(
+          group: group,
           item: item,
           isInEditMode: isInEditMode,
           editModeAnimation: _screenModeAnimationController,
@@ -325,7 +327,8 @@ class _DrugListScreenState extends State<DrugListScreen>
           listAnimation: animation,
           onPresentContextMenuTap: null,
         ),
-        (context, item, animation) => DrugItemWidget(
+        (context, group, item, animation) => DrugItemWidget(
+          group: group,
           item: item,
           isInEditMode: isInEditMode,
           editModeAnimation: _screenModeAnimationController,

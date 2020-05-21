@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_drugs/app/features/drug_list/bloc/drug_list_bloc.dart';
 import 'package:my_drugs/app/features/drug_list/models/drug_item.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_item_group.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_row.dart';
 import 'package:my_drugs/generated/l10n.dart';
 
 class DrugItemWidget extends DrugListRow {
+  final DrugItemGroup group;
   final DrugItem item;
   final bool isInEditMode;
 
@@ -20,6 +22,7 @@ class DrugItemWidget extends DrugListRow {
   final VoidCallback onPresentContextMenuTap;
 
   DrugItemWidget({
+    @required this.group,
     @required this.item,
     @required this.isInEditMode,
     @required this.onPresentContextMenuTap,
@@ -93,6 +96,7 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
             onTap: widget.isInEditMode
                 ? () => BlocProvider.of<DrugListBloc>(context)
                         .add(SelectDeselectDrug(
+                      widget.group,
                       widget.item,
                     ))
                 : widget.onPresentContextMenuTap,

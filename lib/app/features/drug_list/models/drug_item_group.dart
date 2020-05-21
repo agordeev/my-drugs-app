@@ -22,7 +22,7 @@ class DrugItemGroup extends Selectable {
       items.length == items.where((item) => item.isSelected).length;
 
   List<String> get selectedItemsIds =>
-      items.where((e) => e.isSelected).map((e) => e.id);
+      items.where((e) => e.isSelected).map((e) => e.id).toList();
 
   DrugItemGroup(
     this.key,

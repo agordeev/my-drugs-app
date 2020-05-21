@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:my_drugs/app/features/drug_list/models/selectable.dart';
-import 'package:my_drugs/app/features/drug_list/widgets/drug_heading_row_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_item_widget.dart';
 
 class DrugItem extends Selectable {
   final GlobalKey<DrugItemRowState> key;
-  // TODO: Remove if possible.
-  final GlobalKey<DrugHeadingRowState> groupKey;
   final String id;
   final String name;
   final String expiresOn;
@@ -18,7 +15,6 @@ class DrugItem extends Selectable {
 
   DrugItem(
     this.key,
-    this.groupKey,
     this.id,
     this.name,
     this.expiresOn,

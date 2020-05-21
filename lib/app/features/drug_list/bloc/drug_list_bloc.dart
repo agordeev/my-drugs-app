@@ -117,7 +117,6 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
               .map(
                 (e) => DrugItem(
                   GlobalKey(),
-                  groupKey,
                   e.id,
                   e.name,
                   _dateFormat.format(e.expiresOn),
@@ -140,7 +139,6 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
               .map(
                 (e) => DrugItem(
                   GlobalKey(),
-                  groupKey,
                   e.id,
                   e.name,
                   _dateFormat.format(e.expiresOn),
@@ -191,13 +189,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> _mapSelectDeselectDrugEventToState(
     SelectDeselectDrug event,
   ) async* {
-    final group = _groups.firstWhere(
-      (element) => element.key == event.item.groupKey,
-      orElse: () => null,
-    );
-    if (group == null) {
-      return;
-    }
+    final group = event.group;
     event.item.toggleSelection(!event.item.isSelected);
     // If all drugs from the current group are selected, then mark it as selected too.
     group.toggleSelection(group.areAllItemsSelected);
@@ -273,7 +265,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         final selectedItemsIds = group.selectedItemsIds;
         await _repository.delete(selectedItemsIds);
         _filteredDrugs.removeWhere((e) => selectedItemsIds.contains(e.id));
-        group.removeSelectedItems(event.itemBuilder);
+        group.removeSelectedItems((context, item, animation) =>
+            event.itemBuilder(context, group, item, animation));
       }
     }
     _setScreenMode(ScreenMode.normal);
@@ -362,7 +355,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
           final item = group.items.removeAt(index);
           group.listKey.currentState.removeItem(
             index,
-            (context, animation) => event.itemBuilder(context, item, animation),
+            (context, animation) =>
+                event.itemBuilder(context, group, item, animation),
             duration: _animationDuration,
           );
         }
@@ -371,7 +365,6 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       for (var drug in drugsToAdd) {
         final itemToAdd = DrugItem(
           GlobalKey(),
-          group.key,
           drug.id,
           drug.name,
           _dateFormat.format(drug.expiresOn),

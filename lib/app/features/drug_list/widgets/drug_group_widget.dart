@@ -42,6 +42,7 @@ class DrugItemGroupWidget extends StatelessWidget {
               itemBuilder: (context, itemIndex, itemAnimation) {
                 final item = group.items[itemIndex];
                 return DrugItemWidget(
+                  group: group,
                   item: item,
                   isInEditMode: isInEditMode,
                   editModeAnimation: editModeAnimation,
