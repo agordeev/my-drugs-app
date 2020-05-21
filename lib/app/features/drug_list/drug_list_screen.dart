@@ -20,6 +20,7 @@ class _DrugListScreenState extends State<DrugListScreen>
     with SingleTickerProviderStateMixin {
   AnimationController _screenModeAnimationController;
   final _scrollController = ScrollController();
+  final _searchTextController = TextEditingController();
   final _animationDuration = Duration(milliseconds: 500);
 
   @override
@@ -27,6 +28,20 @@ class _DrugListScreenState extends State<DrugListScreen>
     _screenModeAnimationController = AnimationController(
       vsync: this,
       duration: _animationDuration,
+    );
+    _searchTextController.addListener(
+      () => BlocProvider.of<DrugListBloc>(context).add(
+        DrugListSearchTextFieldUpdated(
+          _searchTextController.text,
+          (context, item, animation) => DrugGroupItemWidget(
+            item: item,
+            isInEditMode: false,
+            editModeAnimation: _screenModeAnimationController,
+            animation: animation,
+            onPresentContextMenuTap: null,
+          ),
+        ),
+      ),
     );
 
     BlocProvider.of<DrugListBloc>(context).screenMode.listen((screenMode) {
@@ -42,6 +57,7 @@ class _DrugListScreenState extends State<DrugListScreen>
   @override
   void dispose() {
     _screenModeAnimationController.dispose();
+    _searchTextController.dispose();
     super.dispose();
   }
 
@@ -90,6 +106,9 @@ class _DrugListScreenState extends State<DrugListScreen>
           appBar: AppBar(
             title: Text(S.of(context).appTitle),
             actions: actions,
+            bottom: SearchBar(
+              controller: _searchTextController,
+            ),
           ),
           body: body,
           bottomNavigationBar: DrugListBottomBar(
@@ -312,5 +331,79 @@ class _DrugListScreenState extends State<DrugListScreen>
         ),
       ));
     }
+  }
+}
+
+class SearchBar extends StatelessWidget implements PreferredSizeWidget {
+  final TextEditingController controller;
+
+  const SearchBar({Key key, @required this.controller}) : super(key: key);
+
+  @override
+  Size get preferredSize => Size(
+        double.infinity,
+        54.0,
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final border = OutlineInputBorder(
+      borderRadius: const BorderRadius.all(
+        Radius.circular(10.0),
+      ),
+      borderSide: BorderSide(
+        color: Colors.transparent,
+      ),
+    );
+    final color = Color(0xFF3C3C43).withOpacity(0.6);
+    return Material(
+      child: SizedBox(
+        height: preferredSize.height,
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: 8.0,
+          ),
+          color: Colors.white,
+          child: TextField(
+            controller: controller,
+            textAlignVertical: TextAlignVertical.center,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Color(0xFF767680).withOpacity(0.12),
+              contentPadding: EdgeInsets.zero,
+              prefixIconConstraints:
+                  BoxConstraints(minWidth: 36, maxHeight: 20),
+              prefixIcon: Icon(
+                CupertinoIcons.search,
+                size: 20.0,
+                color: color,
+              ),
+              hintText: 'Search',
+              hintStyle: TextStyle(
+                fontSize: 16,
+                color: color,
+              ),
+              border: border,
+              focusedBorder: border,
+              enabledBorder: border,
+              errorBorder: border,
+              disabledBorder: border,
+              suffixIcon: CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: () => controller.text = '',
+                child: Icon(
+                  CupertinoIcons.clear_circled_solid,
+                  size: 16,
+                  color: Color(0xFF8E8E93),
+                ),
+              ),
+              suffixIconConstraints:
+                  BoxConstraints(minWidth: 36, maxHeight: 20),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

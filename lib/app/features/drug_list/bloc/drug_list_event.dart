@@ -87,3 +87,20 @@ class DrugListEditingStarted extends DrugListEvent {
   @override
   List<Object> get props => [id];
 }
+
+class DrugListSearchTextFieldUpdated extends DrugListEvent {
+  final String text;
+  final Widget Function(BuildContext, DrugGroupItem, Animation<double>)
+      itemBuilder;
+
+  DrugListSearchTextFieldUpdated(
+    this.text,
+    this.itemBuilder,
+  );
+
+  @override
+  List<Object> get props => [
+        text,
+        itemBuilder,
+      ];
+}

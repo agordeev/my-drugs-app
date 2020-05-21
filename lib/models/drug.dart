@@ -14,6 +14,11 @@ class Drug extends Model {
   @JsonKey(required: true, disallowNullValue: true)
   final DateTime createdAt;
 
+  String _lowercasedName;
+
+  /// Used to speed up search.
+  String get lowercasedName => _lowercasedName ?? name.toLowerCase();
+
   Drug({
     @required String id,
     @required this.name,
@@ -23,6 +28,7 @@ class Drug extends Model {
         assert(name != null),
         assert(expiresOn != null),
         assert(createdAt != null),
+        _lowercasedName = name.toLowerCase(),
         super(id);
 
   factory Drug.fromJson(Map json) => _$DrugFromJson(json);

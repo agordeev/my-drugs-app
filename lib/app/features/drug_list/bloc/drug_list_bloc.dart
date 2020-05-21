@@ -23,7 +23,12 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   final GlobalKey<NavigatorState> _navigatorKey;
   final AbstractDrugRepository _repository;
   final FirebaseAnalytics _analytics;
+
+  /// The original array of drugs.
   final List<Drug> _drugs;
+
+  /// The array of drugs that is currently visible.
+  List<Drug> _filteredDrugs;
 
   List<DrugGroup> _groups;
   int get _selectedItemsCount => _groups.fold(
@@ -64,8 +69,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     this._repository,
     this._analytics,
     this._drugs,
-  ) {
-    _sentScreenAnalytics();
+  ) : _filteredDrugs = _drugs {
+    _sendScreenAnalytics();
   }
 
   @override
@@ -79,18 +84,18 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
 
   DrugListState _buildState() {
     _sortDrugs();
-    _groups ??= _buildGroups(_drugs);
+    _groups ??= _buildGroups(_filteredDrugs);
     final selectedItemsCount = _selectedItemsCount;
-    if (_drugs.isEmpty) {
+    if (_filteredDrugs.isEmpty) {
       _setScreenMode(ScreenMode.normal);
     }
     return DrugListInitial(
-      _drugs.isEmpty,
+      _filteredDrugs.isEmpty,
       _screenMode,
       _bottomBarKey,
       _listKey,
       _groups,
-      _localizations.drugListTotalItems(_drugs.length),
+      _localizations.drugListTotalItems(_filteredDrugs.length),
       _localizations.drugListTotalItemsSelected(selectedItemsCount),
       selectedItemsCount > 0,
     );
@@ -145,7 +150,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
                 ),
               )
               .toList(),
-          true,
+          false,
           false,
         ),
       );
@@ -171,6 +176,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       yield* _mapAddingStartedEventToState(event);
     } else if (event is DrugListEditingStarted) {
       yield* _mapEditingStartedEventToState(event);
+    } else if (event is DrugListSearchTextFieldUpdated) {
+      yield* _mapSearchTextFieldUpdatedEventToState(event);
     }
   }
 
@@ -273,7 +280,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       if (groupIndex == -1 || itemIndex == -1) {
         return;
       }
-      _drugs.removeWhere((element) => element.id == event.item.id);
+      _filteredDrugs.removeWhere((element) => element.id == event.item.id);
       final group = _groups[groupIndex];
       if (group.items.length == 1) {
         // The group will become empty after item removal. Delete the entire group.
@@ -296,7 +303,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
           duration: _animationDuration,
         );
       }
-      _sentScreenAnalytics();
+      _sendScreenAnalytics();
       yield _buildState();
     } catch (e) {
       print(e);
@@ -311,7 +318,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       final index = _groups.indexWhere((group) => group.isSelected);
       await _repository.delete(_groups[index].items.map((e) => e.id).toList());
       final group = _groups.removeAt(index);
-      group.items.forEach((item) => _drugs.removeWhere((e) => e.id == item.id));
+      group.items.forEach(
+          (item) => _filteredDrugs.removeWhere((e) => e.id == item.id));
       _listKey.currentState.removeItem(
         index,
         (context, animation) => event.groupBuilder(context, group, animation),
@@ -330,7 +338,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         while (selectedItemsCount > 0) {
           final index = group.items.indexWhere((item) => item.isSelected);
           final item = group.items.removeAt(index);
-          _drugs.removeWhere((e) => e.id == item.id);
+          _filteredDrugs.removeWhere((e) => e.id == item.id);
           await _repository.delete([item.id]);
           group.listKey.currentState.removeItem(
             index,
@@ -343,7 +351,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     }
     _setScreenMode(ScreenMode.normal);
     _updateBottomBarDeleteButtonColor();
-    _sentScreenAnalytics();
+    _sendScreenAnalytics();
     yield _buildState();
   }
 
@@ -353,16 +361,16 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     final drug =
         await _navigatorKey.currentState.pushNamed<Drug>(AppRoutes.manageDrug);
     if (drug != null) {
-      _drugs.add(drug);
+      _filteredDrugs.add(drug);
       _sortDrugs();
       final oldGroupsLength = _groups.length;
-      _groups = _buildGroups(_drugs);
+      _groups = _buildGroups(_filteredDrugs);
       if (_groups.length > oldGroupsLength) {
         // A new group was added.
         final indexToAdd = _isDrugExpired(drug) ? 0 : 1;
         _listKey.currentState?.insertItem(indexToAdd);
       }
-      _sentScreenAnalytics();
+      _sendScreenAnalytics();
       yield _buildState();
     }
   }
@@ -370,22 +378,103 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> _mapEditingStartedEventToState(
     DrugListEditingStarted event,
   ) async* {
-    final index = _drugs.indexWhere((drug) => drug.id == event.id);
+    final index = _filteredDrugs.indexWhere((drug) => drug.id == event.id);
     if (index == -1) {
       print('Unable edit a drug ${event.id}: unable to find its index');
       return;
     }
-    final selectedDrug = _drugs[index];
+    final selectedDrug = _filteredDrugs[index];
     final drug = await _navigatorKey.currentState
         .pushNamed<Drug>(AppRoutes.manageDrug, arguments: selectedDrug);
     if (drug != null) {
-      _drugs[index] = drug;
+      _filteredDrugs[index] = drug;
       // Sort in case if [expiresOn] was updated.
       _sortDrugs();
-      _groups = _buildGroups(_drugs);
-      _sentScreenAnalytics();
+      _groups = _buildGroups(_filteredDrugs);
+      _sendScreenAnalytics();
       yield _buildState();
     }
+  }
+
+  Stream<DrugListState> _mapSearchTextFieldUpdatedEventToState(
+    DrugListSearchTextFieldUpdated event,
+  ) async* {
+    _filteredDrugs = _drugs
+        .where(
+          (e) => e.lowercasedName.contains(
+            event.text.toLowerCase(),
+          ),
+        )
+        .toList();
+
+    for (var group in _groups) {
+      final idsToRemove = <String>[];
+      final drugsToAdd = <Drug>[];
+      final idsForGroup = group.items.map((e) => e.id).toList();
+      final expectedDrugsForGroup = _filteredDrugs.where((e) {
+        if (group.isExpired) {
+          return _isDrugExpired(e);
+        } else {
+          return !_isDrugExpired(e);
+        }
+      }).toList();
+      for (var item in group.items) {
+        if (!expectedDrugsForGroup.map((e) => e.id).contains(item.id)) {
+          idsToRemove.add(item.id);
+        }
+      }
+      for (var drug in expectedDrugsForGroup) {
+        if (!idsForGroup.contains(drug.id)) {
+          drugsToAdd.add(drug);
+        }
+      }
+
+      for (var id in idsToRemove) {
+        final index = group.items.indexWhere((item) => item.id == id);
+        if (index > -1) {
+          final item = group.items.removeAt(index);
+          group.listKey.currentState.removeItem(
+            index,
+            (context, animation) => event.itemBuilder(context, item, animation),
+            duration: _animationDuration,
+          );
+        }
+      }
+
+      for (var drug in drugsToAdd) {
+        final itemToAdd = DrugGroupItem(
+          GlobalKey(),
+          group.key,
+          drug.id,
+          drug.name,
+          _dateFormat.format(drug.expiresOn),
+          true,
+          false,
+        );
+        group.items.add(itemToAdd);
+        group.items.sort((first, second) {
+          /// TODO: Refactor this extremely ugly code.
+          final firstExpiresOn = _dateFormat.parse(first.expiresOn);
+          final secondExpiresOn = _dateFormat.parse(second.expiresOn);
+          final expiresOnCompare = firstExpiresOn.compareTo(secondExpiresOn);
+          if (expiresOnCompare == 0) {
+            return first.name.compareTo(second.name);
+          } else {
+            return expiresOnCompare;
+          }
+        });
+
+        final index = group.items.indexOf(itemToAdd);
+        if (index > -1) {
+          group.listKey.currentState.insertItem(
+            index,
+            duration: _animationDuration,
+          );
+        }
+      }
+    }
+
+    yield _buildState();
   }
 
   void _sortDrugs() {
@@ -411,7 +500,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     }
   }
 
-  void _sentScreenAnalytics() {
+  void _sendScreenAnalytics() {
     _analytics.setUserProperty(
       name: 'drugs_count_total',
       value: '${_drugs.length}',
