@@ -59,7 +59,8 @@ void main() async {
       ),
       Drug(
         id: '1 exp',
-        name: '1 exp',
+        name:
+            '1 exp arstianrast inrasiot nrseiotnwfyupl uynrst uaroiesnt oierasntieor sntyuwfpnrsnat riesantieorsant ieorasnt wyfun raisetn rioesntoir',
         expiresOn: DateTime(2020, 1),
         createdAt: DateTime.now(),
       ),
@@ -76,6 +77,24 @@ void main() async {
         createdAt: DateTime.now(),
       ),
     ],
+    // drugs: List.generate(
+    //       500,
+    //       (index) => Drug(
+    //         id: '$index',
+    //         name: '$index',
+    //         expiresOn: DateTime(2020, 1),
+    //         createdAt: DateTime.now(),
+    //       ),
+    //     ) +
+    //     List.generate(
+    //       100,
+    //       (index) => Drug(
+    //         id: '$index',
+    //         name: '$index',
+    //         expiresOn: DateTime(2021, 1),
+    //         createdAt: DateTime.now(),
+    //       ),
+    //     ),
   ));
 }
 

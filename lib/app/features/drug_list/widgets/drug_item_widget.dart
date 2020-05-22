@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_drugs/app/features/drug_list/bloc/drug_list_bloc.dart';
 import 'package:my_drugs/app/features/drug_list/models/drug_item.dart';
@@ -38,20 +39,19 @@ class DrugItemWidget extends DrugListRow {
 }
 
 class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
-  final double _expiresOnWidth = 90;
+  // final double _expiresOnWidth = 100;
   final double _height = 68;
   final _backgroundColor = Colors.white;
 
   /// Drug name block.
   @override
   Widget buildDynamicContent(BuildContext context) {
-    final widgetWidth =
-        MediaQuery.of(context).size.width - widget.horizontalPadding * 2;
-    final textWidth = widgetWidth - (_expiresOnWidth + 16 + 8);
     return Opacity(
       opacity: widget.item.isExpired ? 0.6 : 1.0,
       child: Container(
         height: _height,
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.only(left: 16.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
           color: _backgroundColor,
@@ -62,21 +62,12 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
             ),
           ],
         ),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: SizedBox(
-            width: textWidth,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 16.0),
-              child: Text(
-                widget.item.drug.name,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 16,
-                ),
-              ),
-            ),
+        child: Text(
+          widget.item.drug.name,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 16,
           ),
         ),
       ),
@@ -126,33 +117,35 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
             ),
           ),
         ),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 8),
-          width: _expiresOnWidth,
-          height: _height,
-          color: _backgroundColor,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                S.of(context).drugListExpiresOnLabel.toUpperCase(),
-                style: TextStyle(
-                  color: Color(0xFFBABABA),
-                  fontSize: 10,
-                  letterSpacing: 1.2,
+        FittedBox(
+          fit: BoxFit.contain,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            height: _height,
+            color: _backgroundColor,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  S.of(context).drugListExpiresOnLabel.toUpperCase(),
+                  style: TextStyle(
+                    color: Color(0xFFBABABA),
+                    fontSize: 10,
+                    letterSpacing: 1.2,
+                  ),
                 ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                widget.item.formattedExpiresOn.replaceFirst(' ', '\n'),
-                style: TextStyle(
-                  color: Color(0xFF8C8C8C),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                SizedBox(height: 4),
+                Text(
+                  widget.item.formattedExpiresOn.replaceFirst(' ', '\n'),
+                  style: TextStyle(
+                    color: Color(0xFF8C8C8C),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         SizedBox(
