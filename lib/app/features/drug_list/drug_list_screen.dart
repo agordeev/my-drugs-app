@@ -7,9 +7,9 @@ import 'package:my_drugs/app/features/drug_list/models/drug_item_group.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_group_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_item_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
+import 'package:my_drugs/app/features/drug_list/widgets/switch_screen_mode_button.dart';
 import 'package:my_drugs/app/widgets/custom_app_bar.dart';
 import 'package:my_drugs/generated/l10n.dart';
-import 'package:my_drugs/shared/painters/screen_mode_button_painter.dart';
 
 import 'bloc/drug_list_bloc.dart';
 
@@ -70,14 +70,8 @@ class _DrugListScreenState extends State<DrugListScreen>
             );
 
             actions = [
-              PlatformButton(
-                androidFlat: (context) => MaterialFlatButtonData(),
-                child: CustomPaint(
-                  size: Size(24, 24),
-                  painter: ScreenModeButtonPainter(
-                      Theme.of(context).colorScheme.primary,
-                      _screenModeAnimationController),
-                ),
+              SwitchScreenModeButton(
+                animation: _screenModeAnimationController.view,
                 onPressed: () => BlocProvider.of<DrugListBloc>(context)
                     .add(DrugListScreenModeSwitched()),
               ),

@@ -8,7 +8,7 @@ class ScreenModeButtonPainter extends CustomPainter {
 
   final double _radius = 2.0;
 
-  ScreenModeButtonPainter(this.color, AnimationController animationController)
+  ScreenModeButtonPainter(this.color, Animation<double> animation)
       : _paint = Paint()
           ..color = color
           ..strokeWidth = 2.0
@@ -20,7 +20,7 @@ class ScreenModeButtonPainter extends CustomPainter {
           end: 0.0,
         ).animate(
           CurvedAnimation(
-            parent: animationController,
+            parent: animation,
             curve: Interval(
               0.0,
               0.5,
@@ -33,7 +33,7 @@ class ScreenModeButtonPainter extends CustomPainter {
           end: 1.0,
         ).animate(
           CurvedAnimation(
-            parent: animationController,
+            parent: animation,
             curve: Interval(
               0.5,
               1.0,
