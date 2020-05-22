@@ -138,6 +138,7 @@ class _DrugListScreenState extends State<DrugListScreen>
                 padding: EdgeInsets.zero,
                 android: (context) => MaterialRaisedButtonData(
                   color: Theme.of(context).colorScheme.primary,
+                  textColor: Theme.of(context).colorScheme.onPrimary,
                 ),
                 ios: (context) => CupertinoButtonData(
                   color: Theme.of(context).colorScheme.primary,

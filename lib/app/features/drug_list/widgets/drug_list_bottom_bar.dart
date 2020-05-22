@@ -135,7 +135,6 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
                   : Icons.delete,
               color: _colorAnimation.value,
             ),
-            _colorAnimation.value,
             widget.isDeleteButtonActive ? widget.onDeleteButtonPressed : null,
           ),
         ),
@@ -147,8 +146,10 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
           widget.numberOfItemsTotalOpacity,
           widget.numberOfItemsTotalOffset,
           widget.numberOfItemsTotal,
-          Icon(Icons.add),
-          null,
+          Icon(
+            Icons.add,
+            color: Theme.of(context).colorScheme.primary,
+          ),
           widget.onAddButtonPressed,
         ),
       ],
@@ -163,7 +164,6 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
     Animation<Offset> position,
     String text,
     Widget icon,
-    Color color,
     VoidCallback onPressed,
   ) {
     return IgnorePointer(
