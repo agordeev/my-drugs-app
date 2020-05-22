@@ -96,7 +96,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       numberOfItemsTotal = '${_filteredDrugs.length}/$numberOfItemsTotal';
     }
     return DrugListInitial(
-      _filteredDrugs.isEmpty,
+      _drugs.isEmpty,
       _screenMode,
       _bottomBarKey,
       _listKey,

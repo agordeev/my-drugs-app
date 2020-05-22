@@ -52,6 +52,7 @@ class _CustomCupertinoSearchBarState extends State<CustomCupertinoSearchBar> {
             textAlignVertical: TextAlignVertical.center,
             onChanged: widget.onChanged,
             focusNode: textFieldFocusNode,
+            textInputAction: TextInputAction.search,
             decoration: InputDecoration(
               filled: true,
               fillColor: Color(0xFF767680).withOpacity(0.12),
