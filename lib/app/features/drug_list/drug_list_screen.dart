@@ -347,7 +347,9 @@ class SearchBar extends StatelessWidget implements PreferredSizeWidget {
   final TextEditingController controller;
   final void Function(String) onChanged;
 
-  const SearchBar({
+  final textFieldFocusNode = FocusNode();
+
+  SearchBar({
     Key key,
     @required this.controller,
     this.onChanged,
@@ -383,6 +385,7 @@ class SearchBar extends StatelessWidget implements PreferredSizeWidget {
             controller: controller,
             textAlignVertical: TextAlignVertical.center,
             onChanged: onChanged,
+            focusNode: textFieldFocusNode,
             decoration: InputDecoration(
               filled: true,
               fillColor: Color(0xFF767680).withOpacity(0.12),
@@ -409,7 +412,17 @@ class SearchBar extends StatelessWidget implements PreferredSizeWidget {
                 onPressed: () {
                   controller.text = '';
                   onChanged(controller.text);
-                  FocusScope.of(context).unfocus();
+
+                  // Unfocus all focus nodes
+                  textFieldFocusNode.unfocus();
+
+                  // Disable text field's focus node request
+                  textFieldFocusNode.canRequestFocus = false;
+
+                  //Enable the text field's focus node request after some delay
+                  WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                    textFieldFocusNode.canRequestFocus = true;
+                  });
                 },
                 child: Icon(
                   CupertinoIcons.clear_circled_solid,
