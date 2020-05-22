@@ -62,10 +62,11 @@ class CustomMaterialAppBar extends StatefulWidget {
   _CustomMaterialAppBarState createState() => _CustomMaterialAppBarState();
 }
 
-class _CustomMaterialAppBarState extends State<CustomMaterialAppBar> {
+class _CustomMaterialAppBarState extends State<CustomMaterialAppBar>
+    with SingleTickerProviderStateMixin {
   final _searchTextController = TextEditingController();
-
   bool isSearchTextFieldVisible = false;
+
   @override
   void initState() {
     super.initState();
@@ -75,6 +76,7 @@ class _CustomMaterialAppBarState extends State<CustomMaterialAppBar> {
   @override
   void dispose() {
     BackButtonInterceptor.remove(_onPhysicalBackButtonPress);
+    _searchTextController.dispose();
     super.dispose();
   }
 
@@ -121,6 +123,7 @@ class _CustomMaterialAppBarState extends State<CustomMaterialAppBar> {
   }
 
   void _hideSearchTextField() {
+    _clearSearchTextField();
     setState(() {
       isSearchTextFieldVisible = false;
     });
@@ -134,10 +137,9 @@ class _CustomMaterialAppBarState extends State<CustomMaterialAppBar> {
     return TextField(
       controller: _searchTextController,
       decoration: InputDecoration(
-        border: const UnderlineInputBorder(),
-        // focusedBorder: UnderlineInputBorder(),
-        enabledBorder: const UnderlineInputBorder(),
-        // disabledBorder: const UnderlineInputBorder(),
+        border: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        disabledBorder: InputBorder.none,
         hintText: S.of(context).searchHint,
       ),
       textInputAction: TextInputAction.search,
