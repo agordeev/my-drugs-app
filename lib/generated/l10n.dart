@@ -72,6 +72,15 @@ class S {
     );
   }
 
+  String get searchHint {
+    return Intl.message(
+      'Search',
+      name: 'searchHint',
+      desc: '',
+      args: [],
+    );
+  }
+
   String get validationEmptyRequiredField {
     return Intl.message(
       'Please fill this field',

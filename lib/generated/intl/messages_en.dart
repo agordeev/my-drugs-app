@@ -43,6 +43,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "manageDrugExpiresOnFieldLabel" : MessageLookupByLibrary.simpleMessage("Expires On"),
     "manageDrugNameFieldHint" : MessageLookupByLibrary.simpleMessage("Aspirin"),
     "manageDrugNameFieldLabel" : MessageLookupByLibrary.simpleMessage("Name"),
+    "searchHint" : MessageLookupByLibrary.simpleMessage("Search"),
     "unknownRouteMessage" : MessageLookupByLibrary.simpleMessage("We\'re sorry, but there was an error in navigation.\nPlease try again or contact us."),
     "validationEmptyRequiredField" : MessageLookupByLibrary.simpleMessage("Please fill this field"),
     "validationInvalidExpiryDate" : MessageLookupByLibrary.simpleMessage("Please enter a valid expiry date")

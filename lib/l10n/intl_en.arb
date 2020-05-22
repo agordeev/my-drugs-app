@@ -4,6 +4,7 @@
   "dateDelimeter": "/",
   "buttonEdit": "Edit",
   "buttonDelete": "Delete",
+  "searchHint": "Search",
   "validationEmptyRequiredField": "Please fill this field",
   "validationInvalidExpiryDate": "Please enter a valid expiry date",
   "unknownRouteMessage": "We're sorry, but there was an error in navigation.\nPlease try again or contact us.",

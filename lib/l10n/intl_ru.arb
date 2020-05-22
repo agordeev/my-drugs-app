@@ -4,6 +4,7 @@
   "dateDelimeter": ".",
   "buttonEdit": "Изменить",
   "buttonDelete": "Удалить",
+  "searchHint": "Поиск",
   "validationEmptyRequiredField": "Заполните это поле",
   "validationInvalidExpiryDate": "Введите верный срок годности",
   "unknownRouteMessage": "Произошла ошибка навигации.\nПожалуйста, попробуйте еще раз или свяжитесь с нами.",

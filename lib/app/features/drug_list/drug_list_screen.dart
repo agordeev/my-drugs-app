@@ -7,6 +7,7 @@ import 'package:my_drugs/app/features/drug_list/models/drug_item_group.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_group_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_item_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
+import 'package:my_drugs/app/widgets/custom_cupertino_search_bar.dart';
 import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/shared/painters/screen_mode_button_painter.dart';
 
@@ -93,7 +94,7 @@ class _DrugListScreenState extends State<DrugListScreen>
           appBar: AppBar(
             title: Text(S.of(context).appTitle),
             actions: actions,
-            bottom: SearchBar(
+            bottom: CustomCupertinoSearchBar(
               controller: _searchTextController,
               onChanged: _onSearchTextFieldUpdated,
             ),
@@ -339,103 +340,5 @@ class _DrugListScreenState extends State<DrugListScreen>
         ),
       ));
     }
-  }
-}
-
-// TODO: Move to a separate file
-class SearchBar extends StatelessWidget implements PreferredSizeWidget {
-  final TextEditingController controller;
-  final void Function(String) onChanged;
-
-  final textFieldFocusNode = FocusNode();
-
-  SearchBar({
-    Key key,
-    @required this.controller,
-    this.onChanged,
-  }) : super(key: key);
-
-  @override
-  Size get preferredSize => Size(
-        double.infinity,
-        54.0,
-      );
-
-  @override
-  Widget build(BuildContext context) {
-    final border = OutlineInputBorder(
-      borderRadius: const BorderRadius.all(
-        Radius.circular(10.0),
-      ),
-      borderSide: BorderSide(
-        color: Colors.transparent,
-      ),
-    );
-    final color = Color(0xFF3C3C43).withOpacity(0.6);
-    return Material(
-      child: SizedBox(
-        height: preferredSize.height,
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: 16.0,
-            vertical: 8.0,
-          ),
-          color: Colors.white,
-          child: TextField(
-            controller: controller,
-            textAlignVertical: TextAlignVertical.center,
-            onChanged: onChanged,
-            focusNode: textFieldFocusNode,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Color(0xFF767680).withOpacity(0.12),
-              contentPadding: EdgeInsets.zero,
-              prefixIconConstraints:
-                  BoxConstraints(minWidth: 36, maxHeight: 20),
-              prefixIcon: Icon(
-                CupertinoIcons.search,
-                size: 20.0,
-                color: color,
-              ),
-              hintText: 'Search',
-              hintStyle: TextStyle(
-                fontSize: 16,
-                color: color,
-              ),
-              border: border,
-              focusedBorder: border,
-              enabledBorder: border,
-              errorBorder: border,
-              disabledBorder: border,
-              suffixIcon: CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  controller.text = '';
-                  onChanged(controller.text);
-
-                  // Unfocus all focus nodes
-                  textFieldFocusNode.unfocus();
-
-                  // Disable text field's focus node request
-                  textFieldFocusNode.canRequestFocus = false;
-
-                  //Enable the text field's focus node request after some delay
-                  WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                    textFieldFocusNode.canRequestFocus = true;
-                  });
-                },
-                child: Icon(
-                  CupertinoIcons.clear_circled_solid,
-                  size: 16,
-                  color: Color(0xFF8E8E93),
-                ),
-              ),
-              suffixIconConstraints:
-                  BoxConstraints(minWidth: 36, maxHeight: 20),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
