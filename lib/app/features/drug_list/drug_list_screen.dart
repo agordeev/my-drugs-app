@@ -7,7 +7,7 @@ import 'package:my_drugs/app/features/drug_list/models/drug_item_group.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_group_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_item_widget.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
-import 'package:my_drugs/app/widgets/custom_cupertino_search_bar.dart';
+import 'package:my_drugs/app/widgets/custom_app_bar.dart';
 import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/shared/painters/screen_mode_button_painter.dart';
 
@@ -92,13 +92,10 @@ class _DrugListScreenState extends State<DrugListScreen>
         }
         return Scaffold(
           resizeToAvoidBottomInset: false,
-          appBar: AppBar(
-            title: Text(S.of(context).appTitle),
+          appBar: CustomAppBar(
+            title: S.of(context).appTitle,
             actions: actions,
-            bottom: CustomCupertinoSearchBar(
-              controller: _searchTextController,
-              onChanged: _onSearchTextFieldUpdated,
-            ),
+            onSearchTextFieldUpdated: _onSearchTextFieldUpdated,
           ),
           body: body,
           bottomNavigationBar: DrugListBottomBar(

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:my_drugs/shared/constants.dart';
 
 class DrugListBottomBar extends StatefulWidget {
   final AnimationController screenModeAnimationController;
@@ -97,9 +98,7 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(
-          top: BorderSide(
-            color: Colors.grey[350],
-          ),
+          top: kDefaultCupertinoBorderSide,
         ),
       ),
       child: SafeArea(
