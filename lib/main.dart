@@ -7,7 +7,7 @@ import 'package:my_drugs/app/routes/app_route_factory.dart';
 import 'package:my_drugs/app/routes/app_routes.dart';
 import 'package:my_drugs/data_access/data_access.dart';
 import 'package:my_drugs/models/drug.dart';
-import 'package:path/path.dart' as Path;
+import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart';
 
 import 'generated/l10n.dart';
@@ -81,7 +81,7 @@ void main() async {
 
 Future<Database> instantiateDatabase(String databasesPath) => openDatabase(
       // Set the path to the database.
-      Path.join(databasesPath, 'drugs_database.db'),
+      path.join(databasesPath, 'drugs_database.db'),
       // When the database is first created, create a table to store dogs.
       onCreate: (db, version) => db.execute(
         'CREATE TABLE drugs(id TEXT PRIMARY KEY, name TEXT, expiresOn INTEGER, createdAt INTEGER)',

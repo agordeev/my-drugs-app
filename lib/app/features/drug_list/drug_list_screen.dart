@@ -91,6 +91,7 @@ class _DrugListScreenState extends State<DrugListScreen>
           body = Container();
         }
         return Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: AppBar(
             title: Text(S.of(context).appTitle),
             actions: actions,
