@@ -12,13 +12,11 @@ class CustomCupertinoSearchBar extends StatefulWidget
         kCupertinoSearchBarHeigth,
       );
 
-  final TextEditingController controller;
-  final void Function(String) onChanged;
+  final void Function(String) onSearchTextFieldUpdated;
 
   const CustomCupertinoSearchBar({
     Key key,
-    @required this.controller,
-    this.onChanged,
+    @required this.onSearchTextFieldUpdated,
   }) : super(key: key);
 
   @override
@@ -27,7 +25,15 @@ class CustomCupertinoSearchBar extends StatefulWidget
 }
 
 class _CustomCupertinoSearchBarState extends State<CustomCupertinoSearchBar> {
-  final textFieldFocusNode = FocusNode();
+  final _searchTextFieldFocusNode = FocusNode();
+  final _searchTextController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchTextController.dispose();
+    _searchTextFieldFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,10 +60,10 @@ class _CustomCupertinoSearchBarState extends State<CustomCupertinoSearchBar> {
           ),
         ),
         child: TextField(
-          controller: widget.controller,
+          controller: _searchTextController,
           textAlignVertical: TextAlignVertical.center,
-          onChanged: widget.onChanged,
-          focusNode: textFieldFocusNode,
+          onChanged: widget.onSearchTextFieldUpdated,
+          focusNode: _searchTextFieldFocusNode,
           textInputAction: TextInputAction.search,
           decoration: InputDecoration(
             filled: true,
@@ -82,18 +88,18 @@ class _CustomCupertinoSearchBarState extends State<CustomCupertinoSearchBar> {
             suffixIcon: CupertinoButton(
               padding: EdgeInsets.zero,
               onPressed: () {
-                widget.controller.text = '';
-                widget.onChanged(widget.controller.text);
+                _searchTextController.text = '';
+                widget.onSearchTextFieldUpdated(_searchTextController.text);
 
                 // Unfocus all focus nodes
-                textFieldFocusNode.unfocus();
+                _searchTextFieldFocusNode.unfocus();
 
                 // Disable text field's focus node request
-                textFieldFocusNode.canRequestFocus = false;
+                _searchTextFieldFocusNode.canRequestFocus = false;
 
                 //Enable the text field's focus node request after some delay
                 Future.delayed(Duration(milliseconds: 100), () {
-                  textFieldFocusNode.canRequestFocus = true;
+                  _searchTextFieldFocusNode.canRequestFocus = true;
                 });
               },
               child: Icon(
