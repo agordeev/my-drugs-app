@@ -96,6 +96,7 @@ class _DrugListScreenState extends State<DrugListScreen>
             title: S.of(context).appTitle,
             actions: actions,
             onSearchTextFieldUpdated: _onSearchTextFieldUpdated,
+            platform: Theme.of(context).platform,
           ),
           body: body,
           bottomNavigationBar: DrugListBottomBar(

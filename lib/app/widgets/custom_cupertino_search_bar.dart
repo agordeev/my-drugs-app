@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/shared/constants.dart';
 
+const kCupertinoSearchBarHeigth = 54.0;
+
 class CustomCupertinoSearchBar extends StatefulWidget
     implements PreferredSizeWidget {
   @override
   Size get preferredSize => Size.fromHeight(
-        54.0,
+        kCupertinoSearchBarHeigth,
       );
 
   final TextEditingController controller;
