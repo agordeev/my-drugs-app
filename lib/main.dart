@@ -66,7 +66,8 @@ void main() async {
       ),
       Drug(
         id: '2 exp',
-        name: '2 exp',
+        name:
+            '2 exp arie tsn ra ensth ri oern rsti reitn ri sier rsei rsie rier sif',
         expiresOn: DateTime(2020, 2),
         createdAt: DateTime.now(),
       ),

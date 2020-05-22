@@ -39,13 +39,16 @@ class DrugItemWidget extends DrugListRow {
 }
 
 class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
-  // final double _expiresOnWidth = 100;
+  final double _expiresOnWidth = 90;
   final double _height = 68;
   final _backgroundColor = Colors.white;
 
   /// Drug name block.
   @override
   Widget buildDynamicContent(BuildContext context) {
+    final widgetWidth =
+        MediaQuery.of(context).size.width - widget.horizontalPadding * 2;
+    final textWidth = widgetWidth - (_expiresOnWidth + 16 + 8);
     return Opacity(
       opacity: widget.item.isExpired ? 0.6 : 1.0,
       child: Container(
@@ -62,12 +65,15 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
             ),
           ],
         ),
-        child: Text(
-          widget.item.drug.name,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 16,
+        child: SizedBox(
+          width: textWidth,
+          child: Text(
+            widget.item.drug.name,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 16,
+            ),
           ),
         ),
       ),
@@ -117,35 +123,33 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
             ),
           ),
         ),
-        FittedBox(
-          fit: BoxFit.contain,
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            height: _height,
-            color: _backgroundColor,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  S.of(context).drugListExpiresOnLabel.toUpperCase(),
-                  style: TextStyle(
-                    color: Color(0xFFBABABA),
-                    fontSize: 10,
-                    letterSpacing: 1.2,
-                  ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          height: _height,
+          width: _expiresOnWidth,
+          color: _backgroundColor,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                S.of(context).drugListExpiresOnLabel.toUpperCase(),
+                style: TextStyle(
+                  color: Color(0xFFBABABA),
+                  fontSize: 10,
+                  letterSpacing: 1.2,
                 ),
-                SizedBox(height: 4),
-                Text(
-                  widget.item.formattedExpiresOn.replaceFirst(' ', '\n'),
-                  style: TextStyle(
-                    color: Color(0xFF8C8C8C),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                widget.item.formattedExpiresOn.replaceFirst(' ', '\n'),
+                style: TextStyle(
+                  color: Color(0xFF8C8C8C),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         SizedBox(
