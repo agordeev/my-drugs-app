@@ -2,8 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_drugs/generated/l10n.dart';
 
-class CustomCupertinoSearchBar extends StatelessWidget
+class CustomCupertinoSearchBar extends StatefulWidget
     implements PreferredSizeWidget {
+  @override
+  Size get preferredSize => Size(
+        double.infinity,
+        54.0,
+      );
+
   final TextEditingController controller;
   final void Function(String) onChanged;
 
@@ -14,10 +20,12 @@ class CustomCupertinoSearchBar extends StatelessWidget
   }) : super(key: key);
 
   @override
-  Size get preferredSize => Size(
-        double.infinity,
-        54.0,
-      );
+  _CustomCupertinoSearchBarState createState() =>
+      _CustomCupertinoSearchBarState();
+}
+
+class _CustomCupertinoSearchBarState extends State<CustomCupertinoSearchBar> {
+  final textFieldFocusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +40,7 @@ class CustomCupertinoSearchBar extends StatelessWidget
     final color = Color(0xFF3C3C43).withOpacity(0.6);
     return Material(
       child: SizedBox(
-        height: preferredSize.height,
+        height: widget.preferredSize.height,
         child: Container(
           padding: EdgeInsets.symmetric(
             horizontal: 16.0,
@@ -40,10 +48,10 @@ class CustomCupertinoSearchBar extends StatelessWidget
           ),
           color: Colors.white,
           child: TextField(
-            controller: controller,
+            controller: widget.controller,
             textAlignVertical: TextAlignVertical.center,
-            onChanged: onChanged,
-            // focusNode: textFieldFocusNode,
+            onChanged: widget.onChanged,
+            focusNode: textFieldFocusNode,
             decoration: InputDecoration(
               filled: true,
               fillColor: Color(0xFF767680).withOpacity(0.12),
@@ -68,19 +76,19 @@ class CustomCupertinoSearchBar extends StatelessWidget
               suffixIcon: CupertinoButton(
                 padding: EdgeInsets.zero,
                 onPressed: () {
-                  controller.text = '';
-                  onChanged(controller.text);
+                  widget.controller.text = '';
+                  widget.onChanged(widget.controller.text);
 
-                  // // Unfocus all focus nodes
-                  // textFieldFocusNode.unfocus();
+                  // Unfocus all focus nodes
+                  textFieldFocusNode.unfocus();
 
-                  // // Disable text field's focus node request
-                  // textFieldFocusNode.canRequestFocus = false;
+                  // Disable text field's focus node request
+                  textFieldFocusNode.canRequestFocus = false;
 
-                  // //Enable the text field's focus node request after some delay
-                  // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                  //   textFieldFocusNode.canRequestFocus = true;
-                  // });
+                  //Enable the text field's focus node request after some delay
+                  Future.delayed(Duration(milliseconds: 100), () {
+                    textFieldFocusNode.canRequestFocus = true;
+                  });
                 },
                 child: Icon(
                   CupertinoIcons.clear_circled_solid,
