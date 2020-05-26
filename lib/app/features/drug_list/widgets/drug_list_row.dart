@@ -8,9 +8,11 @@ abstract class DrugListRow extends StatefulWidget {
   final Animation<double> _checkmarkOpacity;
   final Animation<EdgeInsets> _checkmarkPadding;
   final Animation<EdgeInsets> _contentPadding;
+  final bool isSelected;
 
   DrugListRow({
     Key key,
+    @required this.isSelected,
     @required this.editModeAnimation,
   })  : _checkmarkOpacity = Tween<double>(
           begin: 0.0,
@@ -48,7 +50,6 @@ abstract class DrugListRow extends StatefulWidget {
 
 abstract class DrugListRowState<T extends DrugListRow> extends State<T>
     with SingleTickerProviderStateMixin {
-  bool isSelected = false;
   AnimationController checkmarkAnimationController;
 
   @override
@@ -57,6 +58,7 @@ abstract class DrugListRowState<T extends DrugListRow> extends State<T>
       vsync: this,
       duration: Duration(milliseconds: 300),
     );
+    checkmarkAnimationController.value = widget.isSelected ? 1.0 : 0.0;
     super.initState();
   }
 
@@ -73,9 +75,13 @@ abstract class DrugListRowState<T extends DrugListRow> extends State<T>
       animation: widget.editModeAnimation,
       child: buildStaticContent(context),
     );
-    return buildScaffold(
-      context,
-      animatedChild,
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: onTap,
+      child: buildScaffold(
+        context,
+        animatedChild,
+      ),
     );
   }
 
@@ -110,4 +116,6 @@ abstract class DrugListRowState<T extends DrugListRow> extends State<T>
   Widget buildDynamicContent(BuildContext context);
 
   Widget buildStaticContent(BuildContext context);
+
+  void onTap();
 }

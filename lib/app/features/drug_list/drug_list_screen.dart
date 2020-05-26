@@ -2,16 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:my_drugs/app/features/drug_list/models/drug_item.dart';
-import 'package:my_drugs/app/features/drug_list/models/drug_item_group.dart';
-import 'package:my_drugs/app/features/drug_list/widgets/drug_group_widget.dart';
-import 'package:my_drugs/app/features/drug_list/widgets/drug_item_widget.dart';
+import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/switch_screen_mode_button.dart';
 import 'package:my_drugs/app/widgets/custom_app_bar.dart';
 import 'package:my_drugs/generated/l10n.dart';
 
 import 'bloc/drug_list_bloc.dart';
+import 'models/drug_list_item.dart';
 
 class DrugListScreen extends StatefulWidget {
   @override
@@ -150,189 +148,165 @@ class _DrugListScreenState extends State<DrugListScreen>
     BuildContext context,
     DrugListInitial state,
   ) {
-    final isInEditMode = state.screenMode == ScreenMode.edit;
     return Scrollbar(
       controller: _scrollController,
-      child: AnimatedList(
-        controller: _scrollController,
-        key: state.listKey,
-        physics: AlwaysScrollableScrollPhysics(),
+      child: ImplicitlyAnimatedList<DrugListItem>(
+        items: state.items,
+        // shrinkWrap: true,
+        // physics: const NeverScrollableScrollPhysics(),
+        insertDuration: Duration(milliseconds: 350),
+        removeDuration: Duration(milliseconds: 350),
+        updateDuration: Duration(milliseconds: 350),
         padding: EdgeInsets.symmetric(
           horizontal: 8,
           vertical: 12,
         ),
-        initialItemCount: state.groups.length,
-        itemBuilder: (context, groupIndex, groupAnimation) =>
-            DrugItemGroupWidget(
-          group: state.groups[groupIndex],
-          isInEditMode: isInEditMode,
-          editModeAnimation: _screenModeAnimationController,
-          listAnimation: groupAnimation,
-          onPresentContextMenuTap: (item) => _presentBottomSheet(
-            context,
-            state.groups[groupIndex],
-            item,
-            isInEditMode,
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _presentBottomSheet(
-    BuildContext context,
-    DrugItemGroup group,
-    DrugItem item,
-    bool isInEditMode,
-  ) {
-    final deleteButtonHandler = () => _onContextMenuDeletePressed(
-          context,
-          group,
-          item,
-          isInEditMode,
-        );
-    final editButtonHandler = () {
-      Navigator.of(context).pop();
-      BlocProvider.of<DrugListBloc>(context)
-          .add(DrugListEditingStarted(item.drug.id));
-    };
-    if (Theme.of(context).platform == TargetPlatform.iOS) {
-      showCupertinoModalPopup(
-        context: context,
-        builder: (_) => CupertinoActionSheet(
-          actions: <Widget>[
-            CupertinoActionSheetAction(
-              child: Text(
-                S.of(context).buttonEdit,
-              ),
-              onPressed: editButtonHandler,
-            ),
-            CupertinoActionSheetAction(
-              child: Text(
-                S.of(context).buttonDelete,
-              ),
-              isDestructiveAction: true,
-              onPressed: deleteButtonHandler,
-            ),
-          ],
-        ),
-      );
-    } else {
-      showModalBottomSheet(
-        context: context,
-        builder: (_) => Wrap(
-          children: <Widget>[
-            SizedBox(height: 8),
-            _buildBottomSheetRow(
+        areItemsTheSame: (oldItem, newItem) => oldItem.id == newItem.id,
+        itemBuilder: (context, itemAnimation, item, index) {
+          return SizeFadeTransition(
+            sizeFraction: 0.7,
+            curve: Curves.easeInOut,
+            animation: itemAnimation,
+            child: item.build(
               context,
-              Icons.edit,
-              S.of(context).buttonEdit,
-              editButtonHandler,
+              _screenModeAnimationController,
             ),
-            _buildBottomSheetRow(
+          );
+        },
+        updateItemBuilder: (context, itemAnimation, item) {
+          return FadeTransition(
+            opacity: itemAnimation,
+            child: item.build(
               context,
-              Icons.delete,
-              S.of(context).buttonDelete,
-              deleteButtonHandler,
+              _screenModeAnimationController,
             ),
-          ],
-        ),
-      );
-    }
-  }
-
-  void _onContextMenuDeletePressed(
-    BuildContext context,
-    DrugItemGroup group,
-    DrugItem item,
-    bool isInEditMode,
-  ) {
-    Navigator.of(context).pop();
-    BlocProvider.of<DrugListBloc>(context).add(
-      DrugListGroupItemDeleted(
-        group,
-        item,
-        (context, animation) => DrugItemGroupWidget(
-          group: group,
-          isInEditMode: isInEditMode,
-          editModeAnimation: _screenModeAnimationController,
-          listAnimation: animation,
-          onPresentContextMenuTap: null,
-        ),
-        (context, animation) => DrugItemWidget(
-          group: group,
-          item: item,
-          isInEditMode: isInEditMode,
-          editModeAnimation: _screenModeAnimationController,
-          animation: animation,
-          onPresentContextMenuTap: null,
-        ),
+          );
+        },
       ),
     );
   }
 
-  void _onSearchTextFieldUpdated(String text) {
-    BlocProvider.of<DrugListBloc>(context).add(
-      DrugListSearchTextFieldUpdated(
-        text,
-        (context, group, item, animation) => DrugItemWidget(
-          group: group,
-          item: item,
-          isInEditMode: false,
-          editModeAnimation: _screenModeAnimationController,
-          animation: animation,
-          onPresentContextMenuTap: null,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomSheetRow(
-    BuildContext context,
-    IconData icon,
-    String text,
-    VoidCallback onTap,
-  ) =>
-      InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Icon(
-                  icon,
-                  color: Colors.grey[700],
-                ),
-              ),
-              SizedBox(width: 8),
-              Text(text),
-            ],
-          ),
+  void _onSearchTextFieldUpdated(String text) =>
+      BlocProvider.of<DrugListBloc>(context).add(
+        DrugListSearchTextFieldUpdated(
+          text,
         ),
       );
 
   void _deleteSelectedItems(BuildContext context, DrugListState state) {
-    if (state is DrugListInitial) {
-      final isInEditMode = state.screenMode == ScreenMode.edit;
-      BlocProvider.of<DrugListBloc>(context).add(DrugListSelectedItemsDeleted(
-        (context, group, animation) => DrugItemGroupWidget(
-          group: group,
-          isInEditMode: isInEditMode,
-          editModeAnimation: _screenModeAnimationController,
-          listAnimation: animation,
-          onPresentContextMenuTap: null,
-        ),
-        (context, group, item, animation) => DrugItemWidget(
-          group: group,
-          item: item,
-          isInEditMode: isInEditMode,
-          editModeAnimation: _screenModeAnimationController,
-          animation: animation,
-          onPresentContextMenuTap: null,
-        ),
-      ));
-    }
+    // if (state is DrugListInitial) {
+    //   final isInEditMode = state.screenMode == ScreenMode.edit;
+    //   BlocProvider.of<DrugListBloc>(context).add(DrugListSelectedItemsDeleted(
+    //     (context, group, animation) => DrugItemGroupWidget(
+    //       group: group,
+    //       isInEditMode: isInEditMode,
+    //       editModeAnimation: _screenModeAnimationController,
+    //       listAnimation: animation,
+    //       onPresentContextMenuTap: null,
+    //     ),
+    //     (context, group, item, animation) => DrugItemWidget(
+    //       group: group,
+    //       item: item,
+    //       isInEditMode: isInEditMode,
+    //       editModeAnimation: _screenModeAnimationController,
+    //       animation: animation,
+    //       onPresentContextMenuTap: null,
+    //     ),
+    //   ));
+    // }
+  }
+}
+
+/// A transition that fades the `child` in or out before shrinking or expanding
+/// to the `childs` size along the `axis`.
+///
+/// This can be used as a item transition in an [ImplicitlyAnimatedReorderableList].
+class SizeFadeTransition extends StatefulWidget {
+  /// The animation to be used.
+  final Animation<double> animation;
+
+  /// The curve of the animation.
+  final Curve curve;
+
+  /// How long the [Interval] for the [SizeTransition] should be.
+  ///
+  /// The value must be between 0 and 1.
+  ///
+  /// For example a `sizeFraction` of `0.66` would result in `Interval(0.0, 0.66)`
+  /// for the size animation and `Interval(0.66, 1.0)` for the opacity animation.
+  final double sizeFraction;
+
+  /// [Axis.horizontal] modifies the width,
+  /// [Axis.vertical] modifies the height.
+  final Axis axis;
+
+  /// Describes how to align the child along the axis the [animation] is
+  /// modifying.
+  ///
+  /// A value of -1.0 indicates the top when [axis] is [Axis.vertical], and the
+  /// start when [axis] is [Axis.horizontal]. The start is on the left when the
+  /// text direction in effect is [TextDirection.ltr] and on the right when it
+  /// is [TextDirection.rtl].
+  ///
+  /// A value of 1.0 indicates the bottom or end, depending upon the [axis].
+  ///
+  /// A value of 0.0 (the default) indicates the center for either [axis] value.
+  final double axisAlignment;
+
+  /// The child widget.
+  final Widget child;
+  const SizeFadeTransition({
+    Key key,
+    @required this.animation,
+    this.sizeFraction = 2 / 3,
+    this.curve = Curves.linear,
+    this.axis = Axis.vertical,
+    this.axisAlignment = 0.0,
+    this.child,
+  })  : assert(animation != null),
+        assert(axisAlignment != null),
+        assert(axis != null),
+        assert(curve != null),
+        assert(sizeFraction != null),
+        assert(sizeFraction >= 0.0 && sizeFraction <= 1.0),
+        super(key: key);
+
+  @override
+  _SizeFadeTransitionState createState() => _SizeFadeTransitionState();
+}
+
+class _SizeFadeTransitionState extends State<SizeFadeTransition> {
+  Animation size;
+  Animation opacity;
+
+  @override
+  void initState() {
+    super.initState();
+    didUpdateWidget(widget);
+  }
+
+  @override
+  void didUpdateWidget(SizeFadeTransition oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final curve =
+        CurvedAnimation(parent: widget.animation, curve: widget.curve);
+    size = CurvedAnimation(
+        curve: Interval(0.0, widget.sizeFraction), parent: curve);
+    opacity = CurvedAnimation(
+        curve: Interval(widget.sizeFraction, 1.0), parent: curve);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizeTransition(
+      sizeFactor: size,
+      axis: widget.axis,
+      axisAlignment: widget.axisAlignment,
+      child: FadeTransition(
+        opacity: opacity,
+        child: widget.child,
+      ),
+    );
   }
 }

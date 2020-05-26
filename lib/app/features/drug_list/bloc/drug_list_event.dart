@@ -9,26 +9,23 @@ class DrugListScreenModeSwitched extends DrugListEvent {
   List<Object> get props => [];
 }
 
-class SelectDeselectDrug extends DrugListEvent {
-  final DrugItemGroup group;
-  final DrugItem item;
+class DrugListItemSelectionToggled extends DrugListEvent {
+  final DrugListRowItem item;
 
-  SelectDeselectDrug(
-    this.group,
+  DrugListItemSelectionToggled(
     this.item,
   );
 
   @override
   List<Object> get props => [
-        group,
         item,
       ];
 }
 
-class DrugListGroupSelectionChanged extends DrugListEvent {
-  final DrugItemGroup group;
+class DrugListGroupSelectionToggled extends DrugListEvent {
+  final DrugListHeadingItem group;
 
-  DrugListGroupSelectionChanged(
+  DrugListGroupSelectionToggled(
     this.group,
   );
 
@@ -38,44 +35,24 @@ class DrugListGroupSelectionChanged extends DrugListEvent {
       ];
 }
 
-class DrugListGroupItemDeleted extends DrugListEvent {
-  final DrugItemGroup group;
-  final DrugItem item;
-  final AnimatedListRemovedItemBuilder groupBuilder;
-  final AnimatedListRemovedItemBuilder itemBuilder;
+class DrugListItemDeleted extends DrugListEvent {
+  final String id;
 
-  DrugListGroupItemDeleted(
-    this.group,
-    this.item,
-    this.groupBuilder,
-    this.itemBuilder,
+  DrugListItemDeleted(
+    this.id,
   );
 
   @override
   List<Object> get props => [
-        group,
-        item,
-        groupBuilder,
-        itemBuilder,
+        id,
       ];
 }
 
 class DrugListSelectedItemsDeleted extends DrugListEvent {
-  final Widget Function(BuildContext, DrugItemGroup, Animation<double>)
-      groupBuilder;
-  final Widget Function(
-      BuildContext, DrugItemGroup, DrugItem, Animation<double>) itemBuilder;
-
-  DrugListSelectedItemsDeleted(
-    this.groupBuilder,
-    this.itemBuilder,
-  );
+  DrugListSelectedItemsDeleted();
 
   @override
-  List<Object> get props => [
-        groupBuilder,
-        itemBuilder,
-      ];
+  List<Object> get props => [];
 }
 
 class DrugListAddingStarted extends DrugListEvent {
@@ -96,17 +73,13 @@ class DrugListEditingStarted extends DrugListEvent {
 
 class DrugListSearchTextFieldUpdated extends DrugListEvent {
   final String text;
-  final Widget Function(
-      BuildContext, DrugItemGroup, DrugItem, Animation<double>) itemBuilder;
 
   DrugListSearchTextFieldUpdated(
     this.text,
-    this.itemBuilder,
   );
 
   @override
   List<Object> get props => [
         text,
-        itemBuilder,
       ];
 }

@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_drugs/app/features/drug_list/bloc/drug_list_bloc.dart';
-import 'package:my_drugs/app/features/drug_list/models/drug_item_group.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_list_item.dart';
 
 import 'drug_list_row.dart';
 
 class DrugHeadingRowWidget extends DrugListRow {
-  final DrugItemGroup item;
-  final bool isInEditMode;
+  final DrugListHeadingItem group;
 
   DrugHeadingRowWidget({
-    @required this.item,
-    @required this.isInEditMode,
+    Key key,
+    @required this.group,
+    @required bool isSelected,
     @required Animation<double> editModeAnimation,
   }) : super(
-          key: item.key,
+          key: key,
+          isSelected: isSelected,
           editModeAnimation: editModeAnimation,
         );
 
@@ -25,19 +26,9 @@ class DrugHeadingRowWidget extends DrugListRow {
 class DrugHeadingRowState extends DrugListRowState<DrugHeadingRowWidget> {
   @override
   Widget buildScaffold(BuildContext context, Widget animatedChild) {
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onTap: widget.isInEditMode
-          ? () => BlocProvider.of<DrugListBloc>(context).add(
-                DrugListGroupSelectionChanged(
-                  widget.item,
-                ),
-              )
-          : null,
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
-        child: animatedChild,
-      ),
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: animatedChild,
     );
   }
 
@@ -47,7 +38,7 @@ class DrugHeadingRowState extends DrugListRowState<DrugHeadingRowWidget> {
     return Align(
       alignment: Alignment.centerLeft,
       child: Text(
-        widget.item.name,
+        widget.group.name,
         style: TextStyle(
           fontSize: 16,
           color: Color(0xFFBABABA),
@@ -59,4 +50,15 @@ class DrugHeadingRowState extends DrugListRowState<DrugHeadingRowWidget> {
 
   @override
   Widget buildStaticContent(BuildContext context) => Container();
+
+  @override
+  void onTap() {
+    final bloc = BlocProvider.of<DrugListBloc>(context);
+    final screenMode = bloc.currentScreenMode;
+    if (screenMode == ScreenMode.edit) {
+      bloc.add(DrugListGroupSelectionToggled(
+        widget.group,
+      ));
+    } else {}
+  }
 }

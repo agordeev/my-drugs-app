@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 /// Incorporates selection/unselection logic.
 abstract class Selectable {
-  bool isSelected = false;
+  bool isSelected;
   AnimationController get checkmarkAnimationController;
+
+  Selectable(this.isSelected);
 
   void deselect() {
     toggleSelection(false);
