@@ -252,19 +252,19 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> _mapEditingStartedEventToState(
     DrugListEditingStarted event,
   ) async* {
-    // final index = _filteredDrugs.indexWhere((drug) => drug.id == event.id);
-    // if (index == -1) {
-    //   print('Unable edit a drug ${event.id}: unable to find its index');
-    //   return;
-    // }
-    // final selectedDrug = _filteredDrugs[index];
-    // final drug = await _navigatorKey.currentState
-    //     .pushNamed<Drug>(AppRoutes.manageDrug, arguments: selectedDrug);
-    // if (drug != null) {
-    //   _filteredDrugs[index] = drug;
-    //   _sendScreenAnalytics();
-    //   yield _buildState();
-    // }
+    final index = _filteredDrugs.indexWhere((drug) => drug.id == event.id);
+    if (index == -1) {
+      print('Unable edit a drug ${event.id}: unable to find its index');
+      return;
+    }
+    final selectedDrug = _filteredDrugs[index];
+    final drug = await _navigatorKey.currentState
+        .pushNamed<Drug>(AppRoutes.manageDrug, arguments: selectedDrug);
+    if (drug != null) {
+      _filteredDrugs[index] = drug;
+      _sendScreenAnalytics();
+      yield _buildState();
+    }
   }
 
   Stream<DrugListState> _mapSearchTextFieldUpdatedEventToState(
