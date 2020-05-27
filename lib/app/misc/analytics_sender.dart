@@ -1,6 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:my_drugs/app/features/drug_list/models/drug_list_item.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_list_row_item.dart';
 
 mixin AnalyticsSender {
   FirebaseAnalytics get analytics;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_drugs/app/features/drug_list/bloc/drug_list_bloc.dart';
-import 'package:my_drugs/app/features/drug_list/models/drug_list_item.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_list_heading_item.dart';
 
 import 'drug_list_row.dart';
 
