@@ -138,7 +138,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
   List<DrugListItem> _buildGroup(
       List<Drug> drugs, String groupTitle, bool isExpired) {
     final group = DrugListHeadingItem(
-      name: _localizations.drugListExpiredGroupTitle.toUpperCase(),
+      name: groupTitle,
     );
     final items = drugs
         .map(
@@ -253,16 +253,10 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
   ) async* {
     final drug =
         await _navigatorKey.currentState.pushNamed<Drug>(AppRoutes.manageDrug);
-    // TODO: Remove
-    // final drug = Drug(
-    //   id: 'new',
-    //   expiresOn: DateTime.now(),
-    //   name: 'New',
-    //   createdAt: DateTime.now(),
-    // );
     if (drug != null) {
       _filteredDrugs.add(drug);
       _filteredDrugs.sort();
+      _items = _buildItems(_filteredDrugs);
       sendScreenAnalytics();
       yield _buildState();
     }
@@ -281,6 +275,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
         .pushNamed<Drug>(AppRoutes.manageDrug, arguments: selectedDrug);
     if (drug != null) {
       _filteredDrugs[index] = drug;
+      _filteredDrugs.sort();
+      _items = _buildItems(_filteredDrugs);
       sendScreenAnalytics();
       yield _buildState();
     }
@@ -300,7 +296,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
           )
           .toList();
     }
-
+    _items = _buildItems(_filteredDrugs);
     yield _buildState();
   }
 
