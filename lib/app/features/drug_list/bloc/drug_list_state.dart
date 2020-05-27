@@ -13,7 +13,7 @@ class DrugListInitial extends DrugListState {
   final String numberOfItemsSelected;
   final bool isDeleteButtonActive;
 
-  DrugListInitial(
+  const DrugListInitial({
     this.isEmpty,
     this.screenMode,
     this.bottomBarKey,
@@ -21,7 +21,7 @@ class DrugListInitial extends DrugListState {
     this.numberOfItemsTotal,
     this.numberOfItemsSelected,
     this.isDeleteButtonActive,
-  );
+  });
 
   @override
   List<Object> get props => [

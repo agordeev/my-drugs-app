@@ -48,7 +48,7 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
           color: _backgroundColor,
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               blurRadius: 4,
               color: Color(0xFFD7D7D7),
@@ -61,7 +61,7 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
             widget.item.name,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
             ),
           ),
@@ -92,13 +92,13 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [_backgroundColor.withOpacity(0), _backgroundColor],
-                stops: [0.0, 1.0],
+                stops: const [0.0, 1.0],
               ),
             ),
           ),
         ),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           height: _height,
           width: _expiresOnWidth,
           color: _backgroundColor,
@@ -108,16 +108,16 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
             children: <Widget>[
               Text(
                 S.of(context).drugListExpiresOnLabel.toUpperCase(),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFFBABABA),
                   fontSize: 10,
                   letterSpacing: 1.2,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 widget.item.formattedExpiresOn.replaceFirst(' ', '\n'),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFF8C8C8C),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -126,7 +126,7 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
             ],
           ),
         ),
-        SizedBox(
+        const SizedBox(
           width: 8,
         ),
       ],
@@ -146,31 +146,35 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
   void _presentBottomSheet(
     BuildContext context,
   ) {
-    final deleteButtonHandler = () => _onContextMenuDeletePressed(
-          context,
-        );
-    final editButtonHandler = () {
+    void deleteButtonHandler() {
+      _onContextMenuDeletePressed(
+        context,
+      );
+    }
+
+    void editButtonHandler() {
       Navigator.of(context).pop();
       BlocProvider.of<DrugListBloc>(context)
           .add(DrugListEditingStarted(widget.item.id));
-    };
+    }
+
     if (Theme.of(context).platform == TargetPlatform.iOS) {
       showCupertinoModalPopup(
         context: context,
         builder: (_) => CupertinoActionSheet(
           actions: <Widget>[
             CupertinoActionSheetAction(
+              onPressed: editButtonHandler,
               child: Text(
                 S.of(context).buttonEdit,
               ),
-              onPressed: editButtonHandler,
             ),
             CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              onPressed: deleteButtonHandler,
               child: Text(
                 S.of(context).buttonDelete,
               ),
-              isDestructiveAction: true,
-              onPressed: deleteButtonHandler,
             ),
           ],
         ),
@@ -180,7 +184,7 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
         context: context,
         builder: (_) => Wrap(
           children: <Widget>[
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             _buildBottomSheetRow(
               context,
               Icons.edit,
@@ -218,7 +222,7 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
                   color: Colors.grey[700],
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(text),
             ],
           ),

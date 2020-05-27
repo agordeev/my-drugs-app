@@ -23,15 +23,16 @@ class SqliteDrugRepository implements AbstractDrugRepository {
   @override
   Future<List<Drug>> fetchList() async {
     final maps = await _database.query(_tableName);
-    var result = <Drug>[];
-    maps.forEach((e) {
+    final result = <Drug>[];
+    for (final map in maps) {
       try {
-        final drug = Drug.fromJson(e);
+        final drug = Drug.fromJson(map);
         result.add(drug);
       } catch (e) {
+        // ignore: avoid_print
         print(e);
       }
-    });
+    }
 
     return result;
   }

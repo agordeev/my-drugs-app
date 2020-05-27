@@ -8,7 +8,7 @@ class SwitchScreenModeButton extends StatelessWidget {
   final Animation<double> animation;
   final EdgeInsets padding;
 
-  final double _size = 24.0;
+  double get _size => 24.0;
 
   const SwitchScreenModeButton({
     Key key,
@@ -23,14 +23,14 @@ class SwitchScreenModeButton extends StatelessWidget {
 
     final effectiveVisualDensity = theme.visualDensity;
 
-    final unadjustedConstraints = const BoxConstraints(
+    const unadjustedConstraints = BoxConstraints(
       minWidth: kMinInteractiveDimension,
       minHeight: kMinInteractiveDimension,
     );
     final adjustedConstraints =
         effectiveVisualDensity.effectiveConstraints(unadjustedConstraints);
 
-    Widget result = ConstrainedBox(
+    final result = ConstrainedBox(
       constraints: adjustedConstraints,
       child: Padding(
         padding: padding,
@@ -54,9 +54,7 @@ class SwitchScreenModeButton extends StatelessWidget {
       button: true,
       enabled: true,
       child: InkResponse(
-        canRequestFocus: true,
         onTap: onPressed,
-        child: result,
         highlightColor: Theme.of(context).platform == TargetPlatform.iOS
             ? Colors.transparent
             : Theme.of(context).highlightColor,
@@ -71,6 +69,7 @@ class SwitchScreenModeButton extends StatelessWidget {
           (_size + math.min(padding.horizontal, padding.vertical)) * 0.7,
           // x 0.5 for diameter -> radius and + 40% overflow derived from other Material apps.
         ),
+        child: result,
       ),
     );
   }

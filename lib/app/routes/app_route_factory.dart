@@ -14,7 +14,7 @@ import 'package:my_drugs/models/drug.dart';
 
 class AppRouteFactory {
   /// Used to push/pop screens from blocs.
-  final navigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   final AbstractDrugRepository repository;
   final FirebaseAnalytics analytics;
@@ -30,12 +30,19 @@ class AppRouteFactory {
             settings: settings,
             pageBuilder: (context, _, __) => _buildDrugListScreen(context));
       case AppRoutes.manageDrug:
+        Drug drug;
+        if (arguments != null) {
+          if (arguments is Drug) {
+            drug = arguments;
+          } else {
+            break;
+          }
+        }
         return platformPageRoute<Drug>(
             context: context,
             settings: settings,
             fullscreenDialog: true,
-            builder: (context) => _buildManageDrugScreen(context, arguments));
-        break;
+            builder: (context) => _buildManageDrugScreen(context, drug));
     }
     return _buildUnknownRoute(
       settings,

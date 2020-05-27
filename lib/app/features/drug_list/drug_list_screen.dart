@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
+import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/switch_screen_mode_button.dart';
 import 'package:my_drugs/app/widgets/custom_app_bar.dart';
@@ -21,7 +22,7 @@ class _DrugListScreenState extends State<DrugListScreen>
   AnimationController _screenModeAnimationController;
   final _scrollController = ScrollController();
   final _searchTextController = TextEditingController();
-  final _animationDuration = Duration(milliseconds: 500);
+  final _animationDuration = const Duration(milliseconds: 500);
 
   @override
   void initState() {
@@ -98,9 +99,9 @@ class _DrugListScreenState extends State<DrugListScreen>
             numberOfItemsSelected: numberOfItemsSelected,
             isDeleteButtonActive: isDeleteButtonActive,
             onAddButtonPressed: () => BlocProvider.of<DrugListBloc>(context)
-                .add(DrugListAddingStarted()),
+                .add(const DrugListAddingStarted()),
             onDeleteButtonPressed: () => BlocProvider.of<DrugListBloc>(context)
-                .add(DrugListSelectedItemsDeleted()),
+                .add(const DrugListSelectedItemsDeleted()),
           ),
         );
       },
@@ -115,14 +116,14 @@ class _DrugListScreenState extends State<DrugListScreen>
               'assets/images/drug_list_empty_state.png',
               width: 145.0,
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Text(
               S.of(context).drugListNoItems,
               style: TextStyle(
                 color: Colors.grey,
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             SizedBox(
               width: 240,
               child: PlatformButton(
@@ -134,11 +135,11 @@ class _DrugListScreenState extends State<DrugListScreen>
                 ios: (context) => CupertinoButtonData(
                   color: Theme.of(context).colorScheme.primary,
                 ),
+                onPressed: () => BlocProvider.of<DrugListBloc>(context)
+                    .add(const DrugListAddingStarted()),
                 child: Text(
                   S.of(context).manageDrugAddDrugModeActionButtonTitle,
                 ),
-                onPressed: () => BlocProvider.of<DrugListBloc>(context)
-                    .add(DrugListAddingStarted()),
               ),
             )
           ],
@@ -158,10 +159,10 @@ class _DrugListScreenState extends State<DrugListScreen>
         // insertDuration: Duration(milliseconds: 350),
         // removeDuration: Duration(milliseconds: 350),
         // updateDuration: Duration(milliseconds: 350),
-        insertDuration: Duration(milliseconds: 5000),
-        removeDuration: Duration(milliseconds: 5000),
-        updateDuration: Duration(milliseconds: 5000),
-        padding: EdgeInsets.symmetric(
+        insertDuration: const Duration(milliseconds: 5000),
+        removeDuration: const Duration(milliseconds: 5000),
+        updateDuration: const Duration(milliseconds: 5000),
+        padding: const EdgeInsets.symmetric(
           horizontal: 8,
           vertical: 12,
         ),
@@ -196,98 +197,4 @@ class _DrugListScreenState extends State<DrugListScreen>
           text,
         ),
       );
-}
-
-/// A transition that fades the `child` in or out before shrinking or expanding
-/// to the `childs` size along the `axis`.
-///
-/// This can be used as a item transition in an [ImplicitlyAnimatedReorderableList].
-class SizeFadeTransition extends StatefulWidget {
-  /// The animation to be used.
-  final Animation<double> animation;
-
-  /// The curve of the animation.
-  final Curve curve;
-
-  /// How long the [Interval] for the [SizeTransition] should be.
-  ///
-  /// The value must be between 0 and 1.
-  ///
-  /// For example a `sizeFraction` of `0.66` would result in `Interval(0.0, 0.66)`
-  /// for the size animation and `Interval(0.66, 1.0)` for the opacity animation.
-  final double sizeFraction;
-
-  /// [Axis.horizontal] modifies the width,
-  /// [Axis.vertical] modifies the height.
-  final Axis axis;
-
-  /// Describes how to align the child along the axis the [animation] is
-  /// modifying.
-  ///
-  /// A value of -1.0 indicates the top when [axis] is [Axis.vertical], and the
-  /// start when [axis] is [Axis.horizontal]. The start is on the left when the
-  /// text direction in effect is [TextDirection.ltr] and on the right when it
-  /// is [TextDirection.rtl].
-  ///
-  /// A value of 1.0 indicates the bottom or end, depending upon the [axis].
-  ///
-  /// A value of 0.0 (the default) indicates the center for either [axis] value.
-  final double axisAlignment;
-
-  /// The child widget.
-  final Widget child;
-  const SizeFadeTransition({
-    Key key,
-    @required this.animation,
-    this.sizeFraction = 2 / 3,
-    this.curve = Curves.linear,
-    this.axis = Axis.vertical,
-    this.axisAlignment = 0.0,
-    this.child,
-  })  : assert(animation != null),
-        assert(axisAlignment != null),
-        assert(axis != null),
-        assert(curve != null),
-        assert(sizeFraction != null),
-        assert(sizeFraction >= 0.0 && sizeFraction <= 1.0),
-        super(key: key);
-
-  @override
-  _SizeFadeTransitionState createState() => _SizeFadeTransitionState();
-}
-
-class _SizeFadeTransitionState extends State<SizeFadeTransition> {
-  Animation size;
-  Animation opacity;
-
-  @override
-  void initState() {
-    super.initState();
-    didUpdateWidget(widget);
-  }
-
-  @override
-  void didUpdateWidget(SizeFadeTransition oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    final curve =
-        CurvedAnimation(parent: widget.animation, curve: widget.curve);
-    size = CurvedAnimation(
-        curve: Interval(0.0, widget.sizeFraction), parent: curve);
-    opacity = CurvedAnimation(
-        curve: Interval(widget.sizeFraction, 1.0), parent: curve);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizeTransition(
-      sizeFactor: size,
-      axis: widget.axis,
-      axisAlignment: widget.axisAlignment,
-      child: FadeTransition(
-        opacity: opacity,
-        child: widget.child,
-      ),
-    );
-  }
 }

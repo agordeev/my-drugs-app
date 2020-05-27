@@ -31,12 +31,12 @@ class Drug extends Model implements Comparable {
         _lowercasedName = name.toLowerCase(),
         super(id);
 
-  factory Drug.fromJson(Map json) => _$DrugFromJson(json);
+  factory Drug.fromJson(Map<String, dynamic> json) => _$DrugFromJson(json);
 
   Map<String, dynamic> toJson() => _$DrugToJson(this);
 
   @override
-  int compareTo(other) {
+  int compareTo(dynamic other) {
     if (other is Drug) {
       // Compare by [expiresOn] first. If they are equal, compare by [name].
       final expiresOnCompare = expiresOn.compareTo(other.expiresOn);

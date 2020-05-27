@@ -16,10 +16,10 @@ class UnknownRouteScreen extends StatelessWidget {
               S.of(context).unknownRouteMessage,
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             PlatformButton(
-              child: Text(MaterialLocalizations.of(context).backButtonTooltip),
               onPressed: () => Navigator.of(context).pop(),
+              child: Text(MaterialLocalizations.of(context).backButtonTooltip),
             ),
           ],
         ),

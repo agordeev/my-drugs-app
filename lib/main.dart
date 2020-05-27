@@ -12,7 +12,7 @@ import 'package:sqflite/sqflite.dart';
 
 import 'generated/l10n.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final database = await instantiateDatabase(await getDatabasesPath());
   final repository = AbstractDrugRepository.make(database);
@@ -132,9 +132,9 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   @override
-  void didChangeDependencies() async {
+  Future<void> didChangeDependencies() async {
     await precacheImage(
-      AssetImage('assets/images/drug_list_empty_state.png'),
+      const AssetImage('assets/images/drug_list_empty_state.png'),
       context,
     );
     super.didChangeDependencies();
@@ -163,20 +163,20 @@ class _MyAppState extends State<MyApp> {
 
   ThemeData _buildTheme(BuildContext context) {
     final baseTheme = ThemeData.light();
-    final primaryColor = Color(0xFFf05b6c);
+    const primaryColor = Color(0xFFf05b6c);
     return ThemeData(
       primaryColor: primaryColor,
       visualDensity: VisualDensity.adaptivePlatformDensity,
       colorScheme: baseTheme.colorScheme.copyWith(
         primary: primaryColor,
-        surface: Color(0xFFFBFBFB),
+        surface: const Color(0xFFFBFBFB),
       ),
       inputDecorationTheme: InputDecorationTheme(
-        contentPadding: EdgeInsets.symmetric(
+        contentPadding: const EdgeInsets.symmetric(
           horizontal: 8.0,
         ),
         hintStyle: TextStyle(color: Colors.grey[400]),
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
             color: Colors.grey[350],
@@ -187,7 +187,7 @@ class _MyAppState extends State<MyApp> {
         brightness: Brightness.light,
         color: Colors.white,
         textTheme: Theme.of(context).textTheme,
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: primaryColor,
         ),
       ),

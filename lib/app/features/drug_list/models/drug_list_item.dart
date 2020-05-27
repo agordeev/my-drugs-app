@@ -6,7 +6,7 @@ import 'package:my_drugs/app/features/drug_list/widgets/drug_item_widget.dart';
 abstract class DrugListItem extends Selectable {
   final String id;
 
-  DrugListItem(this.id, bool isSelected) : super(isSelected);
+  DrugListItem({this.id});
 
   Widget build(
     BuildContext context,
@@ -26,12 +26,11 @@ class DrugListHeadingItem extends DrugListItem {
   AnimationController get checkmarkAnimationController =>
       key.currentState?.checkmarkAnimationController;
 
-  DrugListHeadingItem(
+  DrugListHeadingItem({
     this.name,
-    bool isSelected,
-  )   : key = GlobalKey(debugLabel: name),
+  })  : key = GlobalKey(debugLabel: name),
         // TODO: Refactor
-        super('heading$name', isSelected);
+        super(id: 'heading$name');
 
   @override
   Widget build(
@@ -59,15 +58,14 @@ class DrugListRowItem extends DrugListItem {
   AnimationController get checkmarkAnimationController =>
       key.currentState?.checkmarkAnimationController;
 
-  DrugListRowItem(
+  DrugListRowItem({
     this.group,
     String id,
     this.name,
     this.formattedExpiresOn,
     this.isExpired,
-    bool isSelected,
-  )   : key = GlobalKey(debugLabel: id),
-        super(id, isSelected);
+  })  : key = GlobalKey(debugLabel: id),
+        super(id: id);
 
   @override
   Widget build(

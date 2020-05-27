@@ -27,8 +27,8 @@ class ManageDrugScreen extends StatelessWidget {
             : <Widget>[
                 PlatformButton(
                   androidFlat: (context) => MaterialFlatButtonData(),
-                  child: Icon(Icons.clear),
                   onPressed: () => Navigator.of(context).pop(),
+                  child: Icon(Icons.clear),
                 )
               ],
       ),
@@ -65,12 +65,12 @@ class ManageDrugScreen extends StatelessWidget {
                   child: ListView(
                     padding: const EdgeInsets.all(16.0),
                     children: <Widget>[
-                      SizedBox(height: 8.0),
+                      const SizedBox(height: 8.0),
                       TextFormField(
                         autofocus: true,
                         controller: state.nameController,
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                             horizontal: 8.0,
                             vertical: 16.0,
                           ),
@@ -85,8 +85,8 @@ class ManageDrugScreen extends StatelessWidget {
                         validator: (value) =>
                             RequiredFieldValidator.validate(context, value),
                       ),
-                      SizedBox(height: 16.0),
-                      SizedBox(height: 8.0),
+                      const SizedBox(height: 16.0),
+                      const SizedBox(height: 8.0),
                       TextFormField(
                         controller: state.expiresOnController,
                         decoration: InputDecoration(
@@ -99,7 +99,7 @@ class ManageDrugScreen extends StatelessWidget {
                           MaskTextInputFormatter(
                             mask: state.expiresOnMask,
                             filter: {
-                              '#': RegExp(r'[0-9]'),
+                              '#': RegExp('[0-9]'),
                             },
                           ),
                         ],
@@ -111,7 +111,7 @@ class ManageDrugScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             SizedBox(
               width: double.infinity,
               child: PlatformButton(
@@ -120,6 +120,8 @@ class ManageDrugScreen extends StatelessWidget {
                 ),
                 ios: (context) => CupertinoButtonData(
                     color: Theme.of(context).colorScheme.primary),
+                onPressed: () => BlocProvider.of<ManageDrugBloc>(context)
+                    .add(ManageDrugDrugStored()),
                 child: Text(
                   actionButtonTitle.toUpperCase(),
                   style: TextStyle(
@@ -128,8 +130,6 @@ class ManageDrugScreen extends StatelessWidget {
                     letterSpacing: 0.1,
                   ),
                 ),
-                onPressed: () => BlocProvider.of<ManageDrugBloc>(context)
-                    .add(ManageDrugDrugStored()),
               ),
             ),
           ],
@@ -150,5 +150,5 @@ class _InvisibleScrollBehavior extends ScrollBehavior {
 
   @override
   ScrollPhysics getScrollPhysics(BuildContext context) =>
-      ClampingScrollPhysics();
+      const ClampingScrollPhysics();
 }

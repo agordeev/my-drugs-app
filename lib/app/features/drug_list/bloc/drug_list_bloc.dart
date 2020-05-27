@@ -73,7 +73,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   DrugListState _buildState() {
     // Sorting uses the default [Comparator]. See [Drug.compareTo] for more info.
     _filteredDrugs.sort();
-    _items = _buildItems(_filteredDrugs);
+    _items ??= _buildItems(_filteredDrugs);
     final selectedItemsCount = _calculateSelectedItemsCount();
     if (_filteredDrugs.isEmpty) {
       _setScreenMode(ScreenMode.normal);
@@ -84,20 +84,21 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       numberOfItemsTotal = '${_filteredDrugs.length}/$numberOfItemsTotal';
     }
     return DrugListInitial(
-      _drugs.isEmpty,
-      _screenMode,
-      _bottomBarKey,
-      _items,
-      numberOfItemsTotal,
-      _localizations.drugListTotalItemsSelected(selectedItemsCount),
-      selectedItemsCount > 0,
+      isEmpty: _drugs.isEmpty,
+      screenMode: _screenMode,
+      bottomBarKey: _bottomBarKey,
+      items: _items,
+      numberOfItemsTotal: numberOfItemsTotal,
+      numberOfItemsSelected:
+          _localizations.drugListTotalItemsSelected(selectedItemsCount),
+      isDeleteButtonActive: selectedItemsCount > 0,
     );
   }
 
   List<DrugListItem> _buildItems(List<Drug> drugs) {
     final expired = drugs.where(_isDrugExpired).toList();
     final notExpired = drugs.where((e) => !_isDrugExpired(e)).toList();
-    var result = <DrugListItem>[];
+    final result = <DrugListItem>[];
     if (expired.isNotEmpty) {
       result.addAll(
         _buildGroup(
@@ -119,18 +120,16 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
 
   List<DrugListItem> _buildGroup(List<Drug> drugs, String groupTitle) {
     final group = DrugListHeadingItem(
-      _localizations.drugListExpiredGroupTitle.toUpperCase(),
-      false,
+      name: _localizations.drugListExpiredGroupTitle.toUpperCase(),
     );
     final items = drugs
         .map(
           (e) => DrugListRowItem(
-            group,
-            e.id,
-            e.name,
-            expiresOnDateFormat.format(e.expiresOn),
-            true,
-            false,
+            group: group,
+            id: e.id,
+            name: e.name,
+            formattedExpiresOn: expiresOnDateFormat.format(e.expiresOn),
+            isExpired: true,
           ),
         )
         .toList();
@@ -170,7 +169,9 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     } else {
       _setScreenMode(ScreenMode.edit);
     }
-    _items.forEach((e) => e.toggleSelection(false));
+    for (final item in _items) {
+      item.toggleSelection(isSelected: false);
+    }
     yield _buildState();
   }
 
@@ -178,19 +179,21 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     DrugListItemSelectionToggled event,
   ) async* {
     final item = event.item;
-    item.toggleSelection(!item.isSelected);
+    item.toggleSelection(isSelected: !item.isSelected);
     _updateBottomBarDeleteButtonColor();
     yield _buildState();
     final group = item.group;
-    group.toggleSelection(group.areAllItemsSelected);
+    group.toggleSelection(isSelected: group.areAllItemsSelected);
   }
 
   Stream<DrugListState> _mapGroupSelectionToggledEventToState(
     DrugListGroupSelectionToggled event,
   ) async* {
     final group = event.group;
-    group.toggleSelection(!group.isSelected);
-    group.items.forEach((e) => e.toggleSelection(group.isSelected));
+    group.toggleSelection(isSelected: !group.isSelected);
+    for (final item in group.items) {
+      item.toggleSelection(isSelected: group.isSelected);
+    }
     _updateBottomBarDeleteButtonColor();
     yield _buildState();
   }
@@ -199,14 +202,12 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     DrugListItemDeleted event,
   ) async* {
     try {
-      print(_filteredDrugs.length);
       await _repository.delete([event.id]);
       _filteredDrugs.removeWhere((element) => element.id == event.id);
       _sendScreenAnalytics();
-      print(_filteredDrugs.length);
       yield _buildState();
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 
@@ -225,7 +226,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       _sendScreenAnalytics();
       yield _buildState();
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 
@@ -252,19 +253,19 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> _mapEditingStartedEventToState(
     DrugListEditingStarted event,
   ) async* {
-    final index = _filteredDrugs.indexWhere((drug) => drug.id == event.id);
-    if (index == -1) {
-      print('Unable edit a drug ${event.id}: unable to find its index');
-      return;
-    }
-    final selectedDrug = _filteredDrugs[index];
-    final drug = await _navigatorKey.currentState
-        .pushNamed<Drug>(AppRoutes.manageDrug, arguments: selectedDrug);
-    if (drug != null) {
-      _filteredDrugs[index] = drug;
-      _sendScreenAnalytics();
-      yield _buildState();
-    }
+    // final index = _filteredDrugs.indexWhere((drug) => drug.id == event.id);
+    // if (index == -1) {
+    //   debugPrint('Unable edit a drug ${event.id}: unable to find its index');
+    //   return;
+    // }
+    // final selectedDrug = _filteredDrugs[index];
+    // final drug = await _navigatorKey.currentState
+    //     .pushNamed<Drug>(AppRoutes.manageDrug, arguments: selectedDrug);
+    // if (drug != null) {
+    //   _filteredDrugs[index] = drug;
+    //   _sendScreenAnalytics();
+    //   yield _buildState();
+    // }
   }
 
   Stream<DrugListState> _mapSearchTextFieldUpdatedEventToState(

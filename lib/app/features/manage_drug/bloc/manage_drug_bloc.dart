@@ -73,7 +73,7 @@ class ManageDrugBloc extends Bloc<ManageDrugEvent, ManageDrugState> {
       final storedDrug = await _repository.store(drug);
       _navigatorKey.currentState.pop(storedDrug);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       final snackBar = SnackBar(
         content: Text(e.toString()),
         backgroundColor: Theme.of(context).colorScheme.error,

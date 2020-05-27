@@ -114,12 +114,12 @@ class CheckmarkPainter extends CustomPainter {
 
     final path = Path();
 
-    var metricsIterator = originalPath.computeMetrics().iterator;
+    final metricsIterator = originalPath.computeMetrics().iterator;
 
     while (metricsIterator.moveNext()) {
-      var metric = metricsIterator.current;
+      final metric = metricsIterator.current;
 
-      var nextLength = currentLength + metric.length;
+      final nextLength = currentLength + metric.length;
 
       final isLastSegment = nextLength > length;
       if (isLastSegment) {

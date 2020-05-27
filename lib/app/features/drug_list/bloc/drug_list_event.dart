@@ -12,7 +12,7 @@ class DrugListScreenModeSwitched extends DrugListEvent {
 class DrugListItemSelectionToggled extends DrugListEvent {
   final DrugListRowItem item;
 
-  DrugListItemSelectionToggled(
+  const DrugListItemSelectionToggled(
     this.item,
   );
 
@@ -25,7 +25,7 @@ class DrugListItemSelectionToggled extends DrugListEvent {
 class DrugListGroupSelectionToggled extends DrugListEvent {
   final DrugListHeadingItem group;
 
-  DrugListGroupSelectionToggled(
+  const DrugListGroupSelectionToggled(
     this.group,
   );
 
@@ -38,7 +38,7 @@ class DrugListGroupSelectionToggled extends DrugListEvent {
 class DrugListItemDeleted extends DrugListEvent {
   final String id;
 
-  DrugListItemDeleted(
+  const DrugListItemDeleted(
     this.id,
   );
 
@@ -49,14 +49,14 @@ class DrugListItemDeleted extends DrugListEvent {
 }
 
 class DrugListSelectedItemsDeleted extends DrugListEvent {
-  DrugListSelectedItemsDeleted();
+  const DrugListSelectedItemsDeleted();
 
   @override
   List<Object> get props => [];
 }
 
 class DrugListAddingStarted extends DrugListEvent {
-  DrugListAddingStarted();
+  const DrugListAddingStarted();
 
   @override
   List<Object> get props => [];
@@ -65,7 +65,7 @@ class DrugListAddingStarted extends DrugListEvent {
 class DrugListEditingStarted extends DrugListEvent {
   final String id;
 
-  DrugListEditingStarted(this.id);
+  const DrugListEditingStarted(this.id);
 
   @override
   List<Object> get props => [id];
@@ -74,7 +74,7 @@ class DrugListEditingStarted extends DrugListEvent {
 class DrugListSearchTextFieldUpdated extends DrugListEvent {
   final String text;
 
-  DrugListSearchTextFieldUpdated(
+  const DrugListSearchTextFieldUpdated(
     this.text,
   );
 

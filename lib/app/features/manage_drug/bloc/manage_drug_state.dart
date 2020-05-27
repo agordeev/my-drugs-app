@@ -11,7 +11,7 @@ class ManageDrugInitial extends ManageDrugState {
   final String expiresOnMask;
   final String expiresOnPlaceholderText;
 
-  ManageDrugInitial(
+  const ManageDrugInitial(
     this.formKey,
     this.nameController,
     this.expiresOnController,

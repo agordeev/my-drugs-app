@@ -14,7 +14,7 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderRadius = BorderRadius.all(
+    const borderRadius = BorderRadius.all(
       Radius.circular(4.0),
     );
     return Container(

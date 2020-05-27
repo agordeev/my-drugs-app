@@ -29,7 +29,7 @@ abstract class DrugListRow extends StatefulWidget {
         ),
         _checkmarkPadding = Tween<EdgeInsets>(
           begin: EdgeInsets.zero,
-          end: EdgeInsets.only(left: 4.0),
+          end: const EdgeInsets.only(left: 4.0),
         ).animate(
           CurvedAnimation(
             parent: editModeAnimation,
@@ -37,8 +37,8 @@ abstract class DrugListRow extends StatefulWidget {
           ),
         ),
         _contentPadding = Tween<EdgeInsets>(
-          begin: EdgeInsets.only(left: 8.0),
-          end: EdgeInsets.only(left: 36.0),
+          begin: const EdgeInsets.only(left: 8.0),
+          end: const EdgeInsets.only(left: 36.0),
         ).animate(
           CurvedAnimation(
             parent: editModeAnimation,
@@ -56,7 +56,7 @@ abstract class DrugListRowState<T extends DrugListRow> extends State<T>
   void initState() {
     checkmarkAnimationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
     );
     checkmarkAnimationController.value = widget.isSelected ? 1.0 : 0.0;
     super.initState();

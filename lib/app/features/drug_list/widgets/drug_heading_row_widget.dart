@@ -27,7 +27,7 @@ class DrugHeadingRowState extends DrugListRowState<DrugHeadingRowWidget> {
   @override
   Widget buildScaffold(BuildContext context, Widget animatedChild) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: animatedChild,
     );
   }
@@ -39,7 +39,7 @@ class DrugHeadingRowState extends DrugListRowState<DrugHeadingRowWidget> {
       alignment: Alignment.centerLeft,
       child: Text(
         widget.group.name,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 16,
           color: Color(0xFFBABABA),
           fontWeight: FontWeight.w500,
