@@ -79,7 +79,7 @@ void main() async {
     //   ),
     // ],
     drugs: List.generate(
-          5,
+          500,
           (index) => Drug(
             id: '$index',
             name: '$index',
@@ -88,7 +88,7 @@ void main() async {
           ),
         ) +
         List.generate(
-          1,
+          1000,
           (index) => Drug(
             id: 'exp$index',
             name: '$index',

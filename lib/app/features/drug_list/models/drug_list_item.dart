@@ -4,7 +4,7 @@ import 'package:my_drugs/app/features/drug_list/widgets/drug_heading_row_widget.
 import 'package:my_drugs/app/features/drug_list/widgets/drug_item_widget.dart';
 
 abstract class DrugListItem extends Selectable {
-  final id;
+  final String id;
 
   DrugListItem(this.id, bool isSelected) : super(isSelected);
 
@@ -14,15 +14,22 @@ abstract class DrugListItem extends Selectable {
   );
 }
 
+// TODO: Move to separate file
 class DrugListHeadingItem extends DrugListItem {
   final GlobalKey<DrugHeadingRowState> key;
   final String name;
+  List<DrugListRowItem> items;
+
+  bool get areAllItemsSelected => items.indexWhere((e) => !e.isSelected) == -1;
+
   @override
   AnimationController get checkmarkAnimationController =>
-      key.currentState.checkmarkAnimationController;
+      key.currentState?.checkmarkAnimationController;
 
-  DrugListHeadingItem(this.name, bool isSelected)
-      : key = GlobalKey(),
+  DrugListHeadingItem(
+    this.name,
+    bool isSelected,
+  )   : key = GlobalKey(debugLabel: name),
         // TODO: Refactor
         super('heading$name', isSelected);
 
@@ -40,22 +47,26 @@ class DrugListHeadingItem extends DrugListItem {
   }
 }
 
+// TODO: Move to separate file
 class DrugListRowItem extends DrugListItem {
+  final DrugListHeadingItem group;
   final GlobalKey<DrugItemRowState> key;
   final String name;
   final String formattedExpiresOn;
   final bool isExpired;
+
   @override
   AnimationController get checkmarkAnimationController =>
-      key.currentState.checkmarkAnimationController;
+      key.currentState?.checkmarkAnimationController;
 
   DrugListRowItem(
+    this.group,
     String id,
     this.name,
     this.formattedExpiresOn,
     this.isExpired,
     bool isSelected,
-  )   : key = GlobalKey(),
+  )   : key = GlobalKey(debugLabel: id),
         super(id, isSelected);
 
   @override

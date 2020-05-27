@@ -17,6 +17,10 @@ abstract class Selectable {
 
   void toggleSelection(bool isSelected) {
     this.isSelected = isSelected;
+    if (checkmarkAnimationController == null) {
+      // The item isn't currently visible on the screen.
+      return;
+    }
     isSelected
         ? checkmarkAnimationController.forward()
         : checkmarkAnimationController.reverse();

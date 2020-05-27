@@ -5,7 +5,7 @@
 // import 'package:my_drugs/app/features/drug_list/widgets/drug_heading_row_widget.dart';
 // import 'package:my_drugs/models/drug.dart';
 
-class DrugItemGroup {}
+// TODO: Remove
 
 // /// A group of [DrugItem].
 // class DrugItemGroup extends Selectable {

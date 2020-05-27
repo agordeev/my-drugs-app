@@ -99,7 +99,8 @@ class _DrugListScreenState extends State<DrugListScreen>
             isDeleteButtonActive: isDeleteButtonActive,
             onAddButtonPressed: () => BlocProvider.of<DrugListBloc>(context)
                 .add(DrugListAddingStarted()),
-            onDeleteButtonPressed: () => _deleteSelectedItems(context, state),
+            onDeleteButtonPressed: () => BlocProvider.of<DrugListBloc>(context)
+                .add(DrugListSelectedItemsDeleted()),
           ),
         );
       },
@@ -154,9 +155,12 @@ class _DrugListScreenState extends State<DrugListScreen>
         items: state.items,
         // shrinkWrap: true,
         // physics: const NeverScrollableScrollPhysics(),
-        insertDuration: Duration(milliseconds: 350),
-        removeDuration: Duration(milliseconds: 350),
-        updateDuration: Duration(milliseconds: 350),
+        // insertDuration: Duration(milliseconds: 350),
+        // removeDuration: Duration(milliseconds: 350),
+        // updateDuration: Duration(milliseconds: 350),
+        insertDuration: Duration(milliseconds: 5000),
+        removeDuration: Duration(milliseconds: 5000),
+        updateDuration: Duration(milliseconds: 5000),
         padding: EdgeInsets.symmetric(
           horizontal: 8,
           vertical: 12,
@@ -192,29 +196,6 @@ class _DrugListScreenState extends State<DrugListScreen>
           text,
         ),
       );
-
-  void _deleteSelectedItems(BuildContext context, DrugListState state) {
-    // if (state is DrugListInitial) {
-    //   final isInEditMode = state.screenMode == ScreenMode.edit;
-    //   BlocProvider.of<DrugListBloc>(context).add(DrugListSelectedItemsDeleted(
-    //     (context, group, animation) => DrugItemGroupWidget(
-    //       group: group,
-    //       isInEditMode: isInEditMode,
-    //       editModeAnimation: _screenModeAnimationController,
-    //       listAnimation: animation,
-    //       onPresentContextMenuTap: null,
-    //     ),
-    //     (context, group, item, animation) => DrugItemWidget(
-    //       group: group,
-    //       item: item,
-    //       isInEditMode: isInEditMode,
-    //       editModeAnimation: _screenModeAnimationController,
-    //       animation: animation,
-    //       onPresentContextMenuTap: null,
-    //     ),
-    //   ));
-    // }
-  }
 }
 
 /// A transition that fades the `child` in or out before shrinking or expanding
