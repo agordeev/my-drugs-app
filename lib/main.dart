@@ -17,7 +17,25 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final database = await instantiateDatabase(await getDatabasesPath());
   final repository = AbstractDrugRepository.make(database);
-  final drugs = await repository.fetchList();
+  // final drugs = await repository.fetchList();
+  final drugs = List.generate(
+        500,
+        (index) => Drug(
+          id: '$index',
+          name: '$index',
+          expiresOn: DateTime(2020, 1),
+          createdAt: DateTime.now(),
+        ),
+      ) +
+      List.generate(
+        1000,
+        (index) => Drug(
+          id: 'exp$index',
+          name: '$index',
+          expiresOn: DateTime(2021, 1),
+          createdAt: DateTime.now(),
+        ),
+      );
 
   final analytics = FirebaseAnalytics();
   analytics.setAnalyticsCollectionEnabled(kReleaseMode);
@@ -25,82 +43,7 @@ Future<void> main() async {
   runApp(MyApp(
     repository: repository,
     analytics: analytics,
-    // drugs: [
-    //   Drug(
-    //     id: '1',
-    //     name: '1',
-    //     expiresOn: DateTime(2021, 1),
-    //     createdAt: DateTime.now(),
-    //   ),
-    //   Drug(
-    //     id: '2',
-    //     name: '2',
-    //     expiresOn: DateTime(2021, 2),
-    //     createdAt: DateTime.now(),
-    //   ),
-    //   Drug(
-    //     id: '3',
-    //     name: '3',
-    //     expiresOn: DateTime(2021, 3),
-    //     createdAt: DateTime.now(),
-    //   ),
-    //   Drug(
-    //     id: '4',
-    //     name: '4',
-    //     expiresOn: DateTime(2021, 4),
-    //     createdAt: DateTime.now(),
-    //   ),
-    //   Drug(
-    //     id: '5',
-    //     name: '5',
-    //     expiresOn: DateTime(2021, 5),
-    //     createdAt: DateTime.now(),
-    //   ),
-    //   Drug(
-    //     id: '6',
-    //     name: '6',
-    //     expiresOn: DateTime(2021, 6),
-    //     createdAt: DateTime.now(),
-    //   ),
-    //   Drug(
-    //     id: '1 exp',
-    //     name:
-    //         '1 exp arstianrast inrasiot nrseiotnwfyupl uynrst uaroiesnt oierasntieor sntyuwfpnrsnat riesantieorsant ieorasnt wyfun raisetn rioesntoir',
-    //     expiresOn: DateTime(2020, 1),
-    //     createdAt: DateTime.now(),
-    //   ),
-    //   Drug(
-    //     id: '2 exp',
-    //     name:
-    //         '2 exp arie tsn ra ensth ri oern rsti reitn ri sier rsei rsie rier sif',
-    //     expiresOn: DateTime(2020, 2),
-    //     createdAt: DateTime.now(),
-    //   ),
-    //   Drug(
-    //     id: '3 exp',
-    //     name: '3 exp',
-    //     expiresOn: DateTime(2020, 3),
-    //     createdAt: DateTime.now(),
-    //   ),
-    // ],
-    drugs: List.generate(
-          5,
-          (index) => Drug(
-            id: '$index',
-            name: '$index',
-            expiresOn: DateTime(2020, 1),
-            createdAt: DateTime.now(),
-          ),
-        ) +
-        List.generate(
-          1,
-          (index) => Drug(
-            id: 'exp$index',
-            name: '$index',
-            expiresOn: DateTime(2021, 1),
-            createdAt: DateTime.now(),
-          ),
-        ),
+    drugs: drugs,
   ));
 }
 
