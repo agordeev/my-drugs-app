@@ -17,7 +17,6 @@ class DrugListHeadingItem extends DrugListItem {
   DrugListHeadingItem({
     this.name,
   })  : key = GlobalKey(debugLabel: name),
-        // TODO: Refactor
         super(id: 'heading$name');
 
   @override
