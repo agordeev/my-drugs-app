@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_drugs/app/features/drug_list/models/drug_list_item.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
+import 'package:my_drugs/app/misc/analytics_sender.dart';
 import 'package:my_drugs/app/routes/app_routes.dart';
 import 'package:my_drugs/data_access/data_access.dart';
 import 'package:my_drugs/generated/l10n.dart';
@@ -19,11 +21,11 @@ enum ScreenMode { normal, edit }
 
 DateFormat expiresOnDateFormat = DateFormat('MMMM yyyy');
 
-class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
+class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
+    with AnalyticsSender {
   final S _localizations;
   final GlobalKey<NavigatorState> _navigatorKey;
   final AbstractDrugRepository _repository;
-  final FirebaseAnalytics _analytics;
 
   /// The original array of drugs.
   final List<Drug> _drugs;
@@ -37,6 +39,17 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   /// Use [setScreenMode()] instead to update the bottom bar state.
   ScreenMode _screenMode = ScreenMode.normal;
   ScreenMode get currentScreenMode => _screenMode;
+
+  @override
+  final FirebaseAnalytics analytics;
+
+  /// Used for analytics.
+  @override
+  int get drugsCountTotal => _drugs.length;
+
+  /// Used for analytics.
+  @override
+  List<DrugListItem> get items => _items;
 
   void _setScreenMode(ScreenMode screenMode) {
     _screenMode = screenMode;
@@ -55,10 +68,10 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     this._localizations,
     this._navigatorKey,
     this._repository,
-    this._analytics,
+    this.analytics,
     this._drugs,
   ) : _filteredDrugs = _drugs {
-    _sendScreenAnalytics();
+    sendScreenAnalytics();
   }
 
   @override
@@ -104,6 +117,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         _buildGroup(
           expired,
           _localizations.drugListExpiredGroupTitle.toUpperCase(),
+          true,
         ),
       );
     }
@@ -112,13 +126,15 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
         _buildGroup(
           notExpired,
           _localizations.drugListNotExpiredGroupTitle.toUpperCase(),
+          false,
         ),
       );
     }
     return result;
   }
 
-  List<DrugListItem> _buildGroup(List<Drug> drugs, String groupTitle) {
+  List<DrugListItem> _buildGroup(
+      List<Drug> drugs, String groupTitle, bool isExpired) {
     final group = DrugListHeadingItem(
       name: _localizations.drugListExpiredGroupTitle.toUpperCase(),
     );
@@ -129,7 +145,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
             id: e.id,
             name: e.name,
             formattedExpiresOn: expiresOnDateFormat.format(e.expiresOn),
-            isExpired: true,
+            isExpired: isExpired,
           ),
         )
         .toList();
@@ -204,7 +220,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     try {
       await _repository.delete([event.id]);
       _filteredDrugs.removeWhere((element) => element.id == event.id);
-      _sendScreenAnalytics();
+      sendScreenAnalytics();
       yield _buildState();
     } catch (e) {
       debugPrint(e.toString());
@@ -223,7 +239,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       _items = _items.where((e) => !e.isSelected).toList();
       _setScreenMode(ScreenMode.normal);
       _updateBottomBarDeleteButtonColor();
-      _sendScreenAnalytics();
+      sendScreenAnalytics();
       yield _buildState();
     } catch (e) {
       debugPrint(e.toString());
@@ -245,7 +261,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     if (drug != null) {
       _filteredDrugs.add(drug);
       _filteredDrugs.sort();
-      _sendScreenAnalytics();
+      sendScreenAnalytics();
       yield _buildState();
     }
   }
@@ -253,19 +269,19 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<DrugListState> _mapEditingStartedEventToState(
     DrugListEditingStarted event,
   ) async* {
-    // final index = _filteredDrugs.indexWhere((drug) => drug.id == event.id);
-    // if (index == -1) {
-    //   debugPrint('Unable edit a drug ${event.id}: unable to find its index');
-    //   return;
-    // }
-    // final selectedDrug = _filteredDrugs[index];
-    // final drug = await _navigatorKey.currentState
-    //     .pushNamed<Drug>(AppRoutes.manageDrug, arguments: selectedDrug);
-    // if (drug != null) {
-    //   _filteredDrugs[index] = drug;
-    //   _sendScreenAnalytics();
-    //   yield _buildState();
-    // }
+    final index = _filteredDrugs.indexWhere((drug) => drug.id == event.id);
+    if (index == -1) {
+      debugPrint('Unable edit a drug ${event.id}: unable to find its index');
+      return;
+    }
+    final selectedDrug = _filteredDrugs[index];
+    final drug = await _navigatorKey.currentState
+        .pushNamed<Drug>(AppRoutes.manageDrug, arguments: selectedDrug);
+    if (drug != null) {
+      _filteredDrugs[index] = drug;
+      sendScreenAnalytics();
+      yield _buildState();
+    }
   }
 
   Stream<DrugListState> _mapSearchTextFieldUpdatedEventToState(
@@ -299,29 +315,5 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     } else {
       _bottomBarKey.currentState.deleteButtonColorAnimationController.reverse();
     }
-  }
-
-  void _sendScreenAnalytics() {
-    // _analytics.setUserProperty(
-    //   name: 'drugs_count_total',
-    //   value: '${_drugs.length}',
-    // );
-    // var expiredDrugsCount = 0;
-    // var notExpiredDrugsCount = 0;
-    // _groups.forEach((group) {
-    //   if (group.isExpired) {
-    //     expiredDrugsCount = group.items.length;
-    //   } else {
-    //     notExpiredDrugsCount = group.items.length;
-    //   }
-    // });
-    // _analytics.setUserProperty(
-    //   name: 'drugs_count_expired',
-    //   value: '$expiredDrugsCount',
-    // );
-    // _analytics.setUserProperty(
-    //   name: 'drugs_count_not_expired',
-    //   value: '$notExpiredDrugsCount',
-    // );
   }
 }
