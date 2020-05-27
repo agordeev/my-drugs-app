@@ -222,8 +222,9 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
     try {
       await _repository.delete([event.id]);
       _filteredDrugs.removeWhere((element) => element.id == event.id);
-      sendScreenAnalytics();
+      _items = _buildItems(_filteredDrugs);
       yield _buildState();
+      sendScreenAnalytics();
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -241,8 +242,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
       _items = _items.where((e) => !e.isSelected).toList();
       _setScreenMode(ScreenMode.normal);
       _updateBottomBarDeleteButtonColor();
-      sendScreenAnalytics();
       yield _buildState();
+      sendScreenAnalytics();
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -257,8 +258,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
       _filteredDrugs.add(drug);
       _filteredDrugs.sort();
       _items = _buildItems(_filteredDrugs);
-      sendScreenAnalytics();
       yield _buildState();
+      sendScreenAnalytics();
     }
   }
 
@@ -277,8 +278,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
       _filteredDrugs[index] = drug;
       _filteredDrugs.sort();
       _items = _buildItems(_filteredDrugs);
-      sendScreenAnalytics();
       yield _buildState();
+      sendScreenAnalytics();
     }
   }
 
