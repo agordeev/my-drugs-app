@@ -1,6 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:my_drugs/app/routes/app_route_factory.dart';
@@ -17,9 +18,13 @@ Future<void> main() async {
   final database = await instantiateDatabase(await getDatabasesPath());
   final repository = AbstractDrugRepository.make(database);
   final drugs = await repository.fetchList();
+
+  final analytics = FirebaseAnalytics();
+  analytics.setAnalyticsCollectionEnabled(kReleaseMode);
+
   runApp(MyApp(
     repository: repository,
-    analytics: FirebaseAnalytics(),
+    analytics: analytics,
     // drugs: [
     //   Drug(
     //     id: '1',
