@@ -93,8 +93,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
     if (_filteredDrugs.isEmpty) {
       _setScreenMode(ScreenMode.normal);
     }
-    var numberOfItemsTotal =
-        _localizations.drugListTotalItems(_filteredDrugs.length);
+    var numberOfItemsTotal = _localizations.drugListTotalItems(_drugs.length);
     if (_filteredDrugs.length != _drugs.length) {
       numberOfItemsTotal = '${_filteredDrugs.length}/$numberOfItemsTotal';
     }
