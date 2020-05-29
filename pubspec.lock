@@ -335,10 +335,12 @@ packages:
   implicitly_animated_reorderable_list:
     dependency: "direct main"
     description:
-      name: implicitly_animated_reorderable_list
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.1"
+      path: "."
+      ref: dev
+      resolved-ref: c841f7995ec1b10d6435ad04e2de0da97ee74b39
+      url: "https://github.com/bnxm/implicitly_animated_reorderable_list"
+    source: git
+    version: "0.2.0-dev+1"
   intl:
     dependency: "direct main"
     description:
