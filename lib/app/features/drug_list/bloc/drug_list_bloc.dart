@@ -221,6 +221,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
   ) async* {
     try {
       await _repository.delete([event.id]);
+      _drugs.removeWhere((element) => element.id == event.id);
       _filteredDrugs.removeWhere((element) => element.id == event.id);
       _items = _buildItems(_filteredDrugs);
       yield _buildState();
@@ -235,10 +236,12 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
   ) async* {
     try {
       final idsToDelete = _items
-          .where((e) => e.isSelected && e is DrugListHeadingItem)
+          .where((e) => e.isSelected && e is DrugListRowItem)
           .map((e) => e.id)
           .toList();
       await _repository.delete(idsToDelete);
+      _drugs.removeWhere((e) => idsToDelete.contains(e.id));
+      _filteredDrugs.removeWhere((e) => idsToDelete.contains(e.id));
       _items = _items.where((e) => !e.isSelected).toList();
       _setScreenMode(ScreenMode.normal);
       _updateBottomBarDeleteButtonColor();
@@ -255,6 +258,8 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
     final drug =
         await _navigatorKey.currentState.pushNamed<Drug>(AppRoutes.manageDrug);
     if (drug != null) {
+      _drugs.add(drug);
+      _drugs.sort();
       _filteredDrugs.add(drug);
       _filteredDrugs.sort();
       _items = _buildItems(_filteredDrugs);
@@ -266,16 +271,24 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
   Stream<DrugListState> _mapEditingStartedEventToState(
     DrugListEditingStarted event,
   ) async* {
-    final index = _filteredDrugs.indexWhere((drug) => drug.id == event.id);
-    if (index == -1) {
+    final filteredDrugsIndex =
+        _filteredDrugs.indexWhere((drug) => drug.id == event.id);
+    if (filteredDrugsIndex == -1) {
       debugPrint('Unable edit a drug ${event.id}: unable to find its index');
       return;
     }
-    final selectedDrug = _filteredDrugs[index];
+    final selectedDrug = _filteredDrugs[filteredDrugsIndex];
     final drug = await _navigatorKey.currentState
         .pushNamed<Drug>(AppRoutes.manageDrug, arguments: selectedDrug);
     if (drug != null) {
-      _filteredDrugs[index] = drug;
+      // Update [_drugs].
+      final drugsIndex = _drugs.indexWhere((drug) => drug.id == event.id);
+      if (drugsIndex != -1) {
+        _drugs[drugsIndex] = drug;
+        _drugs.sort();
+      }
+      // Update [_filteredDrugs].
+      _filteredDrugs[filteredDrugsIndex] = drug;
       _filteredDrugs.sort();
       _items = _buildItems(_filteredDrugs);
       yield _buildState();
