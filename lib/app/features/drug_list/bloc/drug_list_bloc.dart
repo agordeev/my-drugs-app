@@ -15,6 +15,7 @@ import 'package:my_drugs/app/routes/app_routes.dart';
 import 'package:my_drugs/data_access/data_access.dart';
 import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/models/drug.dart';
+import 'package:rxdart/rxdart.dart';
 
 part 'drug_list_event.dart';
 part 'drug_list_state.dart';
@@ -293,6 +294,22 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
       yield _buildState();
       sendScreenAnalytics();
     }
+  }
+
+  @override
+  Stream<Transition<DrugListEvent, DrugListState>> transformEvents(
+      Stream<DrugListEvent> events,
+      TransitionFunction<DrugListEvent, DrugListState> transitionFn) {
+    // Defer search to reduce calculation costs.
+    final defferedEvents = events
+        .where((e) => e is DrugListSearchTextFieldUpdated)
+        .debounceTime(const Duration(milliseconds: 500))
+        .distinct()
+        .switchMap(transitionFn);
+    final forwardedEvents = events
+        .where((e) => e is! DrugListSearchTextFieldUpdated)
+        .asyncExpand(transitionFn);
+    return forwardedEvents.mergeWith([defferedEvents]);
   }
 
   Stream<DrugListState> _mapSearchTextFieldUpdatedEventToState(
