@@ -8,7 +8,7 @@ class CustomMaterialSearchAppBar extends StatefulWidget {
   final List<Widget> actions;
   final void Function(String) onSearchTextFieldUpdated;
 
-  CustomMaterialSearchAppBar({
+  const CustomMaterialSearchAppBar({
     Key key,
     this.title,
     this.actions,

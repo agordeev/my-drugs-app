@@ -18,7 +18,7 @@ void main() {
     setUpAll(() async {
       // Connect to a running Flutter application instance.
       driver = await FlutterDriver.connect();
-      await sleep(Duration(seconds: 5));
+      sleep(const Duration(seconds: 5));
     });
 
     tearDownAll(() async {
@@ -45,6 +45,6 @@ void main() {
 
       // // take screenshot after number is incremented
       // await screenshot(driver, config, '1');
-    }, timeout: Timeout(Duration(seconds: 45)));
+    }, timeout: const Timeout(Duration(seconds: 45)));
   });
 }

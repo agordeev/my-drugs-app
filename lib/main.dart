@@ -1,6 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:my_drugs/app/routes/app_route_factory.dart';
@@ -12,90 +13,38 @@ import 'package:sqflite/sqflite.dart';
 
 import 'generated/l10n.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final database = await instantiateDatabase(await getDatabasesPath());
   final repository = AbstractDrugRepository.make(database);
-  final drugs = await repository.fetchList();
+  // TODO: Fix
+  // final drugs = await repository.fetchList();
+  final drugs = List.generate(
+        5,
+        (index) => Drug(
+          id: '$index',
+          name: '$index',
+          expiresOn: DateTime(2020, 1),
+          createdAt: DateTime.now(),
+        ),
+      ) +
+      List.generate(
+        10,
+        (index) => Drug(
+          id: 'exp$index',
+          name: '$index',
+          expiresOn: DateTime(2021, 1),
+          createdAt: DateTime.now(),
+        ),
+      );
+
+  final analytics = FirebaseAnalytics();
+  analytics.setAnalyticsCollectionEnabled(kReleaseMode);
+
   runApp(MyApp(
     repository: repository,
-    analytics: FirebaseAnalytics(),
-    drugs: [
-      Drug(
-        id: '1',
-        name: '1',
-        expiresOn: DateTime(2021, 1),
-        createdAt: DateTime.now(),
-      ),
-      Drug(
-        id: '2',
-        name: '2',
-        expiresOn: DateTime(2021, 2),
-        createdAt: DateTime.now(),
-      ),
-      Drug(
-        id: '3',
-        name: '3',
-        expiresOn: DateTime(2021, 3),
-        createdAt: DateTime.now(),
-      ),
-      Drug(
-        id: '4',
-        name: '4',
-        expiresOn: DateTime(2021, 4),
-        createdAt: DateTime.now(),
-      ),
-      Drug(
-        id: '5',
-        name: '5',
-        expiresOn: DateTime(2021, 5),
-        createdAt: DateTime.now(),
-      ),
-      Drug(
-        id: '6',
-        name: '6',
-        expiresOn: DateTime(2021, 6),
-        createdAt: DateTime.now(),
-      ),
-      Drug(
-        id: '1 exp',
-        name:
-            '1 exp arstianrast inrasiot nrseiotnwfyupl uynrst uaroiesnt oierasntieor sntyuwfpnrsnat riesantieorsant ieorasnt wyfun raisetn rioesntoir',
-        expiresOn: DateTime(2020, 1),
-        createdAt: DateTime.now(),
-      ),
-      Drug(
-        id: '2 exp',
-        name:
-            '2 exp arie tsn ra ensth ri oern rsti reitn ri sier rsei rsie rier sif',
-        expiresOn: DateTime(2020, 2),
-        createdAt: DateTime.now(),
-      ),
-      Drug(
-        id: '3 exp',
-        name: '3 exp',
-        expiresOn: DateTime(2020, 3),
-        createdAt: DateTime.now(),
-      ),
-    ],
-    // drugs: List.generate(
-    //       500,
-    //       (index) => Drug(
-    //         id: '$index',
-    //         name: '$index',
-    //         expiresOn: DateTime(2020, 1),
-    //         createdAt: DateTime.now(),
-    //       ),
-    //     ) +
-    //     List.generate(
-    //       100,
-    //       (index) => Drug(
-    //         id: '$index',
-    //         name: '$index',
-    //         expiresOn: DateTime(2021, 1),
-    //         createdAt: DateTime.now(),
-    //       ),
-    //     ),
+    analytics: analytics,
+    drugs: drugs,
   ));
 }
 
@@ -132,9 +81,9 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   @override
-  void didChangeDependencies() async {
+  Future<void> didChangeDependencies() async {
     await precacheImage(
-      AssetImage('assets/images/drug_list_empty_state.png'),
+      const AssetImage('assets/images/drug_list_empty_state.png'),
       context,
     );
     super.didChangeDependencies();
@@ -163,20 +112,20 @@ class _MyAppState extends State<MyApp> {
 
   ThemeData _buildTheme(BuildContext context) {
     final baseTheme = ThemeData.light();
-    final primaryColor = Color(0xFFf05b6c);
+    const primaryColor = Color(0xFFf05b6c);
     return ThemeData(
       primaryColor: primaryColor,
       visualDensity: VisualDensity.adaptivePlatformDensity,
       colorScheme: baseTheme.colorScheme.copyWith(
         primary: primaryColor,
-        surface: Color(0xFFFBFBFB),
+        surface: const Color(0xFFFBFBFB),
       ),
       inputDecorationTheme: InputDecorationTheme(
-        contentPadding: EdgeInsets.symmetric(
+        contentPadding: const EdgeInsets.symmetric(
           horizontal: 8.0,
         ),
         hintStyle: TextStyle(color: Colors.grey[400]),
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
             color: Colors.grey[350],
@@ -187,7 +136,7 @@ class _MyAppState extends State<MyApp> {
         brightness: Brightness.light,
         color: Colors.white,
         textTheme: Theme.of(context).textTheme,
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: primaryColor,
         ),
       ),

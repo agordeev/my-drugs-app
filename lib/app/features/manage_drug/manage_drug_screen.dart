@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:my_drugs/app/features/manage_drug/bloc/manage_drug_bloc.dart';
+import 'package:my_drugs/app/misc/utils.dart';
 import 'package:my_drugs/app/misc/validators/validators.dart';
 import 'package:my_drugs/app/widgets/app_card.dart';
 import 'package:my_drugs/generated/l10n.dart';
@@ -27,8 +28,8 @@ class ManageDrugScreen extends StatelessWidget {
             : <Widget>[
                 PlatformButton(
                   androidFlat: (context) => MaterialFlatButtonData(),
-                  child: Icon(Icons.clear),
                   onPressed: () => Navigator.of(context).pop(),
+                  child: Icon(Icons.clear),
                 )
               ],
       ),
@@ -53,7 +54,9 @@ class ManageDrugScreen extends StatelessWidget {
     ManageDrugInitial state,
   ) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(
+        isTablet() ? 32.0 : 16.0,
+      ),
       child: Form(
         key: state.formKey,
         child: Column(
@@ -65,12 +68,12 @@ class ManageDrugScreen extends StatelessWidget {
                   child: ListView(
                     padding: const EdgeInsets.all(16.0),
                     children: <Widget>[
-                      SizedBox(height: 8.0),
+                      const SizedBox(height: 8.0),
                       TextFormField(
                         autofocus: true,
                         controller: state.nameController,
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                             horizontal: 8.0,
                             vertical: 16.0,
                           ),
@@ -85,8 +88,8 @@ class ManageDrugScreen extends StatelessWidget {
                         validator: (value) =>
                             RequiredFieldValidator.validate(context, value),
                       ),
-                      SizedBox(height: 16.0),
-                      SizedBox(height: 8.0),
+                      const SizedBox(height: 16.0),
+                      const SizedBox(height: 8.0),
                       TextFormField(
                         controller: state.expiresOnController,
                         decoration: InputDecoration(
@@ -99,7 +102,7 @@ class ManageDrugScreen extends StatelessWidget {
                           MaskTextInputFormatter(
                             mask: state.expiresOnMask,
                             filter: {
-                              '#': RegExp(r'[0-9]'),
+                              '#': RegExp('[0-9]'),
                             },
                           ),
                         ],
@@ -111,15 +114,17 @@ class ManageDrugScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             SizedBox(
-              width: double.infinity,
+              width: isTablet() ? kElementMaxWidth : double.infinity,
               child: PlatformButton(
                 android: (context) => MaterialRaisedButtonData(
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 ios: (context) => CupertinoButtonData(
                     color: Theme.of(context).colorScheme.primary),
+                onPressed: () => BlocProvider.of<ManageDrugBloc>(context)
+                    .add(ManageDrugDrugStored()),
                 child: Text(
                   actionButtonTitle.toUpperCase(),
                   style: TextStyle(
@@ -128,8 +133,6 @@ class ManageDrugScreen extends StatelessWidget {
                     letterSpacing: 0.1,
                   ),
                 ),
-                onPressed: () => BlocProvider.of<ManageDrugBloc>(context)
-                    .add(ManageDrugDrugStored()),
               ),
             ),
           ],
@@ -150,5 +153,5 @@ class _InvisibleScrollBehavior extends ScrollBehavior {
 
   @override
   ScrollPhysics getScrollPhysics(BuildContext context) =>
-      ClampingScrollPhysics();
+      const ClampingScrollPhysics();
 }

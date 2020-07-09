@@ -8,30 +8,27 @@ class DrugListInitial extends DrugListState {
   final bool isEmpty;
   final ScreenMode screenMode;
   final GlobalKey<DrugListBottomBarState> bottomBarKey;
-  final GlobalKey<AnimatedListState> listKey;
-  final List<DrugItemGroup> groups;
+  final List<DrugListItem> items;
   final String numberOfItemsTotal;
   final String numberOfItemsSelected;
   final bool isDeleteButtonActive;
 
-  DrugListInitial(
+  const DrugListInitial({
     this.isEmpty,
     this.screenMode,
     this.bottomBarKey,
-    this.listKey,
-    this.groups,
+    this.items,
     this.numberOfItemsTotal,
     this.numberOfItemsSelected,
     this.isDeleteButtonActive,
-  );
+  });
 
   @override
   List<Object> get props => [
         isEmpty,
         screenMode,
         bottomBarKey,
-        listKey,
-        groups,
+        items,
         numberOfItemsTotal,
         numberOfItemsSelected,
         isDeleteButtonActive,

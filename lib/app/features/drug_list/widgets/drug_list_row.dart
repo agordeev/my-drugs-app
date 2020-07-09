@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_drugs/app/misc/utils.dart';
 
 import 'checkmark.dart';
 
@@ -8,9 +9,11 @@ abstract class DrugListRow extends StatefulWidget {
   final Animation<double> _checkmarkOpacity;
   final Animation<EdgeInsets> _checkmarkPadding;
   final Animation<EdgeInsets> _contentPadding;
+  final bool isSelected;
 
   DrugListRow({
     Key key,
+    @required this.isSelected,
     @required this.editModeAnimation,
   })  : _checkmarkOpacity = Tween<double>(
           begin: 0.0,
@@ -27,7 +30,7 @@ abstract class DrugListRow extends StatefulWidget {
         ),
         _checkmarkPadding = Tween<EdgeInsets>(
           begin: EdgeInsets.zero,
-          end: EdgeInsets.only(left: 4.0),
+          end: const EdgeInsets.only(left: 4.0),
         ).animate(
           CurvedAnimation(
             parent: editModeAnimation,
@@ -35,8 +38,8 @@ abstract class DrugListRow extends StatefulWidget {
           ),
         ),
         _contentPadding = Tween<EdgeInsets>(
-          begin: EdgeInsets.only(left: 8.0),
-          end: EdgeInsets.only(left: 36.0),
+          begin: const EdgeInsets.only(left: 8.0),
+          end: EdgeInsets.only(left: isTablet() ? 54.0 : 36.0),
         ).animate(
           CurvedAnimation(
             parent: editModeAnimation,
@@ -48,15 +51,15 @@ abstract class DrugListRow extends StatefulWidget {
 
 abstract class DrugListRowState<T extends DrugListRow> extends State<T>
     with SingleTickerProviderStateMixin {
-  bool isSelected = false;
   AnimationController checkmarkAnimationController;
 
   @override
   void initState() {
     checkmarkAnimationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
     );
+    checkmarkAnimationController.value = widget.isSelected ? 1.0 : 0.0;
     super.initState();
   }
 
@@ -73,9 +76,13 @@ abstract class DrugListRowState<T extends DrugListRow> extends State<T>
       animation: widget.editModeAnimation,
       child: buildStaticContent(context),
     );
-    return buildScaffold(
-      context,
-      animatedChild,
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: onTap,
+      child: buildScaffold(
+        context,
+        animatedChild,
+      ),
     );
   }
 
@@ -110,4 +117,6 @@ abstract class DrugListRowState<T extends DrugListRow> extends State<T>
   Widget buildDynamicContent(BuildContext context);
 
   Widget buildStaticContent(BuildContext context);
+
+  void onTap();
 }

@@ -3,34 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_drugs/app/features/drug_list/bloc/drug_list_bloc.dart';
-import 'package:my_drugs/app/features/drug_list/models/drug_item.dart';
-import 'package:my_drugs/app/features/drug_list/models/drug_item_group.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_list_row_item.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_row.dart';
 import 'package:my_drugs/generated/l10n.dart';
 
 class DrugItemWidget extends DrugListRow {
-  final DrugItemGroup group;
-  final DrugItem item;
-  final bool isInEditMode;
-
-  /// Animation comes from [AnimatedList].
-  /// Used on removal.
-  final Animation<double> animation;
+  final DrugListRowItem item;
 
   /// A padding of parent widget. 16 by default.
   final double horizontalPadding = 16;
 
-  final VoidCallback onPresentContextMenuTap;
-
   DrugItemWidget({
-    @required this.group,
+    Key key,
     @required this.item,
-    @required this.isInEditMode,
-    @required this.onPresentContextMenuTap,
-    @required this.animation,
+    @required bool isSelected,
     @required Animation<double> editModeAnimation,
   }) : super(
-          key: item.key,
+          key: key,
+          isSelected: isSelected,
           editModeAnimation: editModeAnimation,
         );
 
@@ -58,7 +48,7 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
           color: _backgroundColor,
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               blurRadius: 4,
               color: Color(0xFFD7D7D7),
@@ -68,10 +58,10 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
         child: SizedBox(
           width: textWidth,
           child: Text(
-            widget.item.drug.name,
+            widget.item.name,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
             ),
           ),
@@ -82,25 +72,9 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
 
   @override
   Widget buildScaffold(BuildContext context, Widget animatedChild) {
-    return SizeTransition(
-      sizeFactor: widget.animation,
-      child: FadeTransition(
-        opacity: widget.animation,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: widget.isInEditMode
-                ? () => BlocProvider.of<DrugListBloc>(context)
-                        .add(SelectDeselectDrug(
-                      widget.group,
-                      widget.item,
-                    ))
-                : widget.onPresentContextMenuTap,
-            child: animatedChild,
-          ),
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
+      child: animatedChild,
     );
   }
 
@@ -118,13 +92,13 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [_backgroundColor.withOpacity(0), _backgroundColor],
-                stops: [0.0, 1.0],
+                stops: const [0.0, 1.0],
               ),
             ),
           ),
         ),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           height: _height,
           width: _expiresOnWidth,
           color: _backgroundColor,
@@ -134,16 +108,16 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
             children: <Widget>[
               Text(
                 S.of(context).drugListExpiresOnLabel.toUpperCase(),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFFBABABA),
                   fontSize: 10,
                   letterSpacing: 1.2,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 widget.item.formattedExpiresOn.replaceFirst(' ', '\n'),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFF8C8C8C),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -152,10 +126,123 @@ class DrugItemRowState extends DrugListRowState<DrugItemWidget> {
             ],
           ),
         ),
-        SizedBox(
+        const SizedBox(
           width: 8,
         ),
       ],
     );
+  }
+
+  @override
+  void onTap() {
+    final screenMode = BlocProvider.of<DrugListBloc>(context).currentScreenMode;
+    if (screenMode == ScreenMode.edit) {
+      _selectDeselect();
+    } else {
+      _presentBottomSheet(context);
+    }
+  }
+
+  void _presentBottomSheet(
+    BuildContext context,
+  ) {
+    void deleteButtonHandler() {
+      _onContextMenuDeletePressed(
+        context,
+      );
+    }
+
+    void editButtonHandler() {
+      Navigator.of(context).pop();
+      BlocProvider.of<DrugListBloc>(context)
+          .add(DrugListEditingStarted(widget.item.id));
+    }
+
+    if (Theme.of(context).platform == TargetPlatform.iOS) {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (_) => CupertinoActionSheet(
+          actions: <Widget>[
+            CupertinoActionSheetAction(
+              onPressed: editButtonHandler,
+              child: Text(
+                S.of(context).buttonEdit,
+              ),
+            ),
+            CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              onPressed: deleteButtonHandler,
+              child: Text(
+                S.of(context).buttonDelete,
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        builder: (_) => Wrap(
+          children: <Widget>[
+            const SizedBox(height: 8),
+            _buildBottomSheetRow(
+              context,
+              Icons.edit,
+              S.of(context).buttonEdit,
+              editButtonHandler,
+            ),
+            _buildBottomSheetRow(
+              context,
+              Icons.delete,
+              S.of(context).buttonDelete,
+              deleteButtonHandler,
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Widget _buildBottomSheetRow(
+    BuildContext context,
+    IconData icon,
+    String text,
+    VoidCallback onTap,
+  ) =>
+      InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Icon(
+                  icon,
+                  color: Colors.grey[700],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(text),
+            ],
+          ),
+        ),
+      );
+
+  void _onContextMenuDeletePressed(
+    BuildContext context,
+  ) {
+    Navigator.of(context).pop();
+    BlocProvider.of<DrugListBloc>(context).add(
+      DrugListItemDeleted(
+        widget.item.id,
+      ),
+    );
+  }
+
+  void _selectDeselect() {
+    BlocProvider.of<DrugListBloc>(context).add(DrugListItemSelectionToggled(
+      widget.item,
+    ));
   }
 }

@@ -2,16 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:my_drugs/app/features/drug_list/models/drug_item.dart';
-import 'package:my_drugs/app/features/drug_list/models/drug_item_group.dart';
-import 'package:my_drugs/app/features/drug_list/widgets/drug_group_widget.dart';
-import 'package:my_drugs/app/features/drug_list/widgets/drug_item_widget.dart';
+import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
+import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/switch_screen_mode_button.dart';
+import 'package:my_drugs/app/misc/utils.dart';
 import 'package:my_drugs/app/widgets/custom_app_bar.dart';
 import 'package:my_drugs/generated/l10n.dart';
 
 import 'bloc/drug_list_bloc.dart';
+import 'models/drug_list_item.dart';
 
 class DrugListScreen extends StatefulWidget {
   @override
@@ -23,7 +23,7 @@ class _DrugListScreenState extends State<DrugListScreen>
   AnimationController _screenModeAnimationController;
   final _scrollController = ScrollController();
   final _searchTextController = TextEditingController();
-  final _animationDuration = Duration(milliseconds: 500);
+  final _animationDuration = const Duration(milliseconds: 500);
 
   @override
   void initState() {
@@ -100,8 +100,9 @@ class _DrugListScreenState extends State<DrugListScreen>
             numberOfItemsSelected: numberOfItemsSelected,
             isDeleteButtonActive: isDeleteButtonActive,
             onAddButtonPressed: () => BlocProvider.of<DrugListBloc>(context)
-                .add(DrugListAddingStarted()),
-            onDeleteButtonPressed: () => _deleteSelectedItems(context, state),
+                .add(const DrugListAddingStarted()),
+            onDeleteButtonPressed: () => BlocProvider.of<DrugListBloc>(context)
+                .add(const DrugListSelectedItemsDeleted()),
           ),
         );
       },
@@ -116,16 +117,16 @@ class _DrugListScreenState extends State<DrugListScreen>
               'assets/images/drug_list_empty_state.png',
               width: 145.0,
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Text(
               S.of(context).drugListNoItems,
               style: TextStyle(
                 color: Colors.grey,
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             SizedBox(
-              width: 240,
+              width: isTablet() ? kElementMaxWidth : 240.0,
               child: PlatformButton(
                 padding: EdgeInsets.zero,
                 android: (context) => MaterialRaisedButtonData(
@@ -135,11 +136,11 @@ class _DrugListScreenState extends State<DrugListScreen>
                 ios: (context) => CupertinoButtonData(
                   color: Theme.of(context).colorScheme.primary,
                 ),
+                onPressed: () => BlocProvider.of<DrugListBloc>(context)
+                    .add(const DrugListAddingStarted()),
                 child: Text(
                   S.of(context).manageDrugAddDrugModeActionButtonTitle,
                 ),
-                onPressed: () => BlocProvider.of<DrugListBloc>(context)
-                    .add(DrugListAddingStarted()),
               ),
             )
           ],
@@ -150,189 +151,47 @@ class _DrugListScreenState extends State<DrugListScreen>
     BuildContext context,
     DrugListInitial state,
   ) {
-    final isInEditMode = state.screenMode == ScreenMode.edit;
     return Scrollbar(
       controller: _scrollController,
-      child: AnimatedList(
-        controller: _scrollController,
-        key: state.listKey,
-        physics: AlwaysScrollableScrollPhysics(),
+      child: ImplicitlyAnimatedList<DrugListItem>(
+        items: state.items,
+        spawnIsolate: false,
+        insertDuration: const Duration(milliseconds: 350),
+        removeDuration: const Duration(milliseconds: 350),
+        updateDuration: const Duration(milliseconds: 350),
         padding: EdgeInsets.symmetric(
-          horizontal: 8,
-          vertical: 12,
+          horizontal: isTablet() ? 24.0 : 8.0,
+          vertical: 12.0,
         ),
-        initialItemCount: state.groups.length,
-        itemBuilder: (context, groupIndex, groupAnimation) =>
-            DrugItemGroupWidget(
-          group: state.groups[groupIndex],
-          isInEditMode: isInEditMode,
-          editModeAnimation: _screenModeAnimationController,
-          listAnimation: groupAnimation,
-          onPresentContextMenuTap: (item) => _presentBottomSheet(
-            context,
-            state.groups[groupIndex],
-            item,
-            isInEditMode,
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _presentBottomSheet(
-    BuildContext context,
-    DrugItemGroup group,
-    DrugItem item,
-    bool isInEditMode,
-  ) {
-    final deleteButtonHandler = () => _onContextMenuDeletePressed(
-          context,
-          group,
-          item,
-          isInEditMode,
-        );
-    final editButtonHandler = () {
-      Navigator.of(context).pop();
-      BlocProvider.of<DrugListBloc>(context)
-          .add(DrugListEditingStarted(item.drug.id));
-    };
-    if (Theme.of(context).platform == TargetPlatform.iOS) {
-      showCupertinoModalPopup(
-        context: context,
-        builder: (_) => CupertinoActionSheet(
-          actions: <Widget>[
-            CupertinoActionSheetAction(
-              child: Text(
-                S.of(context).buttonEdit,
-              ),
-              onPressed: editButtonHandler,
-            ),
-            CupertinoActionSheetAction(
-              child: Text(
-                S.of(context).buttonDelete,
-              ),
-              isDestructiveAction: true,
-              onPressed: deleteButtonHandler,
-            ),
-          ],
-        ),
-      );
-    } else {
-      showModalBottomSheet(
-        context: context,
-        builder: (_) => Wrap(
-          children: <Widget>[
-            SizedBox(height: 8),
-            _buildBottomSheetRow(
+        areItemsTheSame: (oldItem, newItem) => oldItem.id == newItem.id,
+        itemBuilder: (context, itemAnimation, item, index) {
+          return SizeFadeTransition(
+            sizeFraction: 0.7,
+            curve: Curves.easeInOut,
+            animation: itemAnimation,
+            child: item.build(
               context,
-              Icons.edit,
-              S.of(context).buttonEdit,
-              editButtonHandler,
+              _screenModeAnimationController,
             ),
-            _buildBottomSheetRow(
+          );
+        },
+        updateItemBuilder: (context, itemAnimation, item) {
+          return FadeTransition(
+            opacity: itemAnimation,
+            child: item.build(
               context,
-              Icons.delete,
-              S.of(context).buttonDelete,
-              deleteButtonHandler,
+              _screenModeAnimationController,
             ),
-          ],
-        ),
-      );
-    }
-  }
-
-  void _onContextMenuDeletePressed(
-    BuildContext context,
-    DrugItemGroup group,
-    DrugItem item,
-    bool isInEditMode,
-  ) {
-    Navigator.of(context).pop();
-    BlocProvider.of<DrugListBloc>(context).add(
-      DrugListGroupItemDeleted(
-        group,
-        item,
-        (context, animation) => DrugItemGroupWidget(
-          group: group,
-          isInEditMode: isInEditMode,
-          editModeAnimation: _screenModeAnimationController,
-          listAnimation: animation,
-          onPresentContextMenuTap: null,
-        ),
-        (context, animation) => DrugItemWidget(
-          group: group,
-          item: item,
-          isInEditMode: isInEditMode,
-          editModeAnimation: _screenModeAnimationController,
-          animation: animation,
-          onPresentContextMenuTap: null,
-        ),
+          );
+        },
       ),
     );
   }
 
-  void _onSearchTextFieldUpdated(String text) {
-    BlocProvider.of<DrugListBloc>(context).add(
-      DrugListSearchTextFieldUpdated(
-        text,
-        (context, group, item, animation) => DrugItemWidget(
-          group: group,
-          item: item,
-          isInEditMode: false,
-          editModeAnimation: _screenModeAnimationController,
-          animation: animation,
-          onPresentContextMenuTap: null,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomSheetRow(
-    BuildContext context,
-    IconData icon,
-    String text,
-    VoidCallback onTap,
-  ) =>
-      InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Icon(
-                  icon,
-                  color: Colors.grey[700],
-                ),
-              ),
-              SizedBox(width: 8),
-              Text(text),
-            ],
-          ),
+  void _onSearchTextFieldUpdated(String text) =>
+      BlocProvider.of<DrugListBloc>(context).add(
+        DrugListSearchTextFieldUpdated(
+          text,
         ),
       );
-
-  void _deleteSelectedItems(BuildContext context, DrugListState state) {
-    if (state is DrugListInitial) {
-      final isInEditMode = state.screenMode == ScreenMode.edit;
-      BlocProvider.of<DrugListBloc>(context).add(DrugListSelectedItemsDeleted(
-        (context, group, animation) => DrugItemGroupWidget(
-          group: group,
-          isInEditMode: isInEditMode,
-          editModeAnimation: _screenModeAnimationController,
-          listAnimation: animation,
-          onPresentContextMenuTap: null,
-        ),
-        (context, group, item, animation) => DrugItemWidget(
-          group: group,
-          item: item,
-          isInEditMode: isInEditMode,
-          editModeAnimation: _screenModeAnimationController,
-          animation: animation,
-          onPresentContextMenuTap: null,
-        ),
-      ));
-    }
-  }
 }

@@ -12,7 +12,7 @@ class CheckmarkPainter extends CustomPainter {
 
   CheckmarkPainter(this.color, AnimationController animationController)
       : _strokeWidth = Tween<double>(
-          begin: 2.0,
+          begin: 1.5,
           end: 0.0,
         ).animate(
           CurvedAnimation(
@@ -70,7 +70,7 @@ class CheckmarkPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final strokePaint = Paint()
-      ..color = Colors.grey[350]
+      ..color = color
       ..strokeWidth = _strokeWidth.value
       ..style = PaintingStyle.stroke;
     canvas.drawOval(
@@ -78,7 +78,7 @@ class CheckmarkPainter extends CustomPainter {
       strokePaint,
     );
     final fillPaint = Paint()
-      ..color = Colors.grey[200].withOpacity(_innerCircleOpacity.value)
+      ..color = color.withOpacity(_innerCircleOpacity.value)
       ..style = PaintingStyle.fill;
     canvas.drawOval(
       Rect.fromLTWH(0, 0, size.width, size.height),
@@ -88,7 +88,7 @@ class CheckmarkPainter extends CustomPainter {
       ..moveTo(0.27 * size.width, 0.45 * size.height)
       ..lineTo(0.47 * size.width, 0.64 * size.height)
       ..lineTo(0.72 * size.width, 0.33 * size.height);
-    checkmarkPaint.color = color.withOpacity(_checkmarkOpacity.value);
+    checkmarkPaint.color = Colors.white.withOpacity(_checkmarkOpacity.value);
     final animatedPath = createAnimatedPath(path, _checkmarkProgress.value);
     canvas.drawPath(animatedPath, checkmarkPaint);
   }
@@ -114,12 +114,12 @@ class CheckmarkPainter extends CustomPainter {
 
     final path = Path();
 
-    var metricsIterator = originalPath.computeMetrics().iterator;
+    final metricsIterator = originalPath.computeMetrics().iterator;
 
     while (metricsIterator.moveNext()) {
-      var metric = metricsIterator.current;
+      final metric = metricsIterator.current;
 
-      var nextLength = currentLength + metric.length;
+      final nextLength = currentLength + metric.length;
 
       final isLastSegment = nextLength > length;
       if (isLastSegment) {

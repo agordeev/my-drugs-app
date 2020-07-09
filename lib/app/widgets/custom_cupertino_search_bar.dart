@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:my_drugs/app/misc/utils.dart';
 import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/shared/constants.dart';
 
@@ -8,7 +9,7 @@ const kCupertinoSearchBarHeigth = 54.0;
 class CustomCupertinoSearchBar extends StatefulWidget
     implements PreferredSizeWidget {
   @override
-  Size get preferredSize => Size.fromHeight(
+  Size get preferredSize => const Size.fromHeight(
         kCupertinoSearchBarHeigth,
       );
 
@@ -37,25 +38,25 @@ class _CustomCupertinoSearchBarState extends State<CustomCupertinoSearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    final border = OutlineInputBorder(
-      borderRadius: const BorderRadius.all(
+    const border = OutlineInputBorder(
+      borderRadius: BorderRadius.all(
         Radius.circular(10.0),
       ),
       borderSide: BorderSide(
         color: Colors.transparent,
       ),
     );
-    final color = Color(0xFF3C3C43).withOpacity(0.6);
+    final color = const Color(0xFF3C3C43).withOpacity(0.6);
     return SizedBox(
       height: widget.preferredSize.height,
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: 16.0,
+          horizontal: isTablet() ? 160.0 : 16.0,
           vertical: 8.0,
         ),
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border(
+          border: const Border(
             bottom: kDefaultCupertinoBorderSide,
           ),
         ),
@@ -67,9 +68,10 @@ class _CustomCupertinoSearchBarState extends State<CustomCupertinoSearchBar> {
           textInputAction: TextInputAction.search,
           decoration: InputDecoration(
             filled: true,
-            fillColor: Color(0xFF767680).withOpacity(0.12),
+            fillColor: const Color(0xFF767680).withOpacity(0.12),
             contentPadding: EdgeInsets.zero,
-            prefixIconConstraints: BoxConstraints(minWidth: 36, maxHeight: 20),
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 36, maxHeight: 20),
             prefixIcon: Icon(
               CupertinoIcons.search,
               size: 20.0,
@@ -98,17 +100,18 @@ class _CustomCupertinoSearchBarState extends State<CustomCupertinoSearchBar> {
                 _searchTextFieldFocusNode.canRequestFocus = false;
 
                 //Enable the text field's focus node request after some delay
-                Future.delayed(Duration(milliseconds: 100), () {
+                Future.delayed(const Duration(milliseconds: 100), () {
                   _searchTextFieldFocusNode.canRequestFocus = true;
                 });
               },
               child: Icon(
                 CupertinoIcons.clear_circled_solid,
                 size: 16,
-                color: Color(0xFF8E8E93),
+                color: const Color(0xFF8E8E93),
               ),
             ),
-            suffixIconConstraints: BoxConstraints(minWidth: 36, maxHeight: 20),
+            suffixIconConstraints:
+                const BoxConstraints(minWidth: 36, maxHeight: 20),
           ),
         ),
       ),

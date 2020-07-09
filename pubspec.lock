@@ -332,6 +332,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.12"
+  implicitly_animated_reorderable_list:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: dev
+      resolved-ref: c841f7995ec1b10d6435ad04e2de0da97ee74b39
+      url: "https://github.com/bnxm/implicitly_animated_reorderable_list"
+    source: git
+    version: "0.2.0-dev+1"
   intl:
     dependency: "direct main"
     description:
@@ -381,6 +390,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.3.0"
+  lint:
+    dependency: "direct dev"
+    description:
+      name: lint
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.0"
   logging:
     dependency: transitive
     description:
@@ -473,7 +489,7 @@ packages:
     source: hosted
     version: "1.6.4"
   pedantic:
-    dependency: "direct dev"
+    dependency: transitive
     description:
       name: pedantic
       url: "https://pub.dartlang.org"
@@ -556,6 +572,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.6"
+  rxdart:
+    dependency: "direct main"
+    description:
+      name: rxdart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.24.1"
   screenshots:
     dependency: "direct dev"
     description:

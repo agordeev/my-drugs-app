@@ -1,4 +1,6 @@
-include: package:pedantic/analysis_options.yaml
+include: package:lint/analysis_options.yaml
 analyzer:
   exclude: 
     - lib/generated/**
+  errors:
+    todo: warning

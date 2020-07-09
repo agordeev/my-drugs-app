@@ -25,7 +25,7 @@ class DrugListBottomBar extends StatefulWidget {
     @required this.onDeleteButtonPressed,
   })  : numberOfItemsTotalOffset = Tween<Offset>(
           begin: Offset.zero,
-          end: Offset(0.0, 0.3),
+          end: const Offset(0.0, 0.3),
         ).animate(
           CurvedAnimation(
             parent: screenModeAnimationController,
@@ -42,7 +42,7 @@ class DrugListBottomBar extends StatefulWidget {
           ),
         ),
         numberOfItemsSelectedOffset = Tween<Offset>(
-          begin: Offset(0.0, -0.3),
+          begin: const Offset(0.0, -0.3),
           end: Offset.zero,
         ).animate(
           CurvedAnimation(
@@ -75,7 +75,7 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
   void initState() {
     deleteButtonColorAnimationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 250),
     );
     _colorAnimation = ColorTween(
       begin: Colors.grey,
@@ -178,7 +178,7 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                Spacer(),
+                const Spacer(),
                 Text(
                   text,
                   style: TextStyle(
@@ -197,8 +197,8 @@ class DrugListBottomBarState extends State<DrugListBottomBar>
                         key: Key(buttonKey),
                         androidFlat: (context) => MaterialFlatButtonData(),
                         padding: const EdgeInsets.all(0.0),
-                        child: icon,
                         onPressed: onPressed,
+                        child: icon,
                       ),
                     ),
                   ),

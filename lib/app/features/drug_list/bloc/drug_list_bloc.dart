@@ -3,17 +3,19 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
-import 'package:my_drugs/app/features/drug_list/models/drug_item.dart';
-import 'package:my_drugs/app/features/drug_list/models/drug_item_group.dart';
-import 'package:my_drugs/app/features/drug_list/widgets/drug_heading_row_widget.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_list_heading_item.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_list_item.dart';
+import 'package:my_drugs/app/features/drug_list/models/drug_list_row_item.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
+import 'package:my_drugs/app/misc/analytics_sender.dart';
 import 'package:my_drugs/app/routes/app_routes.dart';
 import 'package:my_drugs/data_access/data_access.dart';
 import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/models/drug.dart';
+import 'package:rxdart/rxdart.dart';
 
 part 'drug_list_event.dart';
 part 'drug_list_state.dart';
@@ -22,11 +24,11 @@ enum ScreenMode { normal, edit }
 
 DateFormat expiresOnDateFormat = DateFormat('MMMM yyyy');
 
-class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
+class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
+    with AnalyticsSender {
   final S _localizations;
   final GlobalKey<NavigatorState> _navigatorKey;
   final AbstractDrugRepository _repository;
-  final FirebaseAnalytics _analytics;
 
   /// The original array of drugs.
   final List<Drug> _drugs;
@@ -34,21 +36,23 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   /// The array of drugs that is currently visible.
   List<Drug> _filteredDrugs;
 
-  List<DrugItemGroup> _groups;
-  int get _selectedItemsCount => _groups.fold(
-        0,
-        (previousValue, group) =>
-            previousValue +
-            group.items.fold(
-              0,
-              (previousValue, item) =>
-                  previousValue + (item.isSelected ? 1 : 0),
-            ),
-      );
+  List<DrugListItem> _items;
 
   /// Avoid to setting this property directly.
   /// Use [setScreenMode()] instead to update the bottom bar state.
   ScreenMode _screenMode = ScreenMode.normal;
+  ScreenMode get currentScreenMode => _screenMode;
+
+  @override
+  final FirebaseAnalytics analytics;
+
+  /// Used for analytics.
+  @override
+  int get drugsCountTotal => _drugs.length;
+
+  /// Used for analytics.
+  @override
+  List<DrugListItem> get items => _items;
 
   void _setScreenMode(ScreenMode screenMode) {
     _screenMode = screenMode;
@@ -59,8 +63,6 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   Stream<ScreenMode> get screenMode => _screenModeStreamController.stream;
 
   final GlobalKey<DrugListBottomBarState> _bottomBarKey = GlobalKey();
-  final GlobalKey<AnimatedListState> _listKey = GlobalKey();
-  final Duration _animationDuration = Duration(milliseconds: 300);
 
   static final _firstDayOfCurrentMonth =
       DateTime(DateTime.now().year, DateTime.now().month, 1);
@@ -69,10 +71,10 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     this._localizations,
     this._navigatorKey,
     this._repository,
-    this._analytics,
+    this.analytics,
     this._drugs,
   ) : _filteredDrugs = _drugs {
-    _sendScreenAnalytics();
+    sendScreenAnalytics();
   }
 
   @override
@@ -85,9 +87,10 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   DrugListState get initialState => _buildState();
 
   DrugListState _buildState() {
+    // Sorting uses the default [Comparator]. See [Drug.compareTo] for more info.
     _filteredDrugs.sort();
-    _groups ??= _buildGroups(_filteredDrugs);
-    final selectedItemsCount = _selectedItemsCount;
+    _items ??= _buildItems(_filteredDrugs);
+    final selectedItemsCount = _calculateSelectedItemsCount();
     if (_filteredDrugs.isEmpty) {
       _setScreenMode(ScreenMode.normal);
     }
@@ -96,64 +99,63 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
       numberOfItemsTotal = '${_filteredDrugs.length}/$numberOfItemsTotal';
     }
     return DrugListInitial(
-      _drugs.isEmpty,
-      _screenMode,
-      _bottomBarKey,
-      _listKey,
-      _groups,
-      numberOfItemsTotal,
-      _localizations.drugListTotalItemsSelected(selectedItemsCount),
-      selectedItemsCount > 0,
+      isEmpty: _drugs.isEmpty,
+      screenMode: _screenMode,
+      bottomBarKey: _bottomBarKey,
+      items: _items,
+      numberOfItemsTotal: numberOfItemsTotal,
+      numberOfItemsSelected:
+          _localizations.drugListTotalItemsSelected(selectedItemsCount),
+      isDeleteButtonActive: selectedItemsCount > 0,
     );
   }
 
-  List<DrugItemGroup> _buildGroups(List<Drug> drugs) {
+  List<DrugListItem> _buildItems(List<Drug> drugs) {
     final expired = drugs.where(_isDrugExpired).toList();
     final notExpired = drugs.where((e) => !_isDrugExpired(e)).toList();
-    var result = <DrugItemGroup>[];
+    final result = <DrugListItem>[];
     if (expired.isNotEmpty) {
-      final groupKey = GlobalKey<DrugHeadingRowState>();
-      result.add(
-        DrugItemGroup(
-          groupKey,
-          GlobalKey(),
+      result.addAll(
+        _buildGroup(
+          expired,
           _localizations.drugListExpiredGroupTitle.toUpperCase(),
-          expired
-              .map(
-                (e) => DrugItem(
-                  GlobalKey(),
-                  e,
-                  expiresOnDateFormat.format(e.expiresOn),
-                  true,
-                ),
-              )
-              .toList(),
           true,
         ),
       );
     }
     if (notExpired.isNotEmpty) {
-      final groupKey = GlobalKey<DrugHeadingRowState>();
-      result.add(
-        DrugItemGroup(
-          groupKey,
-          GlobalKey(),
+      result.addAll(
+        _buildGroup(
+          notExpired,
           _localizations.drugListNotExpiredGroupTitle.toUpperCase(),
-          notExpired
-              .map(
-                (e) => DrugItem(
-                  GlobalKey(),
-                  e,
-                  expiresOnDateFormat.format(e.expiresOn),
-                  false,
-                ),
-              )
-              .toList(),
           false,
         ),
       );
     }
     return result;
+  }
+
+  List<DrugListItem> _buildGroup(
+      List<Drug> drugs, String groupTitle, bool isExpired) {
+    final group = DrugListHeadingItem(
+      name: groupTitle,
+    );
+    final items = drugs
+        .map(
+          (e) => DrugListRowItem(
+            group: group,
+            id: e.id,
+            name: e.name,
+            formattedExpiresOn: expiresOnDateFormat.format(e.expiresOn),
+            isExpired: isExpired,
+          ),
+        )
+        .toList();
+    group.items = items;
+    return [
+      group,
+      ...items,
+    ];
   }
 
   @override
@@ -162,12 +164,12 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
   ) async* {
     if (event is DrugListScreenModeSwitched) {
       yield* _mapSwitchScreenModeEventToState();
-    } else if (event is SelectDeselectDrug) {
-      yield* _mapSelectDeselectDrugEventToState(event);
-    } else if (event is DrugListGroupSelectionChanged) {
-      yield* _mapSelectDeselectGroupEventToState(event);
-    } else if (event is DrugListGroupItemDeleted) {
-      yield* _mapGroupItemDeletedEventToState(event);
+    } else if (event is DrugListItemSelectionToggled) {
+      yield* _mapItemSelectionToggledEventToState(event);
+    } else if (event is DrugListGroupSelectionToggled) {
+      yield* _mapGroupSelectionToggledEventToState(event);
+    } else if (event is DrugListItemDeleted) {
+      yield* _mapItemDeletedEventToState(event);
     } else if (event is DrugListSelectedItemsDeleted) {
       yield* _mapSelectedItemsDeletedEventToState(event);
     } else if (event is DrugListAddingStarted) {
@@ -185,98 +187,69 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     } else {
       _setScreenMode(ScreenMode.edit);
     }
-    _groups.forEach((group) => group.deselect());
+    for (final item in _items) {
+      item.toggleSelection(isSelected: false);
+    }
     yield _buildState();
   }
 
-  Stream<DrugListState> _mapSelectDeselectDrugEventToState(
-    SelectDeselectDrug event,
+  Stream<DrugListState> _mapItemSelectionToggledEventToState(
+    DrugListItemSelectionToggled event,
+  ) async* {
+    final item = event.item;
+    item.toggleSelection(isSelected: !item.isSelected);
+    _updateBottomBarDeleteButtonColor();
+    yield _buildState();
+    final group = item.group;
+    group.toggleSelection(isSelected: group.areAllItemsSelected);
+  }
+
+  Stream<DrugListState> _mapGroupSelectionToggledEventToState(
+    DrugListGroupSelectionToggled event,
   ) async* {
     final group = event.group;
-    event.item.toggleSelection(!event.item.isSelected);
-    // If all drugs from the current group are selected, then mark it as selected too.
-    group.toggleSelection(group.areAllItemsSelected);
+    group.toggleSelection(isSelected: !group.isSelected);
+    for (final item in group.items) {
+      item.toggleSelection(isSelected: group.isSelected);
+    }
     _updateBottomBarDeleteButtonColor();
     yield _buildState();
   }
 
-  Stream<DrugListState> _mapSelectDeselectGroupEventToState(
-    DrugListGroupSelectionChanged event,
-  ) async* {
-    event.group.toggleSelection(!event.group.isSelected);
-    event.group.updateItemsSelection();
-    _updateBottomBarDeleteButtonColor();
-    yield _buildState();
-  }
-
-  Stream<DrugListState> _mapGroupItemDeletedEventToState(
-    DrugListGroupItemDeleted event,
+  Stream<DrugListState> _mapItemDeletedEventToState(
+    DrugListItemDeleted event,
   ) async* {
     try {
-      await _repository.delete([event.item.drug.id]);
-      _filteredDrugs.removeWhere((element) => element.id == event.item.drug.id);
-
-      final group = event.group;
-      if (group.items.length == 1) {
-        // The group will become empty after item removal. Delete the entire group.
-        final groupIndex = _groups.indexOf(group);
-        if (groupIndex > -1) {
-          _groups.removeAt(groupIndex);
-          _listKey.currentState.removeItem(
-            groupIndex,
-            event.groupBuilder,
-            duration: _animationDuration,
-          );
-          if (_groups.isEmpty) {
-            await Future.delayed(Duration(milliseconds: 300));
-            yield _buildState();
-          }
-        }
-      } else {
-        group.removeItem(event.item, event.itemBuilder);
-      }
-      _sendScreenAnalytics();
+      await _repository.delete([event.id]);
+      _drugs.removeWhere((element) => element.id == event.id);
+      _filteredDrugs.removeWhere((element) => element.id == event.id);
+      _items = _buildItems(_filteredDrugs);
       yield _buildState();
+      sendScreenAnalytics();
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 
   Stream<DrugListState> _mapSelectedItemsDeletedEventToState(
     DrugListSelectedItemsDeleted event,
   ) async* {
-    var selectedGroupsCount = _groups.where((group) => group.isSelected).length;
-    while (selectedGroupsCount > 0) {
-      final index = _groups.indexWhere((group) => group.isSelected);
-      await _repository
-          .delete(_groups[index].items.map((e) => e.drug.id).toList());
-      final group = _groups.removeAt(index);
-      group.items.forEach(
-          (item) => _filteredDrugs.removeWhere((e) => e.id == item.drug.id));
-      _listKey.currentState.removeItem(
-        index,
-        (context, animation) => event.groupBuilder(context, group, animation),
-        duration: _animationDuration,
-      );
-      selectedGroupsCount -= 1;
-    }
-
-    if (_groups.isEmpty) {
-      await Future.delayed(_animationDuration);
+    try {
+      final idsToDelete = _items
+          .where((e) => e.isSelected && e is DrugListRowItem)
+          .map((e) => e.id)
+          .toList();
+      await _repository.delete(idsToDelete);
+      _drugs.removeWhere((e) => idsToDelete.contains(e.id));
+      _filteredDrugs.removeWhere((e) => idsToDelete.contains(e.id));
+      _items = _items.where((e) => !e.isSelected).toList();
+      _setScreenMode(ScreenMode.normal);
+      _updateBottomBarDeleteButtonColor();
       yield _buildState();
-    } else {
-      for (var group in _groups) {
-        final selectedItemsIds = group.selectedItemsIds;
-        await _repository.delete(selectedItemsIds);
-        _filteredDrugs.removeWhere((e) => selectedItemsIds.contains(e.id));
-        group.removeSelectedItems((context, item, animation) =>
-            event.itemBuilder(context, group, item, animation));
-      }
+      sendScreenAnalytics();
+    } catch (e) {
+      debugPrint(e.toString());
     }
-    _setScreenMode(ScreenMode.normal);
-    _updateBottomBarDeleteButtonColor();
-    _sendScreenAnalytics();
-    yield _buildState();
   }
 
   Stream<DrugListState> _mapAddingStartedEventToState(
@@ -285,40 +258,58 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
     final drug =
         await _navigatorKey.currentState.pushNamed<Drug>(AppRoutes.manageDrug);
     if (drug != null) {
+      _drugs.add(drug);
+      _drugs.sort();
       _filteredDrugs.add(drug);
       _filteredDrugs.sort();
-      final oldGroupsLength = _groups.length;
-      _groups = _buildGroups(_filteredDrugs);
-      if (_groups.length > oldGroupsLength) {
-        // A new group was added.
-        final indexToAdd = _isDrugExpired(drug) ? 0 : 1;
-        _listKey.currentState?.insertItem(indexToAdd);
-      }
-      _sendScreenAnalytics();
+      _items = _buildItems(_filteredDrugs);
       yield _buildState();
+      sendScreenAnalytics();
     }
   }
 
   Stream<DrugListState> _mapEditingStartedEventToState(
     DrugListEditingStarted event,
   ) async* {
-    final index = _filteredDrugs.indexWhere((drug) => drug.id == event.id);
-    if (index == -1) {
-      print('Unable edit a drug ${event.id}: unable to find its index');
+    final filteredDrugsIndex =
+        _filteredDrugs.indexWhere((drug) => drug.id == event.id);
+    if (filteredDrugsIndex == -1) {
+      debugPrint('Unable edit a drug ${event.id}: unable to find its index');
       return;
     }
-    final selectedDrug = _filteredDrugs[index];
+    final selectedDrug = _filteredDrugs[filteredDrugsIndex];
     final drug = await _navigatorKey.currentState
         .pushNamed<Drug>(AppRoutes.manageDrug, arguments: selectedDrug);
     if (drug != null) {
-      _filteredDrugs[index] = drug;
-      // Sort in case if [expiresOn] was updated.
-      // Sorting uses the default [Comparator]. See [Drug.compareTo] for more info.
+      // Update [_drugs].
+      final drugsIndex = _drugs.indexWhere((drug) => drug.id == event.id);
+      if (drugsIndex != -1) {
+        _drugs[drugsIndex] = drug;
+        _drugs.sort();
+      }
+      // Update [_filteredDrugs].
+      _filteredDrugs[filteredDrugsIndex] = drug;
       _filteredDrugs.sort();
-      _groups = _buildGroups(_filteredDrugs);
-      _sendScreenAnalytics();
+      _items = _buildItems(_filteredDrugs);
       yield _buildState();
+      sendScreenAnalytics();
     }
+  }
+
+  @override
+  Stream<Transition<DrugListEvent, DrugListState>> transformEvents(
+      Stream<DrugListEvent> events,
+      TransitionFunction<DrugListEvent, DrugListState> transitionFn) {
+    // Defer search to reduce calculation costs.
+    final defferedEvents = events
+        .where((e) => e is DrugListSearchTextFieldUpdated)
+        .debounceTime(const Duration(milliseconds: 500))
+        .distinct()
+        .switchMap(transitionFn);
+    final forwardedEvents = events
+        .where((e) => e is! DrugListSearchTextFieldUpdated)
+        .asyncExpand(transitionFn);
+    return forwardedEvents.mergeWith([defferedEvents]);
   }
 
   Stream<DrugListState> _mapSearchTextFieldUpdatedEventToState(
@@ -335,75 +326,22 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState> {
           )
           .toList();
     }
-
+    _items = _buildItems(_filteredDrugs);
     yield _buildState();
-    if (_filteredDrugs.isEmpty) {
-      for (var group in _groups) {
-        final expectedDrugsForGroup = _filteredDrugs.where((e) {
-          if (group.isExpired) {
-            return _isDrugExpired(e);
-          } else {
-            return !_isDrugExpired(e);
-          }
-        }).toList();
-        group.filterItems(
-          expectedDrugsForGroup,
-          event.itemBuilder,
-        );
-      }
-    } else {}
-    // Wait until the animated lists are visible back, then start adding/removing items.
-    // Otherwise app state would be null.
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      for (var group in _groups) {
-        final expectedDrugsForGroup = _filteredDrugs.where((e) {
-          if (group.isExpired) {
-            return _isDrugExpired(e);
-          } else {
-            return !_isDrugExpired(e);
-          }
-        }).toList();
-        group.filterItems(
-          expectedDrugsForGroup,
-          event.itemBuilder,
-        );
-      }
-    });
   }
+
+  int _calculateSelectedItemsCount() =>
+      _items.where((e) => e is DrugListRowItem && e.isSelected).length;
 
   bool _isDrugExpired(Drug drug) {
     return drug.expiresOn.compareTo(_firstDayOfCurrentMonth) < 0;
   }
 
   void _updateBottomBarDeleteButtonColor() {
-    if (_selectedItemsCount > 0) {
+    if (_calculateSelectedItemsCount() > 0) {
       _bottomBarKey.currentState.deleteButtonColorAnimationController.forward();
     } else {
       _bottomBarKey.currentState.deleteButtonColorAnimationController.reverse();
     }
-  }
-
-  void _sendScreenAnalytics() {
-    _analytics.setUserProperty(
-      name: 'drugs_count_total',
-      value: '${_drugs.length}',
-    );
-    var expiredDrugsCount = 0;
-    var notExpiredDrugsCount = 0;
-    _groups.forEach((group) {
-      if (group.isExpired) {
-        expiredDrugsCount = group.items.length;
-      } else {
-        notExpiredDrugsCount = group.items.length;
-      }
-    });
-    _analytics.setUserProperty(
-      name: 'drugs_count_expired',
-      value: '$expiredDrugsCount',
-    );
-    _analytics.setUserProperty(
-      name: 'drugs_count_not_expired',
-      value: '$notExpiredDrugsCount',
-    );
   }
 }
