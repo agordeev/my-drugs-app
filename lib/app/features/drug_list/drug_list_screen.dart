@@ -155,14 +155,9 @@ class _DrugListScreenState extends State<DrugListScreen>
       child: ImplicitlyAnimatedList<DrugListItem>(
         items: state.items,
         spawnIsolate: false,
-        // shrinkWrap: true,
-        // physics: const NeverScrollableScrollPhysics(),
-        // insertDuration: Duration(milliseconds: 350),
-        // removeDuration: Duration(milliseconds: 350),
-        // updateDuration: Duration(milliseconds: 350),
-        insertDuration: const Duration(milliseconds: 3000),
-        removeDuration: const Duration(milliseconds: 3000),
-        updateDuration: const Duration(milliseconds: 3000),
+        insertDuration: const Duration(milliseconds: 350),
+        removeDuration: const Duration(milliseconds: 350),
+        updateDuration: const Duration(milliseconds: 350),
         padding: const EdgeInsets.symmetric(
           horizontal: 8,
           vertical: 12,

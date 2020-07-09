@@ -8,8 +8,12 @@ import 'intl/messages_all.dart';
 // Made by Localizely
 // **************************************************************************
 
+// ignore_for_file: non_constant_identifier_names, lines_longer_than_80_chars
+
 class S {
   S();
+  
+  static S current;
   
   static const AppLocalizationDelegate delegate =
     AppLocalizationDelegate();
@@ -19,7 +23,9 @@ class S {
     final localeName = Intl.canonicalizedLocale(name); 
     return initializeMessages(localeName).then((_) {
       Intl.defaultLocale = localeName;
-      return S();
+      S.current = S();
+      
+      return S.current;
     });
   } 
 
@@ -27,6 +33,7 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
+  /// `My Drugs`
   String get appTitle {
     return Intl.message(
       'My Drugs',
@@ -36,6 +43,7 @@ class S {
     );
   }
 
+  /// `MM/yyyy`
   String get expiryDateFormat {
     return Intl.message(
       'MM/yyyy',
@@ -45,6 +53,7 @@ class S {
     );
   }
 
+  /// `/`
   String get dateDelimeter {
     return Intl.message(
       '/',
@@ -54,6 +63,7 @@ class S {
     );
   }
 
+  /// `Edit`
   String get buttonEdit {
     return Intl.message(
       'Edit',
@@ -63,6 +73,7 @@ class S {
     );
   }
 
+  /// `Delete`
   String get buttonDelete {
     return Intl.message(
       'Delete',
@@ -72,6 +83,7 @@ class S {
     );
   }
 
+  /// `Search`
   String get searchHint {
     return Intl.message(
       'Search',
@@ -81,6 +93,7 @@ class S {
     );
   }
 
+  /// `Please fill this field`
   String get validationEmptyRequiredField {
     return Intl.message(
       'Please fill this field',
@@ -90,6 +103,7 @@ class S {
     );
   }
 
+  /// `Please enter a valid expiry date`
   String get validationInvalidExpiryDate {
     return Intl.message(
       'Please enter a valid expiry date',
@@ -99,6 +113,7 @@ class S {
     );
   }
 
+  /// `We're sorry, but there was an error in navigation.\nPlease try again or contact us.`
   String get unknownRouteMessage {
     return Intl.message(
       'We\'re sorry, but there was an error in navigation.\nPlease try again or contact us.',
@@ -108,6 +123,7 @@ class S {
     );
   }
 
+  /// `{itemsCount, plural, zero{No items} one{1 item} other{{itemsCount} items}}`
   String drugListTotalItems(num itemsCount) {
     return Intl.plural(
       itemsCount,
@@ -120,6 +136,7 @@ class S {
     );
   }
 
+  /// `{itemsCount, plural, zero{No items selected} one{1 item selected} other{{itemsCount} items selected}}`
   String drugListTotalItemsSelected(num itemsCount) {
     return Intl.plural(
       itemsCount,
@@ -132,6 +149,7 @@ class S {
     );
   }
 
+  /// `No drugs added yet`
   String get drugListNoItems {
     return Intl.message(
       'No drugs added yet',
@@ -141,6 +159,7 @@ class S {
     );
   }
 
+  /// `Expired`
   String get drugListExpiredGroupTitle {
     return Intl.message(
       'Expired',
@@ -150,6 +169,7 @@ class S {
     );
   }
 
+  /// `Not Expired`
   String get drugListNotExpiredGroupTitle {
     return Intl.message(
       'Not Expired',
@@ -159,6 +179,7 @@ class S {
     );
   }
 
+  /// `Expires On`
   String get drugListExpiresOnLabel {
     return Intl.message(
       'Expires On',
@@ -168,6 +189,7 @@ class S {
     );
   }
 
+  /// `Add Drug`
   String get manageDrugAddDrugModeTitle {
     return Intl.message(
       'Add Drug',
@@ -177,6 +199,7 @@ class S {
     );
   }
 
+  /// `Add`
   String get manageDrugAddDrugModeActionButtonTitle {
     return Intl.message(
       'Add',
@@ -186,6 +209,7 @@ class S {
     );
   }
 
+  /// `Edit Drug`
   String get manageDrugEditDrugModeTitle {
     return Intl.message(
       'Edit Drug',
@@ -195,6 +219,7 @@ class S {
     );
   }
 
+  /// `Save`
   String get manageDrugEditDrugModeActionButtonTitle {
     return Intl.message(
       'Save',
@@ -204,6 +229,7 @@ class S {
     );
   }
 
+  /// `Name`
   String get manageDrugNameFieldLabel {
     return Intl.message(
       'Name',
@@ -213,6 +239,7 @@ class S {
     );
   }
 
+  /// `Aspirin`
   String get manageDrugNameFieldHint {
     return Intl.message(
       'Aspirin',
@@ -222,6 +249,7 @@ class S {
     );
   }
 
+  /// `Expires On`
   String get manageDrugExpiresOnFieldLabel {
     return Intl.message(
       'Expires On',

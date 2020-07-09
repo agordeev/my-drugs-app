@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:my_drugs/app/misc/extensions.dart';
 import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/shared/constants.dart';
 
@@ -37,8 +38,8 @@ class _CustomCupertinoSearchBarState extends State<CustomCupertinoSearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    final border = OutlineInputBorder(
-      borderRadius: const BorderRadius.all(
+    const border = OutlineInputBorder(
+      borderRadius: BorderRadius.all(
         Radius.circular(10.0),
       ),
       borderSide: BorderSide(
@@ -49,13 +50,13 @@ class _CustomCupertinoSearchBarState extends State<CustomCupertinoSearchBar> {
     return SizedBox(
       height: widget.preferredSize.height,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16.0,
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).isTablet() ? 16.0 : 160.0,
           vertical: 8.0,
         ),
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border(
+          border: const Border(
             bottom: kDefaultCupertinoBorderSide,
           ),
         ),
