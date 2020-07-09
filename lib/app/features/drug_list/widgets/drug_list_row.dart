@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_drugs/app/misc/utils.dart';
 
 import 'checkmark.dart';
 
@@ -38,7 +39,7 @@ abstract class DrugListRow extends StatefulWidget {
         ),
         _contentPadding = Tween<EdgeInsets>(
           begin: const EdgeInsets.only(left: 8.0),
-          end: const EdgeInsets.only(left: 36.0),
+          end: EdgeInsets.only(left: isTablet() ? 54.0 : 36.0),
         ).animate(
           CurvedAnimation(
             parent: editModeAnimation,

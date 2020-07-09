@@ -6,6 +6,7 @@ import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorder
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/drug_list_bottom_bar.dart';
 import 'package:my_drugs/app/features/drug_list/widgets/switch_screen_mode_button.dart';
+import 'package:my_drugs/app/misc/utils.dart';
 import 'package:my_drugs/app/widgets/custom_app_bar.dart';
 import 'package:my_drugs/generated/l10n.dart';
 
@@ -158,9 +159,9 @@ class _DrugListScreenState extends State<DrugListScreen>
         insertDuration: const Duration(milliseconds: 350),
         removeDuration: const Duration(milliseconds: 350),
         updateDuration: const Duration(milliseconds: 350),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 8,
-          vertical: 12,
+        padding: EdgeInsets.symmetric(
+          horizontal: isTablet() ? 24.0 : 8.0,
+          vertical: 12.0,
         ),
         areItemsTheSame: (oldItem, newItem) => oldItem.id == newItem.id,
         itemBuilder: (context, itemAnimation, item, index) {

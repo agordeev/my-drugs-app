@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:my_drugs/app/misc/extensions.dart';
+import 'package:my_drugs/app/misc/utils.dart';
 import 'package:my_drugs/generated/l10n.dart';
 import 'package:my_drugs/shared/constants.dart';
 
@@ -51,7 +51,7 @@ class _CustomCupertinoSearchBarState extends State<CustomCupertinoSearchBar> {
       height: widget.preferredSize.height,
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: MediaQuery.of(context).isTablet() ? 16.0 : 160.0,
+          horizontal: isTablet() ? 160.0 : 16.0,
           vertical: 8.0,
         ),
         decoration: BoxDecoration(

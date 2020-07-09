@@ -20,7 +20,7 @@ Future<void> main() async {
   // TODO: Fix
   // final drugs = await repository.fetchList();
   final drugs = List.generate(
-        500,
+        5,
         (index) => Drug(
           id: '$index',
           name: '$index',
@@ -29,7 +29,7 @@ Future<void> main() async {
         ),
       ) +
       List.generate(
-        1000,
+        10,
         (index) => Drug(
           id: 'exp$index',
           name: '$index',
