@@ -126,7 +126,7 @@ class _DrugListScreenState extends State<DrugListScreen>
             ),
             const SizedBox(height: 16.0),
             SizedBox(
-              width: 240,
+              width: isTablet() ? kElementMaxWidth : 240.0,
               child: PlatformButton(
                 padding: EdgeInsets.zero,
                 android: (context) => MaterialRaisedButtonData(

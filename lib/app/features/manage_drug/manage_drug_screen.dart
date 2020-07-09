@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:my_drugs/app/features/manage_drug/bloc/manage_drug_bloc.dart';
+import 'package:my_drugs/app/misc/utils.dart';
 import 'package:my_drugs/app/misc/validators/validators.dart';
 import 'package:my_drugs/app/widgets/app_card.dart';
 import 'package:my_drugs/generated/l10n.dart';
@@ -53,7 +54,9 @@ class ManageDrugScreen extends StatelessWidget {
     ManageDrugInitial state,
   ) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(
+        isTablet() ? 32.0 : 16.0,
+      ),
       child: Form(
         key: state.formKey,
         child: Column(
@@ -113,7 +116,7 @@ class ManageDrugScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16.0),
             SizedBox(
-              width: double.infinity,
+              width: isTablet() ? kElementMaxWidth : double.infinity,
               child: PlatformButton(
                 android: (context) => MaterialRaisedButtonData(
                   color: Theme.of(context).colorScheme.primary,
