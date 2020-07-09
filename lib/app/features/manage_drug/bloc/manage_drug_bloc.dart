@@ -66,7 +66,7 @@ class ManageDrugBloc extends Bloc<ManageDrugEvent, ManageDrugState> {
       final expiresOn = _dateFormat.parse(_expiresOnController.text);
       final drug = Drug(
         id: _drug?.id ?? Uuid().v4(),
-        name: _nameController.text,
+        name: _nameController.text.trim(),
         expiresOn: expiresOn,
         createdAt: _drug?.createdAt ?? DateTime.now(),
       );

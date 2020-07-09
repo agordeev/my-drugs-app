@@ -59,7 +59,7 @@ class _CustomMaterialSearchAppBarState extends State<CustomMaterialSearchAppBar>
             : _showSearchTextField,
       )
     ];
-    if (!isSearchTextFieldVisible) {
+    if (!isSearchTextFieldVisible && widget.actions != null) {
       actions.addAll(widget.actions);
     }
     return AppBar(

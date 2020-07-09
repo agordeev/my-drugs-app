@@ -73,7 +73,7 @@ class DrugListBloc extends Bloc<DrugListEvent, DrugListState>
     this._repository,
     this.analytics,
     this._drugs,
-  ) : _filteredDrugs = _drugs {
+  ) : _filteredDrugs = List.from(_drugs) {
     sendScreenAnalytics();
   }
 

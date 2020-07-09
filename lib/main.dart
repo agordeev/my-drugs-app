@@ -17,26 +17,25 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final database = await instantiateDatabase(await getDatabasesPath());
   final repository = AbstractDrugRepository.make(database);
-  // TODO: Fix
-  // final drugs = await repository.fetchList();
-  final drugs = List.generate(
-        5,
-        (index) => Drug(
-          id: '$index',
-          name: '$index',
-          expiresOn: DateTime(2020, 1),
-          createdAt: DateTime.now(),
-        ),
-      ) +
-      List.generate(
-        10,
-        (index) => Drug(
-          id: 'exp$index',
-          name: '$index',
-          expiresOn: DateTime(2021, 1),
-          createdAt: DateTime.now(),
-        ),
-      );
+  final drugs = await repository.fetchList();
+  // final drugs = List.generate(
+  //       5,
+  //       (index) => Drug(
+  //         id: '$index',
+  //         name: '$index',
+  //         expiresOn: DateTime(2020, 1),
+  //         createdAt: DateTime.now(),
+  //       ),
+  //     ) +
+  //     List.generate(
+  //       10,
+  //       (index) => Drug(
+  //         id: 'exp$index',
+  //         name: '$index',
+  //         expiresOn: DateTime(2021, 1),
+  //         createdAt: DateTime.now(),
+  //       ),
+  //     );
 
   final analytics = FirebaseAnalytics();
   analytics.setAnalyticsCollectionEnabled(kReleaseMode);
